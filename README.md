@@ -17,7 +17,7 @@ pip install insight-cli
 <p>To ensure the the insight-cli was successfully installed, You can check your insight-cli version by running: </p>
 
 ```bash
-insight-cli --version
+insight --version
 ```
 
 ## Getting Started
