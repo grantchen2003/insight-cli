@@ -7,6 +7,7 @@ from utils import directory as DirectoryUtils, api_requests as ApiRequestUtils
 def initialize(codebase_dir_path: Path) -> None:
     insight_dir_path: Path = codebase_dir_path / "insight"
 
+    # if a valid .insight directory exists, reinitialize the codebase
     if insight_dir.is_valid(insight_dir_path):
         reinitialize(codebase_dir_path)
         return
@@ -30,10 +31,10 @@ def initialize(codebase_dir_path: Path) -> None:
     insight_dir.create(codebase_id)
 
 
-# raises Exception if [insight_dir_path] is an invalid .insight dir path
 def reinitialize(codebase_dir_path: Path) -> None:
     insight_dir_path: Path = codebase_dir_path / "insight"
 
+    # raises Exception if [insight_dir_path] is an invalid .insight dir path
     if not insight_dir.is_valid(insight_dir_path):
         raise insight_dir.InvalidInsightDirectoryPathError(insight_dir_path)
     # TODO

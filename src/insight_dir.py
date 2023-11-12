@@ -7,12 +7,11 @@ class InvalidInsightDirectoryPathError(Exception):
         super().__init__(self.message)
 
 
-def exists(insight_dir_path: Path) -> bool:
+def is_valid(insight_dir_path: Path) -> bool:
+    # TODO, check it has the right files and the files have the right content
     return insight_dir_path.is_dir()
 
 
-def is_valid(insight_dir_path: Path) -> bool:
-    return exists(insight_dir_path)
-
 def create(codebase_id: str) -> None:
-    return 
+    # TODO
+    pass

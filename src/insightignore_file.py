@@ -11,18 +11,9 @@ def exists(insightignore_file_path: Path) -> bool:
     return insightignore_file_path.is_file()
 
 
-def get_lines(insightignore_file_path: Path) -> set[str]:
+def get_ignorable_names(insightignore_file_path: Path) -> set[str]:
     if not exists(insightignore_file_path):
-        raise InvalidInsightignoreFilePathError(insightignore_file_path)
+        return set()
 
     with open(insightignore_file_path) as insightignore_file:
-        insightignore_file_lines = insightignore_file.read().splitlines()
-
-    return set(line.strip() for line in insightignore_file_lines)
-
-
-def get_ignorable_names(insightignore_file_path: Path) -> set[str]:
-    ignorable_names = set()
-    if exists(insightignore_file_path):
-        ignorable_names = get_lines(insightignore_file_path)
-    return ignorable_names
+        return set(line.strip() for line in insightignore_file.read().splitlines())
