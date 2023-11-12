@@ -1,11 +1,7 @@
 import insight_dir
 import insightignore_file
-import json
-import os
 from pathlib import Path
-import requests
-import utils
-from utils import Directory
+from utils import directory as DirectoryUtils, api_requests as ApiRequestUtils
 
 
 def initialize(codebase_dir_path: Path) -> None:
@@ -22,29 +18,16 @@ def initialize(codebase_dir_path: Path) -> None:
     )
 
     # get all dirs/files in codebase excluding those in .insightignore
-    codebase_dir: Directory = utils.create_directory_from_path(
+    codebase_dir: DirectoryUtils.Directory = DirectoryUtils.create_directory_from_path(
         dir_path=codebase_dir_path, ignorable_names=ignorable_names
     )
 
-    try:
-        # send to codebase to server
-        response = requests.post(
-            url=os.environ.get("API_GATEWAY_URL"),
-            json=json.dumps(codebase_dir.to_dict(), default=str),
-        )
-        response_data = response.json()
-        response_data = json.loads(response_data["json"])
-        print(json.dumps(response_data, indent=2))
-
-    except requests.exceptions.RequestException as e:
-        # Handle any request-related exceptions
-        print("Error making the request:", e)
-
-    except json.JSONDecodeError as e:
-        # Handle JSON decoding error
-        print("Error decoding JSON response:", e)
+    # send codebase to api which responds with codebase_id
+    response_data: dict[str, str] = ApiRequestUtils.initialize_codebase(codebase_dir)
+    codebase_id: str = response_data["codebase_id"]
 
     # create .insight directory
+    insight_dir.create(codebase_id)
 
 
 # raises Exception if [insight_dir_path] is an invalid .insight dir path
@@ -58,3 +41,4 @@ def reinitialize(codebase_dir_path: Path) -> None:
 
 def uninitialize(codebase_dir_path: Path) -> None:
     print("uninitialize")
+    # TODO

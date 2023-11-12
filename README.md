@@ -2,12 +2,11 @@
 
 ## Overview
 
-<p>insight is a powerful search engine that enables developers to search for code snippets within their codebase using natural language queries. The insight-cli provides a CLI for developers to interact with the insight search engine. </p>
+<p>The insight-cli provides a CLI for developers to use insight.</p>
 
 ## Installation
 
 <p>Before installing the insight-cli, ensure that you have Python version 3.6+ and PIP version 3+. If not, consider upgrading to the latest version. </p>
-
 <p>To install the insight-cli globally, run the following command:</p>
 
 ```bash

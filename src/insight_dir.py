@@ -13,3 +13,6 @@ def exists(insight_dir_path: Path) -> bool:
 
 def is_valid(insight_dir_path: Path) -> bool:
     return exists(insight_dir_path)
+
+def create(codebase_id: str) -> None:
+    return 
