@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 
 
-class NoEnvironmentMathError(Exception):
+class NoEnvironmentMatchError(Exception):
     def __init__(self, env: str):
         self.message = f"{env} does not match any of the valid environments"
         super().__init__(self.message)
@@ -20,7 +20,7 @@ def load_environment_variables(env: str) -> None:
     env_files = {"dev": ".env.dev", "prod": ".env.prod"}
 
     if env not in env_files:
-        raise NoEnvironmentMathError(env)
+        raise NoEnvironmentMatchError(env)
 
     env_file_absolute_path = os.path.join(config_dir_absolute_path, env_files[env])
 
