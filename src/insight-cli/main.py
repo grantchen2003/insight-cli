@@ -1,11 +1,14 @@
-import argparse
-import codebase
-import os
 from pathlib import Path
-from config import load_environment_variables
+
+import argparse
+import commands
+import config
+import os
 
 
 def main() -> None:
+    config.load_environment_variables(os.environ.get("ENV"))
+
     parser = argparse.ArgumentParser(
         description="insight",
         formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30),
@@ -43,7 +46,7 @@ def main() -> None:
 
     if args.initialize:
         codebase_dir_path = Path.cwd()
-        codebase.initialize(codebase_dir_path)
+        commands.codebase.initialize(codebase_dir_path)
 
     elif args.query:
         query = args.query
@@ -51,12 +54,11 @@ def main() -> None:
 
     elif args.uninitialize:
         codebase_dir_path = Path.cwd()
-        codebase.uninitialize(codebase_dir_path)
+        commands.codebase.uninitialize(codebase_dir_path)
 
     elif args.version:
         print("insight 0.0.0")
 
 
 if __name__ == "__main__":
-    load_environment_variables(os.environ.get("ENV"))
     main()

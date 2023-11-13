@@ -7,12 +7,12 @@ class InvalidInsightignoreFilePathError(Exception):
         super().__init__(self.message)
 
 
-def exists(insightignore_file_path: Path) -> bool:
+def _exists(insightignore_file_path: Path) -> bool:
     return insightignore_file_path.is_file()
 
 
 def get_ignorable_names(insightignore_file_path: Path) -> set[str]:
-    if not exists(insightignore_file_path):
+    if not _exists(insightignore_file_path):
         return set()
 
     with open(insightignore_file_path) as insightignore_file:

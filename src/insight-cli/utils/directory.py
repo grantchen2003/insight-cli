@@ -1,5 +1,5 @@
 from datetime import datetime
-from .file import File, FileDict, create_file_from_path
+from .file import File, FileDict
 from pathlib import Path
 from typing import TypedDict
 
@@ -18,6 +18,32 @@ class Directory:
         self._files: list[File] = []
         self._subdirectories: list[Directory] = []
 
+    @classmethod
+    def create_from_path(
+        cls, dir_path: Path, ignorable_names: set[str] = None
+    ) -> "Directory":
+        directory = Directory(
+            name=dir_path.name,
+            last_updated=datetime.fromtimestamp(dir_path.stat().st_mtime),
+        )
+
+        if ignorable_names is None:
+            ignorable_names = set()
+
+        for path in dir_path.iterdir():
+            if path.name in ignorable_names:
+                continue
+
+            if path.is_dir():
+                subdirectory: Directory = cls.create_from_path(path)
+                directory.add_subdirectory(subdirectory)
+
+            if path.is_file():
+                file: File = File.create_from_path(path)
+                directory.add_file(file)
+
+        return directory
+
     def add_file(self, file: File) -> None:
         self._files.append(file)
 
@@ -33,29 +59,3 @@ class Directory:
                 subdirectory.to_dict() for subdirectory in self._subdirectories
             ],
         }
-
-
-def create_directory_from_path(
-    dir_path: Path, ignorable_names: set[str] = None
-) -> Directory:
-    directory = Directory(
-        name=dir_path.name,
-        last_updated=datetime.fromtimestamp(dir_path.stat().st_mtime),
-    )
-
-    if ignorable_names is None:
-        ignorable_names = set()
-
-    for path in dir_path.iterdir():
-        if path.name in ignorable_names:
-            continue
-
-        if path.is_dir():
-            subdirectory: Directory = create_directory_from_path(path)
-            directory.add_subdirectory(subdirectory)
-
-        if path.is_file():
-            file: File = create_file_from_path(path)
-            directory.add_file(file)
-
-    return directory
