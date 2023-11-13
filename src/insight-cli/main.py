@@ -18,21 +18,21 @@ def main() -> None:
         "-i",
         "--initialize",
         action="store_true",
-        help="creates a code-seek repository in the current directory",
+        help="initializes the current directory as an insight repository",
     )
 
     parser.add_argument(
         "-q",
         "--query",
         type=str,
-        help="shows files in the current repository that satisfy the given natural language query",
+        help="shows files in the current insight repository that satisfy the given natural language query",
     )
 
     parser.add_argument(
         "-u",
         "--uninitialize",
         action="store_true",
-        help="deletes code-seek repositories in the current directory",
+        help="uninitializes the current directory as an insight repository",
     )
 
     parser.add_argument(
