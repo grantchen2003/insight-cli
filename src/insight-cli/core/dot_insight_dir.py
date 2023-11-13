@@ -3,10 +3,11 @@ from pathlib import Path
 import json
 import os
 import requests
+import shutil
 import utils
 
 
-class InvalidInsightDirectoryPathError(Exception):
+class InvalidDotInsightDirectoryPathError(Exception):
     def __init__(self, dir_path: Path):
         self.message = f"{dir_path} is an invalid .insight dir path"
         super().__init__(self.message)
@@ -28,8 +29,8 @@ def _make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
     return response.json()
 
 
-def get_repository_id(insight_dir_path: Path) -> str:
-    config_file_path: Path = insight_dir_path / "config.json"
+def get_repository_id(dot_insight_dir_path: Path) -> str:
+    config_file_path: Path = dot_insight_dir_path / "config.json"
 
     with open(config_file_path, "r") as config_file:
         config_file_content: str = config_file.read()
@@ -39,9 +40,9 @@ def get_repository_id(insight_dir_path: Path) -> str:
     return config_data["repository_id"]
 
 
-def is_valid(insight_dir_path: Path) -> bool:
+def is_valid(dot_insight_dir_path: Path) -> bool:
     try:
-        repository_id = get_repository_id(insight_dir_path)
+        repository_id = get_repository_id(dot_insight_dir_path)
 
         response_data: dict[str, str] = _make_validate_repository_id_request(repository_id)
 
@@ -51,10 +52,10 @@ def is_valid(insight_dir_path: Path) -> bool:
         return False
 
 
-def create(insight_dir_path: Path, repository_id: str) -> None:
-    os.makedirs(insight_dir_path, exist_ok=True)
+def create(dot_insight_dir_path: Path, repository_id: str) -> None:
+    os.makedirs(dot_insight_dir_path, exist_ok=True)
 
-    config_file_path: Path = insight_dir_path / "config.json"
+    config_file_path: Path = dot_insight_dir_path / "config.json"
 
     config_data = {"repository_id": repository_id}
 
@@ -64,8 +65,8 @@ def create(insight_dir_path: Path, repository_id: str) -> None:
         config_file.write(config_file_content)
 
 
-def delete(insight_dir_path: Path) -> None:
-    if not insight_dir_path.is_dir():
-        raise InvalidInsightDirectoryPathError(insight_dir_path)
+def delete(dot_insight_dir_path: Path) -> None:
+    if not dot_insight_dir_path.is_dir():
+        raise InvalidDotInsightDirectoryPathError(dot_insight_dir_path)
 
-    os.rmdir(insight_dir_path)
+    shutil.rmtree(dot_insight_dir_path)

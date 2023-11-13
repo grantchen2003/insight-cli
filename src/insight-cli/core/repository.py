@@ -1,7 +1,7 @@
 from pathlib import Path
 from utils.directory import Directory
-from . import insight_dir
-from . import insightignore_file
+from . import dot_insight_dir
+from . import dot_insightignore_file
 
 import json
 import os
@@ -47,15 +47,15 @@ def _make_reinitialize_repository_request(
 
 
 def initialize(repository_dir_path: Path) -> None:
-    insight_dir_path: Path = repository_dir_path / ".insight"
+    dot_insight_dir_path: Path = repository_dir_path / ".insight"
 
-    if insight_dir.is_valid(insight_dir_path):
+    if dot_insight_dir.is_valid(dot_insight_dir_path):
         reinitialize(repository_dir_path)
         return
 
-    insightignore_file_path: Path = repository_dir_path / ".insightignore"
-    ignorable_names: list[str] = insightignore_file.get_ignorable_names(
-        insightignore_file_path
+    dot_insightignore_file_path: Path = repository_dir_path / ".insightignore"
+    ignorable_names: list[str] = dot_insightignore_file.get_ignorable_names(
+        dot_insightignore_file_path
     )
 
     repository: Directory = utils.Directory.create_from_path(
@@ -65,28 +65,30 @@ def initialize(repository_dir_path: Path) -> None:
     response_data: dict[str, str] = _make_initialize_repository_request(repository)
     repository_id: str = response_data["repository_id"]
 
-    insight_dir.create(insight_dir_path, repository_id)
+    dot_insight_dir.create(dot_insight_dir_path, repository_id)
 
 
 def reinitialize(repository_dir_path: Path) -> None:
-    insight_dir_path: Path = repository_dir_path / ".insight"
+    dot_insight_dir_path: Path = repository_dir_path / ".insight"
 
-    if not insight_dir.is_valid(insight_dir_path):
-        raise insight_dir.InvalidInsightDirectoryPathError(insight_dir_path)
+    if not dot_insight_dir_path.is_valid(dot_insight_dir_path):
+        raise dot_insight_dir.InvalidDotInsightDirectoryPathError(dot_insight_dir_path)
 
-    insightignore_file_path: Path = repository_dir_path / ".insightignore"
-    ignorable_names: list[str] = insightignore_file.get_ignorable_names(
-        insightignore_file_path
+    dot_insightignore_file_path: Path = repository_dir_path / ".insightignore"
+    ignorable_names: list[str] = dot_insightignore_file.get_ignorable_names(
+        dot_insightignore_file_path
     )
 
     repository_dir: Directory = utils.Directory.create_from_path(
         dir_path=repository_dir_path, ignorable_names=ignorable_names
     )
 
-    repository_id: str = insight_dir.get_repository_id(insight_dir_path)
+    repository_id: str = dot_insight_dir.get_repository_id(dot_insight_dir_path)
 
     _make_reinitialize_repository_request(repository_dir, repository_id)
 
 
 def uninitialize(repository_dir_path: Path) -> None:
-    insight_dir.delete(repository_dir_path)
+    dot_insight_dir_path: Path = repository_dir_path / ".insight"
+
+    dot_insight_dir.delete(dot_insight_dir_path)
