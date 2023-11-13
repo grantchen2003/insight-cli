@@ -13,11 +13,11 @@ class InvalidInsightDirectoryPathError(Exception):
 
 
 @utils.requests.handle_make_request_exceptions
-def _make_validate_codebase_id_request(codebase_id: str) -> dict[str, str]:
-    request_url: str = f"{os.environ.get('API_BASE_URL')}/validate_codebase_id"
+def _make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
+    request_url: str = f"{os.environ.get('API_BASE_URL')}/validate_repository_id"
 
     request_json_body: str = json.dumps(
-        {"codebase_id": codebase_id},
+        {"repository_id": repository_id},
         default=str,
     )
 
@@ -28,7 +28,7 @@ def _make_validate_codebase_id_request(codebase_id: str) -> dict[str, str]:
     return response.json()
 
 
-def get_codebase_id(insight_dir_path: Path) -> str:
+def get_repository_id(insight_dir_path: Path) -> str:
     config_file_path: Path = insight_dir_path / "config.json"
 
     with open(config_file_path, "r") as config_file:
@@ -36,27 +36,27 @@ def get_codebase_id(insight_dir_path: Path) -> str:
 
     config_data = dict(json.dumps(config_file_content))
 
-    return config_data["codebase_id"]
+    return config_data["repository_id"]
 
 
 def is_valid(insight_dir_path: Path) -> bool:
     try:
-        codebase_id = get_codebase_id(insight_dir_path)
+        repository_id = get_repository_id(insight_dir_path)
 
-        response_data: dict[str, str] = _make_validate_codebase_id_request(codebase_id)
+        response_data: dict[str, str] = _make_validate_repository_id_request(repository_id)
 
-        return response_data["codebase_id_is_valid"]
+        return response_data["repository_id_is_valid"]
 
     except Exception:
         return False
 
 
-def create(insight_dir_path: Path, codebase_id: str) -> None:
+def create(insight_dir_path: Path, repository_id: str) -> None:
     os.makedirs(insight_dir_path, exist_ok=True)
 
     config_file_path: Path = insight_dir_path / "config.json"
 
-    config_data = {"codebase_id": codebase_id}
+    config_data = {"repository_id": repository_id}
 
     config_file_content: str = json.dumps(config_data, indent=4)
 

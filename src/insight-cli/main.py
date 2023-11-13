@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import argparse
-import commands
+import core
 import config
 import os
 
@@ -45,16 +45,16 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.initialize:
-        codebase_dir_path = Path.cwd()
-        commands.codebase.initialize(codebase_dir_path)
+        repository_dir_path = Path.cwd()
+        core.repository.initialize(repository_dir_path)
 
     elif args.query:
         query = args.query
         print(f"querystring: {query}")
 
     elif args.uninitialize:
-        codebase_dir_path = Path.cwd()
-        commands.codebase.uninitialize(codebase_dir_path)
+        repository_dir_path = Path.cwd()
+        core.repository.uninitialize(repository_dir_path)
 
     elif args.version:
         print("insight 0.0.0")
