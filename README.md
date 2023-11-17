@@ -6,14 +6,14 @@
 
 ## Installation
 
-<p>Before installing the insight-cli, ensure that you have Python version 3.6+ and PIP version 3+. If not, consider upgrading to the latest version. </p>
+<p>Before installing the insight-cli, ensure that you have Python version 3.6+ and PIP version 3+.</p>
 <p>To install the insight-cli globally, run the following command:</p>
 
 ```bash
 pip install insight-cli
 ```
 
-<p>To ensure the the insight-cli was successfully installed, You can check your insight-cli version by running: </p>
+<p>To ensure the insight-cli was successfully installed, check your insight-cli version by running: </p>
 
 ```bash
 insight --version
