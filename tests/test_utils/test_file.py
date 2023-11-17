@@ -31,6 +31,13 @@ class TestFile(unittest.TestCase):
             and all(isinstance(val, str) for val in variable["content"])
         )
 
+    def test_create_from_path(self) -> None:
+        self.assertIsInstance(File.create_from_path(Path("./test_file.py")), File)
+
+        with self.assertRaises(Exception):
+            File.create_from_path(Path())
+            File.create_from_path(Path("./x.py"))
+
     def test_to_dict(self) -> None:
         test_cases = [
             {
