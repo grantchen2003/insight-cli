@@ -29,6 +29,10 @@ def _make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
     return response.json()
 
 
+def get_name() -> str:
+    return ".insight"
+
+
 def get_repository_id(dot_insight_dir_path: Path) -> str:
     config_file_path: Path = dot_insight_dir_path / "config.json"
 
@@ -44,7 +48,9 @@ def is_valid(dot_insight_dir_path: Path) -> bool:
     try:
         repository_id = get_repository_id(dot_insight_dir_path)
 
-        response_data: dict[str, str] = _make_validate_repository_id_request(repository_id)
+        response_data: dict[str, str] = _make_validate_repository_id_request(
+            repository_id
+        )
 
         return response_data["repository_id_is_valid"]
 
