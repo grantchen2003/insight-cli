@@ -16,13 +16,15 @@ def get_dir_name() -> str:
     return ".insight"
 
 
+def get_config_file_name() -> str:
+    return "config.json"
+
+
 def get_repository_id(dot_insight_dir_path: Path) -> str:
-    config_file_path: Path = dot_insight_dir_path / "config.json"
+    config_file_path: Path = dot_insight_dir_path / get_config_file_name()
 
     with open(config_file_path, "r") as config_file:
-        config_file_content: str = config_file.read()
-
-    config_data = dict(json.dumps(config_file_content))
+        config_data = json.load(config_file)
 
     return config_data["repository_id"]
 
@@ -44,7 +46,7 @@ def is_valid(dot_insight_dir_path: Path) -> bool:
 def create(dot_insight_dir_path: Path, repository_id: str) -> None:
     os.makedirs(dot_insight_dir_path, exist_ok=True)
 
-    config_file_path: Path = dot_insight_dir_path / "config.json"
+    config_file_path: Path = dot_insight_dir_path / get_config_file_name()
 
     config_data = {"repository_id": repository_id}
 
