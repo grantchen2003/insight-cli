@@ -1,18 +1,9 @@
 from datetime import datetime, timedelta
 from pathlib import Path
+from src.utils.file import File
 from typing import Any
 
-import sys
 import unittest
-
-NUM_PARENT_DIRECTORIES_TO_PROJECT_ROOT = 2
-project_root_path = (
-    Path(__file__).resolve().parents[NUM_PARENT_DIRECTORIES_TO_PROJECT_ROOT]
-)
-
-sys.path.append(str(project_root_path))
-
-from src.utils.file import File
 
 
 class TestFile(unittest.TestCase):
@@ -32,7 +23,9 @@ class TestFile(unittest.TestCase):
         )
 
     def test_create_from_path(self) -> None:
-        self.assertIsInstance(File.create_from_path(Path("./test_file.py")), File)
+        self.assertIsInstance(
+            File.create_from_path(Path("./tests/test_utils/test_file.py")), File
+        )
 
         with self.assertRaises(Exception):
             File.create_from_path(Path())

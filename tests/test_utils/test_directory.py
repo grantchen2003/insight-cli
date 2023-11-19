@@ -1,18 +1,7 @@
 from datetime import datetime
-from pathlib import Path
-
-import sys
-import unittest
-
-
-NUM_PARENT_DIRECTORIES_TO_PROJECT_ROOT = 2
-project_root_path = (
-    Path(__file__).resolve().parents[NUM_PARENT_DIRECTORIES_TO_PROJECT_ROOT]
-)
-
-sys.path.append(str(project_root_path))
-
 from src.utils.directory import Directory, File
+
+import unittest
 
 
 class TestDirectory(unittest.TestCase):
