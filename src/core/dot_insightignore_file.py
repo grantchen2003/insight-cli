@@ -7,8 +7,11 @@ class InvalidDotInsightignoreFilePathError(Exception):
         super().__init__(self.message)
 
 
-def _exists(dot_insightignore_file_path: Path) -> bool:
-    return dot_insightignore_file_path.is_file()
+def _is_valid(dot_insightignore_file_path: Path) -> bool:
+    return (
+        dot_insightignore_file_path.is_file()
+        and dot_insightignore_file_path.name == get_file_name()
+    )
 
 
 def get_file_name() -> str:
@@ -16,7 +19,7 @@ def get_file_name() -> str:
 
 
 def get_ignorable_names(dot_insightignore_file_path: Path) -> set[str]:
-    if not _exists(dot_insightignore_file_path):
+    if not _is_valid(dot_insightignore_file_path):
         return set()
 
     with open(dot_insightignore_file_path) as dot_insightignore_file:
