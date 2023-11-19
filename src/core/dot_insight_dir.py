@@ -1,9 +1,10 @@
 from pathlib import Path
-
 import json
 import os
-import requests
 import shutil
+
+import requests
+
 import utils
 
 

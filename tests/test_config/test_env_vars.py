@@ -1,10 +1,9 @@
-from unittest.mock import patch
 from src.config.env_vars import (
     load_environment_variables,
     NoEnvironmentMatchError,
     NoEnvironmentVariablesLoadedError,
 )
-
+from unittest.mock import patch
 import os
 import unittest
 

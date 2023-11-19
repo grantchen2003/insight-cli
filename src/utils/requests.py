@@ -1,5 +1,6 @@
-import requests
 from typing import Any, Callable
+
+import requests
 
 
 def handle_make_request_exceptions(make_request: Callable) -> Callable:

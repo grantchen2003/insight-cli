@@ -1,11 +1,12 @@
 from pathlib import Path
-from utils.directory import Directory
-from . import dot_insight_dir
-from . import dot_insightignore_file
-
 import json
 import os
+
 import requests
+
+from . import dot_insight_dir
+from . import dot_insightignore_file
+from utils.directory import Directory
 import utils
 
 

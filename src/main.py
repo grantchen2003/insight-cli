@@ -1,9 +1,9 @@
 from pathlib import Path
-
 import argparse
+import os
+
 import core
 import config
-import os
 
 
 def main() -> None:

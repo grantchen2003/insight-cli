@@ -1,7 +1,8 @@
 from datetime import datetime
-from .file import File, FileDict
 from pathlib import Path
 from typing import TypedDict
+
+from .file import File, FileDict
 
 
 class DirectoryDict(TypedDict):
