@@ -31,7 +31,7 @@ $ insight --initialize
 
 <p>Note that the following commands must be ran in a directory that has been initialized as an insight repository.</p>
 
-<p>To display the files and lines in an insight repository that satisfy the given natural language query, run the following command: </p>
+<p>To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command: </p>
 
 ```bash
 $ insight --query "<query>"
@@ -45,27 +45,33 @@ $ insight --uninitialize
 
 # Example Usage
 
-Install the insight-cli
+Install the insight-cli.
 
 ```bash
 $ pip install insight-cli
 ```
 
-Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/ChenGrant/fitcountr
+Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/ChenGrant/fitcountr.
 
 ```bash
 $ git clone https://github.com/ChenGrant/fitcountr
 $ cd fitcountr
 ```
 
-Initialize the current directory as an insight repository:
+Initialize the current directory as an insight repository. This will create a .insight directory inside the current directory.
 
 ```bash
 $ insight --initialize
 The current directory has been successfully initialized as an insight repository.
 ```
 
-Search in the current insight repository for the "function that makes a connection to the mongodb database".
+Create a .insightignore file in the current directory and specify that we don't want to search the .git directory.
+
+```bash
+$ echo ".git" > .insightignore
+```
+
+Search in the current insight repository (excluding the .git directory) for the "function that makes a connection to the mongodb database".
 
 ```bash
 $ insight --query "function that makes a connection to the mongodb database"
