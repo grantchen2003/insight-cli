@@ -1,1 +1,0 @@
-from .env_vars import load_environment_variables

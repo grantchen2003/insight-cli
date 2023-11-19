@@ -1,4 +1,5 @@
 .env.dev
 .env.prod
+.insight
 __pycache__
 .venv

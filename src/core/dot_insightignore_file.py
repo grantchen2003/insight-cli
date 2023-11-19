@@ -11,7 +11,7 @@ def _exists(dot_insightignore_file_path: Path) -> bool:
     return dot_insightignore_file_path.is_file()
 
 
-def get_name() -> str:
+def get_file_name() -> str:
     return ".insightignore"
 
 

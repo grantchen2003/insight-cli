@@ -3,9 +3,7 @@ import json
 import os
 import shutil
 
-import requests
-
-import utils
+from .api import make_validate_repository_id_request
 
 
 class InvalidDotInsightDirectoryPathError(Exception):
@@ -14,23 +12,7 @@ class InvalidDotInsightDirectoryPathError(Exception):
         super().__init__(self.message)
 
 
-@utils.requests.handle_make_request_exceptions
-def _make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
-    request_url: str = f"{os.environ.get('API_BASE_URL')}/validate_repository_id"
-
-    request_json_body: str = json.dumps(
-        {"repository_id": repository_id},
-        default=str,
-    )
-
-    response = requests.post(url=request_url, json=request_json_body)
-
-    response.raise_for_status()
-
-    return response.json()
-
-
-def get_name() -> str:
+def get_dir_name() -> str:
     return ".insight"
 
 
@@ -49,7 +31,7 @@ def is_valid(dot_insight_dir_path: Path) -> bool:
     try:
         repository_id = get_repository_id(dot_insight_dir_path)
 
-        response_data: dict[str, str] = _make_validate_repository_id_request(
+        response_data: dict[str, str] = make_validate_repository_id_request(
             repository_id
         )
 

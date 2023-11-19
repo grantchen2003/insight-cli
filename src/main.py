@@ -1,14 +1,10 @@
 from pathlib import Path
 import argparse
-import os
 
-import core
-import config
+from . import core
 
 
-def main() -> None:
-    config.load_environment_variables(os.environ.get("ENV"))
-
+def insight_cli() -> None:
     parser = argparse.ArgumentParser(
         description="insight",
         formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30),
@@ -61,4 +57,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    insight_cli()

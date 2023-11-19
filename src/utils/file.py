@@ -17,8 +17,8 @@ class File:
 
     @classmethod
     def create_from_path(cls, file_path: Path) -> "File":
-        with open(file_path) as file:
-            content = file.read().splitlines()
+        with open(file_path, 'rb') as file:
+            content = file.read().decode('utf-8', errors='ignore').splitlines()
 
         return File(
             name=file_path.name,
