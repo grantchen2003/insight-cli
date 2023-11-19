@@ -47,8 +47,8 @@ class Directory:
     def add_file(self, file: File) -> None:
         self._files.append(file)
 
-    def add_subdirectory(self, directory: "Directory") -> None:
-        self._subdirectories.append(directory)
+    def add_subdirectory(self, subdirectory: "Directory") -> None:
+        self._subdirectories.append(subdirectory)
 
     def to_dict(self) -> DirectoryDict:
         return {
