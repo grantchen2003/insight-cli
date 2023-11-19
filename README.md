@@ -1,4 +1,4 @@
-## insight-cli
+# insight-cli
 
 ## Overview
 
@@ -43,7 +43,7 @@ $ insight --query "<query>"
 $ insight --uninitialize
 ```
 
-# Example Usage
+## Example Usage
 
 Install the insight-cli.
 
