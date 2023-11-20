@@ -13,13 +13,6 @@ from ..utils.directory import Directory
 def initialize(repository_dir_path: Path) -> None:
     dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
 
-    if dot_insight_dir.is_valid(dot_insight_dir_path):
-        print(
-            "The current directory is already an insight repository. This insight repository will be reinitialized."
-        )
-        reinitialize(repository_dir_path)
-        return
-
     dot_insightignore_file_path: Path = (
         repository_dir_path / dot_insightignore_file.get_file_name()
     )
@@ -37,8 +30,6 @@ def initialize(repository_dir_path: Path) -> None:
     repository_id: str = response_data["repository_id"]
 
     dot_insight_dir.create(dot_insight_dir_path, repository_id)
-
-    print("The current directory has been initialized as an insight repository.")
 
 
 def reinitialize(repository_dir_path: Path) -> None:
@@ -63,11 +54,8 @@ def reinitialize(repository_dir_path: Path) -> None:
 
     make_reinitialize_repository_request(repository_dir, repository_id)
 
-    print("The current insight repository has been reinitialized.")
-
 
 def uninitialize(repository_dir_path: Path) -> None:
     dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
 
     dot_insight_dir.delete(dot_insight_dir_path)
-    print("The current insight repository has been uninitialized.")

@@ -1,7 +1,6 @@
-from pathlib import Path
 import argparse
 
-from . import core
+from . import commands
 
 
 def insight_cli() -> None:
@@ -41,19 +40,17 @@ def insight_cli() -> None:
     args = parser.parse_args()
 
     if args.initialize:
-        repository_dir_path = Path.cwd()
-        core.repository.initialize(repository_dir_path)
+        commands.initialize()
 
     elif args.query:
-        query = args.query
-        print(f"querystring: {query}")
+        query_string: str = args.query
+        commands.query(query_string)
 
     elif args.uninitialize:
-        repository_dir_path = Path.cwd()
-        core.repository.uninitialize(repository_dir_path)
+        commands.uninitialize()
 
     elif args.version:
-        print("insight 0.0.0")
+        commands.version()
 
 
 if __name__ == "__main__":
