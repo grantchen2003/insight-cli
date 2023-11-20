@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 
@@ -7,7 +8,14 @@ from ..utils import requests as requests_utils
 
 
 def get_base_api_url() -> str:
-    return "http://localhost:5000"
+    env = os.getenv("ENV", "prod")
+
+    env_to_base_api_url = {
+        "dev": "http://localhost:5000",
+        "prod": "https://insight.com",
+    }
+
+    return env_to_base_api_url[env]
 
 
 @requests_utils.handle_make_request_exceptions
