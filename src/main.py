@@ -9,33 +9,13 @@ def insight_cli() -> None:
         formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30),
     )
 
-    parser.add_argument(
-        "-i",
-        "--initialize",
-        action="store_true",
-        help="initializes the current directory as an insight repository",
-    )
+    commands.add_initialize_command(parser)
 
-    parser.add_argument(
-        "-q",
-        "--query",
-        type=str,
-        help="shows files in the current insight repository that satisfy the given natural language query",
-    )
+    commands.add_query_command(parser)
 
-    parser.add_argument(
-        "-u",
-        "--uninitialize",
-        action="store_true",
-        help="uninitializes the current directory as an insight repository",
-    )
+    commands.add_uninitialize_command(parser)
 
-    parser.add_argument(
-        "-v",
-        "--version",
-        action="store_true",
-        help="shows the current version of insight",
-    )
+    commands.add_version_command(parser)
 
     args = parser.parse_args()
 

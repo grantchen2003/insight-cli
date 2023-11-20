@@ -1,6 +1,43 @@
 from pathlib import Path
+from argparse import ArgumentParser
 
 from src.core import dot_insight_dir, repository
+
+
+def add_initialize_command(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        "-i",
+        "--initialize",
+        action="store_true",
+        help="initializes the current directory as an insight repository",
+    )
+
+
+def add_query_command(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        "-q",
+        "--query",
+        type=str,
+        help="shows files in the current insight repository that satisfy the given natural language query",
+    )
+
+
+def add_uninitialize_command(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        "-u",
+        "--uninitialize",
+        action="store_true",
+        help="uninitializes the current directory as an insight repository",
+    )
+
+
+def add_version_command(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="store_true",
+        help="shows the current version of insight",
+    )
 
 
 def initialize() -> None:
@@ -31,7 +68,6 @@ def uninitialize() -> None:
 
     if not dot_insight_dir.is_valid(dot_insight_dir_path):
         print("The current directory is not an insight repository.")
-
         return
 
     repository.uninitialize(repository_dir_path)
