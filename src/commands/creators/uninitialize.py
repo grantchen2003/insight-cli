@@ -2,6 +2,7 @@ from pathlib import Path
 
 from src.commands.classes import Command
 from src.core import dot_insight_dir, repository
+from src.utils.color import Color
 
 
 def create_uninitialize_command() -> Command:
@@ -21,9 +22,9 @@ def handle_uninitialize_command() -> None:
     dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
 
     if not dot_insight_dir.is_valid(dot_insight_dir_path):
-        print("The current directory is not an insight repository.")
+        print(Color.red("The current directory is not an insight repository."))
         return
 
     repository.uninitialize(repository_dir_path)
 
-    print("The current insight repository has been uninitialized.")
+    print(Color.green("The current insight repository has been uninitialized."))

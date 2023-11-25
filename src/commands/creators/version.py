@@ -1,4 +1,5 @@
 from src.commands.classes import Command
+from src.utils.color import Color
 
 
 def create_version_command() -> Command:
@@ -13,4 +14,4 @@ def create_version_command() -> Command:
 
 
 def handle_version_command() -> None:
-    print("insight 0.0.0")
+    print(Color.green("insight-cli v0.0.0"))

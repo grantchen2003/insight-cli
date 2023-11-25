@@ -6,6 +6,7 @@ from .. import utils
 from .api import (
     make_initialize_repository_request,
     make_reinitialize_repository_request,
+    make_query_repository_request
 )
 from ..utils.directory import Directory
 
@@ -59,3 +60,13 @@ def uninitialize(repository_dir_path: Path) -> None:
     dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
 
     dot_insight_dir.delete(dot_insight_dir_path)
+
+
+def query(repository_dir_path: Path, query_string: str) -> None:
+    dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
+    
+    repository_id: str = dot_insight_dir.get_repository_id(dot_insight_dir_path)
+    
+    response = make_query_repository_request(repository_id, query_string)
+    
+    return response

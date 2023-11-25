@@ -2,6 +2,7 @@ from pathlib import Path
 
 from src.commands.classes import Command
 from src.core import dot_insight_dir, repository
+from src.utils.color import Color
 
 
 def create_initialize_command() -> Command:
@@ -22,15 +23,21 @@ def handle_initialize_command() -> None:
 
     if dot_insight_dir.is_valid(dot_insight_dir_path):
         print(
-            "The current directory is already an insight repository. This insight repository will be reinitialized."
+            Color.yellow(
+                "The current directory is already an insight repository. This insight repository will be reinitialized."
+            )
         )
 
         repository.reinitialize(repository_dir_path)
 
-        print("The current insight repository has been reinitialized.")
+        print(Color.green("The current insight repository has been reinitialized."))
 
         return
 
     repository.initialize(repository_dir_path)
 
-    print("The current directory has been initialized as an insight repository.")
+    print(
+        Color.green(
+            "The current directory has been initialized as an insight repository."
+        )
+    )

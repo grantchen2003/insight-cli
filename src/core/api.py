@@ -59,14 +59,25 @@ def make_reinitialize_repository_request(
 
 @requests_utils.handle_make_request_exceptions
 def make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
-    request_url: str = f"{get_base_api_url()}/validate_repository_id"
+    request_url = f"{get_base_api_url()}/validate_repository_id"
 
-    request_json_body: str = json.dumps(
+    request_json_body = json.dumps(
         {"repository_id": repository_id},
         default=str,
     )
 
     response = requests.post(url=request_url, json=request_json_body)
+
+    response.raise_for_status()
+
+    return response.json()
+
+
+@requests_utils.handle_make_request_exceptions
+def make_query_repository_request(repository_id: str, query_string: str) -> list | dict:
+    request_url = f"{get_base_api_url()}/query?repo-id={repository_id}&query-string={query_string}"
+
+    response = requests.get(url=request_url)
 
     response.raise_for_status()
 
