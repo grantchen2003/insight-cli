@@ -1,36 +1,27 @@
-import argparse
-
-from . import commands
+from src.cli import CLI
+from src.commands import (
+    create_initialize_command,
+    create_uninitialize_command,
+    create_query_command,
+    create_version_command,
+)
 
 
 def insight_cli() -> None:
-    parser = argparse.ArgumentParser(
-        description="insight",
-        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30),
-    )
+    commands = [
+        create_initialize_command(),
+        create_query_command(),
+        create_uninitialize_command(),
+        create_version_command(),
+    ]
 
-    commands.add_initialize(parser)
+    cli = CLI("insight-cli")
 
-    commands.add_query(parser)
+    cli.add_commands(commands)
 
-    commands.add_uninitialize(parser)
+    arguments = cli.parse_arguments()
 
-    commands.add_version(parser)
-
-    args = parser.parse_args()
-
-    if args.initialize:
-        commands.handle_initialize()
-
-    elif args.query:
-        query_string: str = args.query
-        commands.handle_query(query_string)
-
-    elif args.uninitialize:
-        commands.handle_uninitialize()
-
-    elif args.version:
-        commands.handle_version()
+    cli.execute_commands(arguments)
 
 
 if __name__ == "__main__":

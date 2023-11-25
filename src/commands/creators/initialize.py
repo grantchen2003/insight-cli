@@ -1,15 +1,17 @@
 from pathlib import Path
-from argparse import ArgumentParser
 
+from src.commands.classes import Command
 from src.core import dot_insight_dir, repository
 
 
-def add_initialize_command(parser: ArgumentParser) -> None:
-    parser.add_argument(
-        "-i",
-        "--initialize",
-        action="store_true",
-        help="initializes the current directory as an insight repository",
+def create_initialize_command() -> Command:
+    return Command(
+        flags=["-i", "--initialize"],
+        description="initializes the current directory as an insight repository",
+        handler={
+            "params": [],
+            "function": handle_initialize_command,
+        },
     )
 
 

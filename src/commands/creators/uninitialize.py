@@ -1,15 +1,17 @@
 from pathlib import Path
-from argparse import ArgumentParser
 
+from src.commands.classes import Command
 from src.core import dot_insight_dir, repository
 
 
-def add_uninitialize_command(parser: ArgumentParser) -> None:
-    parser.add_argument(
-        "-u",
-        "--uninitialize",
-        action="store_true",
-        help="uninitializes the current directory as an insight repository",
+def create_uninitialize_command() -> Command:
+    return Command(
+        flags=["-u", "--uninitialize"],
+        description="uninitializes the current directory as an insight repository",
+        handler={
+            "params": [],
+            "function": handle_uninitialize_command,
+        },
     )
 
 
