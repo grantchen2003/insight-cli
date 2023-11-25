@@ -2,18 +2,18 @@
 
 ## Overview
 
-<p>The insight-cli provides a CLI for developers to use insight.</p>
+The insight-cli provides a CLI for developers to use insight.
 
 ## Installation
 
-<p>Before installing the insight-cli, ensure that you have Python version 3.12.0+ and PIP version 23.2.1+.</p>
-<p>To install the insight-cli globally, run the following command:</p>
+Before installing the insight-cli, ensure that you have Python version 3.12.0+ and PIP version 23.2.1+.
+To install the insight-cli globally, run the following command:
 
 ```bash
 $ pip install insight-cli
 ```
 
-<p>To ensure the insight-cli was successfully installed, check your insight-cli version by running: </p>
+To ensure the insight-cli was successfully installed, check your insight-cli version by running: 
 
 ```bash
 $ insight --version
@@ -21,23 +21,23 @@ $ insight --version
 
 ## CLI Commands
 
-<p>Note that the following commands require an internet connection.</p>
+Note that the following commands require an internet connection.
 
-<p>To initialize the current directory as an insight repository, run the following command: </p>
+To initialize the current directory as an insight repository, run the following command: 
 
 ```bash
 $ insight --initialize
 ```
 
-<p>Note that the following commands must be ran in a directory that has been initialized as an insight repository.</p>
+Note that the following commands must be ran in a directory that has been initialized as an insight repository.
 
-<p>To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command: </p>
+To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command: 
 
 ```bash
 $ insight --query "<query>"
 ```
 
-<p>To uninitialize an insight repository, run the following command: </p>
+To uninitialize an insight repository, run the following command: 
 
 ```bash
 $ insight --uninitialize
@@ -84,8 +84,7 @@ Found matches in the following files:
 
 ## Contributing
 
-<p>Feel free to contribute to the development of the insight-cli. Submit bug reports, feature requests, or pull requests through GitHub.</p>
+Feel free to contribute to the development of the insight-cli. Submit bug reports, feature requests, or pull requests through GitHub.
 
 ## License
-
-<p>This project is licensed under the <a href="https://opensource.org/license/mit/">MIT License</a>.</p>
+This project is licensed under the [MIT License](./LICENSE).
