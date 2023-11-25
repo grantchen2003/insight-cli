@@ -1,3 +1,5 @@
+import yaml
+
 from src.commands.classes import Command
 from src.utils.color import Color
 
@@ -14,4 +16,9 @@ def create_version_command() -> Command:
 
 
 def handle_version_command() -> None:
-    print(Color.green("insight-cli v0.0.0"))
+    with open("insight.yaml", "r") as file:
+        config = yaml.safe_load(file)
+        
+    print(Color.green(f"insight-cli v{config["version"]}"))
+
+
