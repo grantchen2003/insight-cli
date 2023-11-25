@@ -78,7 +78,7 @@ $ insight --query "function that makes a connection to the mongodb database"
 Found matches in the following files:
 /server/src/config/database.js
     Line 3 - 15: const connectToDatabase = async () => {...};
-/sever/src/server.js
+/server/src/server.js
     Line 25: await connectToDatabase(app);
 ```
 
