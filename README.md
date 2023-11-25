@@ -21,7 +21,7 @@ $ insight --version
 
 ## CLI Commands
 
-Note that the following commands require an internet connection.
+The following commands require an internet connection.
 
 To initialize the current directory as an insight repository, run the following command: 
 
@@ -29,7 +29,7 @@ To initialize the current directory as an insight repository, run the following 
 $ insight --initialize
 ```
 
-Note that the following commands must be ran in a directory that has been initialized as an insight repository.
+The following commands must be ran in a directory that has been initialized as an insight repository.
 
 To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command: 
 
