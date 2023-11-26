@@ -5,4 +5,4 @@
 __pycache__
 build
 dist
-insight_cli.egg-info
+*.egg-info
