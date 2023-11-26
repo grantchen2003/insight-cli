@@ -5,8 +5,8 @@ import os
 import shutil
 import unittest
 
-from src.core.api import get_base_api_url
-from src.core.dot_insight_dir import (
+from insight_cli.core.api import get_base_api_url
+from insight_cli.core.dot_insight_dir import (
     InvalidDotInsightDirectoryPathError,
     get_dir_name,
     get_repository_id,

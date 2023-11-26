@@ -6,10 +6,10 @@ import os
 import shutil
 import unittest
 
-from src.core import api
-from src.core import dot_insight_dir
-from src.core.repository import initialize, reinitialize, uninitialize
-from src.utils.directory import Directory
+from insight_cli.core import api
+from insight_cli.core import dot_insight_dir
+from insight_cli.core.repository import initialize, reinitialize, uninitialize
+from insight_cli.utils.directory import Directory
 
 
 class TestRepository(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestRepository(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.test_temp_folder_path)
 
-    @patch("src.core.dot_insight_dir.is_valid")
+    @patch("insight_cli.core.dot_insight_dir.is_valid")
     @patch("requests.post")
     def test_initialize_with_existing_dot_insight_dir(
         self,

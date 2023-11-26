@@ -76,9 +76,9 @@ Search in the current insight repository (excluding the .git directory) for the 
 ```bash
 $ insight --query "function that makes a connection to the mongodb database"
 Found matches in the following files:
-/server/src/config/database.js
+/server/insight_cli/config/database.js
     Line 3 - 15: const connectToDatabase = async () => {...};
-/server/src/server.js
+/server/insight_cli/server.js
     Line 25: await connectToDatabase(app);
 ```
 

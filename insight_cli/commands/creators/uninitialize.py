@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from src.commands.classes import Command
-from src.core import dot_insight_dir, repository
-from src.utils.color import Color
+from insight_cli.commands.classes import Command
+from insight_cli.core import dot_insight_dir, repository
+from insight_cli.utils.color import Color
 
 
 def create_uninitialize_command() -> Command:

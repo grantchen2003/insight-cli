@@ -1,7 +1,7 @@
 from typing import Dict, Any
 import argparse
 
-from src.commands.classes import Command
+from insight_cli.commands.classes import Command
 
 
 MAX_HELP_POS = 50

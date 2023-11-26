@@ -1,7 +1,7 @@
 from datetime import datetime
 import unittest
 
-from src.utils.directory import Directory, File
+from insight_cli.utils.directory import Directory, File
 
 
 class TestDirectory(unittest.TestCase):

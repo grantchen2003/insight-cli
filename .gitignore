@@ -1,5 +1,8 @@
 .env.dev
 .env.prod
 .insight
-__pycache__
 .venv
+__pycache__
+build
+dist
+insight_cli.egg-info

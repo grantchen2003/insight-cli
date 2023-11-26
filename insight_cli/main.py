@@ -1,5 +1,5 @@
-from src.cli import CLI
-from src.commands import (
+from insight_cli.cli import CLI
+from insight_cli.commands import (
     create_initialize_command,
     create_uninitialize_command,
     create_query_command,

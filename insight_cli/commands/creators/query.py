@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from src.commands.classes import Command
-from src.core import repository, dot_insight_dir
-from src.utils import Color
+from insight_cli.commands.classes import Command
+from insight_cli.core import repository, dot_insight_dir
+from insight_cli.utils import Color
 
 
 def create_query_command() -> Command:

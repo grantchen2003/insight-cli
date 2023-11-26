@@ -4,7 +4,7 @@ import os
 import shutil
 import unittest
 
-from src.core.dot_insightignore_file import get_file_name, get_ignorable_names
+from insight_cli.core.dot_insightignore_file import get_file_name, get_ignorable_names
 
 
 class TestDotInsightignoreFile(unittest.TestCase):

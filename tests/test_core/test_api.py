@@ -3,14 +3,14 @@ from unittest.mock import Mock, patch
 import json
 import unittest
 
-from src.core.api import (
+from insight_cli.core.api import (
     make_initialize_repository_request,
     make_reinitialize_repository_request,
     make_validate_repository_id_request,
     get_base_api_url,
 )
-from src.utils.directory import Directory
-from src.utils.file import File
+from insight_cli.utils.directory import Directory
+from insight_cli.utils.file import File
 
 
 class TestApi(unittest.TestCase):
