@@ -9,6 +9,8 @@ setuptools.setup(
         "console_scripts": ["insight = insight_cli:insight_cli"],
     },
     install_requires=[
+        "pip>=23.2.1",
         "requests==2.31.0",
     ],
+    python_requires=">=3.12.0",
 )
