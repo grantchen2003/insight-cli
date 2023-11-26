@@ -3,7 +3,7 @@
 # automate deployment of insight-cli to PyPI
 cd ..
 
-pip install setuptools wheel twine
+python -m pip install setuptools wheel twine
 
 directories=("build" "dist" "insight_cli.egg-info")
 
@@ -19,6 +19,6 @@ done
 
 python setup.py sdist bdist_wheel 
 
-pip install dist/insight_cli-0.0.0-py3-none-any.whl --force-reinstall
+python -m pip install dist/insight_cli-0.0.0-py3-none-any.whl --force-reinstall
 
 read -p "Press Enter to exit"
