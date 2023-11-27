@@ -12,7 +12,7 @@ def get_base_api_url() -> str:
 
     env_to_base_api_url = {
         "dev": "http://localhost:5000",
-        "prod": "https://insight.com",
+        "prod": "https://insight.api.com",
     }
 
     return env_to_base_api_url[env]
