@@ -9,17 +9,25 @@ MAX_HELP_POS = 50
 
 class CLI:
     @staticmethod
-    def _get_command_handler_args(command: Command, command_args: str) -> list[Any]:
-        arg_and_param_type_pairs = zip(command_args, command.handler.param_types)
-        return [param_type(arg) for arg, param_type in arg_and_param_type_pairs]
-
-    @staticmethod
     def _raise_for_invalid_description(description: str) -> None:
         if not isinstance(description, str):
             raise TypeError("description must be a str")
 
         if description.strip() == "":
             raise ValueError("description cannot be empty")
+
+    @staticmethod
+    def _raise_for_invalid_commands(commands: list[Command]) -> None:
+        if not isinstance(commands, list):
+            raise TypeError("commands must be a list")
+
+        if any(not isinstance(command, Command) for command in commands):
+            raise TypeError("each element in commands must be of type Command")
+
+    @staticmethod
+    def _get_command_handler_args(command: Command, command_args: str) -> list[Any]:
+        arg_and_param_type_pairs = zip(command_args, command.handler.param_types)
+        return [param_type(arg) for arg, param_type in arg_and_param_type_pairs]
 
     @staticmethod
     def _parse_command(command: Command) -> list[list[str], dict[str:Any]]:
@@ -43,15 +51,17 @@ class CLI:
 
         return [flag_strings, options]
 
-    def __init__(self, description: str):
+    def __init__(self, description: str, commands: list[Command]):
         CLI._raise_for_invalid_description(description)
-        self._commands: Dict[str, Command] = {}
+        CLI._raise_for_invalid_commands(commands)
         self._parser = argparse.ArgumentParser(
             description=description,
             formatter_class=lambda prog: argparse.HelpFormatter(
                 prog, max_help_position=MAX_HELP_POS
             ),
         )
+        self._commands: Dict[str, Command] = {}
+        self.add_commands(commands, sort=True)
 
     def parse_arguments(self) -> argparse.Namespace:
         arguments: argparse.Namespace = self._parser.parse_args()

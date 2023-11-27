@@ -8,16 +8,15 @@ from insight_cli.commands import (
 
 
 def insight_cli() -> None:
-    commands = [
-        create_initialize_command(),
-        create_query_command(),
-        create_uninitialize_command(),
-        create_version_command(),
-    ]
-
-    cli = CLI("insight-cli")
-
-    cli.add_commands(commands)
+    cli = CLI(
+        description="insight-cli",
+        commands=[
+            create_initialize_command(),
+            create_query_command(),
+            create_uninitialize_command(),
+            create_version_command(),
+        ],
+    )
 
     arguments = cli.parse_arguments()
 
