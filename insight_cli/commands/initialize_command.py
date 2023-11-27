@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from insight_cli.commands.classes import Command
+from insight_cli.commands.command import Command
 from insight_cli.core import dot_insight_dir, repository
 from insight_cli.utils.color import Color
 
