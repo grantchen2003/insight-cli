@@ -75,7 +75,7 @@ def make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
 
 @requests_utils.handle_make_request_exceptions
 def make_query_repository_request(repository_id: str, query_string: str) -> list | dict:
-    request_url = f"{get_base_api_url()}/query?repo-id={repository_id}&query-string={query_string}"
+    request_url = f"{get_base_api_url()}/query?repository-id={repository_id}&query-string={query_string}"
 
     response = requests.get(url=request_url)
 
