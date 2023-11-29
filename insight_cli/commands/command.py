@@ -1,14 +1,32 @@
-import collections, inspect
+import collections
+import inspect
+
+# TODO:
+# make some of the Command.Flag static methods util methods
+# make this prefix hierarchy its own ds
+# refactor
 
 
 class Command:
-    _PREFIXES = ["--", "-"]
+    # general mapping:
+    # prefix => [list1, list2, list3, ...] where list_i = [s1, s2, ...]
 
-    @staticmethod
-    def sort(commands: "list[Command]") -> "list[Command]":
-        return sorted(
-            commands,
-        )
+    _PREFIX_DEPENDENCIES = {
+        # in order for the command to use the "--" flag, nothing is required
+        "--": [],
+        # in order for the command use the "-" flag, the command has to already use
+        # all flags in ["--"]
+        "-": [["--"]],
+        # in order for the command use the "---" flag, the command has to either
+        # already use all flags in ["-"] or already use all flags in ["--"]
+        "---": [["-"], ["--"]],
+        # in order for the command use the "----" flag, the command has to either
+        # already use all flags in ["-"] or already use all flags in ["--", "---"]
+        "----": [["-"], ["--", "---"]]
+    }  # make sure this isn't cyclic,
+    # ensure any flags on the left are also on the right(or maybe auto default them to no dependencies)
+
+    _PREFIXES = ["--", "-", "---"]
 
     @staticmethod
     def _raise_for_invalid_description(description: str) -> None:
@@ -29,17 +47,22 @@ class Command:
 
     @staticmethod
     def _generate_name(flags: list["Command.Flag"]) -> str:
-        prefix = "--"
+        prefix = "--"  # [prefix] is the prefix of the flag whose name will be the command's name
         prefix_to_flags = Command._get_prefix_to_flags(flags)
 
         if len(prefix_to_flags[prefix]) != 1:
             raise ValueError(f"There is not exactly one suffix for the {prefix} prefix")
 
-        return prefix_to_flags[prefix][0].suffix
+        return prefix_to_flags[prefix][0].name
+
+    @classmethod
+    def _raise_for_invalid_prefix_dependency(cls):
+        pass
 
     @classmethod
     def _raise_for_invalid_flags(cls, flags: list["Command.Flag"]) -> None:
-        min_flag_count, max_flag_count = 1, len(cls._PREFIXES)
+        prefixes = cls._PREFIXES
+        min_flag_count, max_flag_count = 1, len(prefixes)
 
         if len(flags) not in range(min_flag_count, max_flag_count + 1):
             raise ValueError(
@@ -47,9 +70,12 @@ class Command:
             )
 
         prefix_to_flags = Command._get_prefix_to_flags(flags)
-
+        # prefixes[0] ... prefixes[i - 1] must map to exactly 1 flag in order for
+        # prefixes[i] to be used.
+        # ensure that prefixes[0], prefixes[1], ..., prefixes[len(flags) - 1]
+        # each map to exactly one flag.
         for i in range(len(flags)):
-            prefix = cls._PREFIXES[i]
+            prefix = prefixes[i]
             flags = prefix_to_flags[prefix]
             if len(flags) != 1:
                 raise ValueError(
@@ -57,7 +83,7 @@ class Command:
                 )
 
     def __init__(self, flags: list[str], description: str, handler: dict):
-        flags = [Command.Flag(flag) for flag in flags]
+        flags = [Command.Flag(flag, Command._PREFIXES) for flag in flags]
         Command._raise_for_invalid_description(description)
         Command._raise_for_invalid_flags(flags)
         self._flags: list[Command.Flag] = flags
@@ -86,18 +112,51 @@ class Command:
 
     class Flag:
         @staticmethod
-        def _raise_for_invalid_flag(string: str):
+        def _get_suffix(string: str, prefix) -> str:
+            return string[len(prefix):]
+
+        @staticmethod
+        def _get_matching_prefixes(string: str, prefixes: list[str]) -> list[str]:
+            return [prefix for prefix in prefixes if string.startswith(prefix)]
+
+        @staticmethod
+        def _get_matching_suffixes(string: str, matching_prefixes: list[str]) -> list[str]:
+            return [
+                Command.Flag._get_suffix(string, matching_prefix)
+                for matching_prefix in matching_prefixes
+            ]
+
+        @staticmethod
+        def _raise_for_invalid_args(string: str, prefixes: list[str]):
             if not isinstance(string, str):
                 raise TypeError("flag must be a str")
 
-            if string.strip() != string or string == "" or string[0] != "-":
-                raise ValueError("string is not in a flag format")
+            if string.strip() != string:
+                raise ValueError("string cannot be cannot have leading/trailing whitespaces")
 
-        def __init__(self, string: str):
-            Command.Flag._raise_for_invalid_flag(string)
-            self._suffix = string.lstrip("-")
-            self._prefix = string[: -len(self._suffix)]
-            # ex: "--query" is a flag with a prefix of "--" and a suffix of "query"
+            if string == "":
+                raise ValueError("string cannot be empty string")
+
+            matching_prefixes = Command.Flag._get_matching_prefixes(string, prefixes)
+
+            if len(matching_prefixes) == 0:
+                raise ValueError("no prefix matched")
+
+            matched_suffixes = Command.Flag._get_matching_suffixes(string, matching_prefixes)
+
+            if all(matched_suffix == "" for matched_suffix in matched_suffixes):
+                raise ValueError("suffix cannot be empty")
+
+        @staticmethod
+        def _get_longest_matching_prefix(string: str, prefixes: list[str]) -> str:
+            matching_prefixes = Command.Flag._get_matching_prefixes(string, prefixes)
+            longest_matching_prefix = max(matching_prefixes, key=len)
+            return longest_matching_prefix
+
+        def __init__(self, string: str, prefixes: list[str]):
+            Command.Flag._raise_for_invalid_args(string, prefixes)
+            self._prefix = Command.Flag._get_longest_matching_prefix(string, prefixes)
+            self._suffix = Command.Flag._get_suffix(string, self._prefix)
 
         def __str__(self) -> str:
             return self._prefix + self._suffix
@@ -107,7 +166,7 @@ class Command:
             return self._prefix
 
         @property
-        def suffix(self) -> str:
+        def name(self) -> str:
             return self._suffix
 
     class Handler:
