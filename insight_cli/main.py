@@ -1,21 +1,19 @@
 from insight_cli.cli import CLI
-from insight_cli.commands import (
-    create_initialize_command,
-    create_uninitialize_command,
-    create_query_command,
-    create_version_command,
-)
+from insight_cli.commands.initialize_command import InitializeCommand
+from insight_cli.commands.query_command import QueryCommand
+from insight_cli.commands.uninitialize_command import UninitializeCommand
+from insight_cli.commands.version_command import VersionCommand
 
 
 def insight_cli() -> None:
     cli = CLI(
         commands=[
-            create_initialize_command(),
-            create_query_command(),
-            create_uninitialize_command(),
-            create_version_command(),
+            InitializeCommand(),
+            QueryCommand(),
+            UninitializeCommand(),
+            VersionCommand(),
         ],
-        description="insight-cli"
+        description="insight-cli",
     )
 
     cli.parse_arguments()

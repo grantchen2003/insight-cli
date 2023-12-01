@@ -62,7 +62,7 @@ def uninitialize(repository_dir_path: Path) -> None:
     dot_insight_dir.delete(dot_insight_dir_path)
 
 
-def query(repository_dir_path: Path, query_string: str) -> None:
+def query(repository_dir_path: Path, query_string: str):
     dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
     
     repository_id: str = dot_insight_dir.get_repository_id(dot_insight_dir_path)

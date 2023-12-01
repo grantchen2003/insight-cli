@@ -1,7 +1,11 @@
-from typing import Any, Dict, Iterable
+from typing import Any, Dict
 import argparse
 
-from insight_cli.commands.command import Command
+from insight_cli.commands.base.command import Command
+
+# TODO
+# handle prefix priority better
+# merge _get_command_executor_args with _parse_command, make it into its own class
 
 
 class CLI:
@@ -31,15 +35,24 @@ class CLI:
 
     @staticmethod
     def _parse_command(command: Command) -> dict:
-        parsed_command = {"flag_strings": [str(flag) for flag in command.flags]}
+        command_name_flag_prefix = "--"
 
-        if command.handler.has_params:
+        parsed_command = {
+            "command": command,
+            "name": [
+                flag.name for flag in command.flags
+                if flag.prefix == command_name_flag_prefix
+            ][0],
+            "flag_strings": [str(flag) for flag in command.flags]
+        }
+
+        if command.has_executor_params:
             parsed_command["options"] = {
                 "help": command.description,
                 "metavar": tuple(
-                    [f"<{param_name}>" for param_name in command.handler.param_names]
+                    [f"<{param_name}>" for param_name in command.executor_param_names]
                 ),
-                "nargs": command.handler.num_params,
+                "nargs": command.num_executor_params,
             }
 
         else:
@@ -51,6 +64,10 @@ class CLI:
 
         return parsed_command
 
+    @staticmethod
+    def _get_command_executor_args(command: Command, command_args: str) -> list[Any]:
+        return [param_type(arg) for arg, param_type in zip(command_args, command.executor_param_types)]
+
     def __init__(self, commands: list[Command], description: str, max_width: int = 50):
         CLI._raise_for_invalid_args(commands, description)
         self._arguments = argparse.Namespace()
@@ -61,27 +78,20 @@ class CLI:
                 prog, max_help_position=max_width
             ),
         )
-        self._add_commands(commands, sort=True)
+        self._add_commands(commands)
 
-    def _add_commands(self, commands: list[Command], sort: bool = True) -> None:
-        if sort:
-            commands = sorted(commands)
+    def _add_commands(self, commands: list[Command]) -> None:
+        parsed_commands = [CLI._parse_command(command) for command in commands]
+        
+        parsed_commands.sort(key=lambda parsed_command: parsed_command["name"])
+        
+        for parsed_command in parsed_commands:
+            if parsed_command["name"] in self._commands:
+                raise ValueError(f"A command with a name of {parsed_command['name']} already exists")
 
-        for command in commands:
-            self._add_command(command)
+            self._parser.add_argument(*parsed_command["flag_strings"], **parsed_command["options"])
 
-    def _add_command(self, command: Command) -> None:
-        if command.name in self._commands:
-            raise ValueError("Cannot add the same command twice")
-
-        parsed_command = CLI._parse_command(command)
-        self._parser.add_argument(*parsed_command["flag_strings"], **parsed_command["options"])
-
-        self._commands[command.name] = command
-
-    def _get_command_handler_args(self, command_name: str, command_args: str) -> list[Any]:
-        arg_and_param_type_pairs = zip(command_args, self._commands[command_name].handler.param_types)
-        return [param_type(arg) for arg, param_type in arg_and_param_type_pairs]
+            self._commands[parsed_command["name"]] = parsed_command["command"]
 
     def _get_invoked_command_name_and_args(self):
         for command_name, command_args in vars(self._arguments).items():
@@ -94,7 +104,5 @@ class CLI:
 
     def execute_invoked_commands(self) -> None:
         for command_name, command_args in self._get_invoked_command_name_and_args():
-            command_handler_args = self._get_command_handler_args(
-                command_name, command_args
-            )
-            self._commands[command_name].handler(*command_handler_args)
+            command = self._commands[command_name]
+            command.execute(*CLI._get_command_executor_args(command, command_args))

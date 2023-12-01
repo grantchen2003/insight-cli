@@ -1,18 +1,13 @@
-from insight_cli.commands.command import Command
-from insight_cli.utils.color import Color
+from insight_cli.commands.base.command import Command
 import insight_cli
 
 
-def create_version_command() -> Command:
-    return Command(
-        flags=["-v", "--version"],
-        description="shows the current version of insight",
-        handler={
-            "params": [],
-            "function": handle_version_command,
-        },
-    )
+class VersionCommand(Command):
+    def __init__(self):
+        super().__init__(
+            flags=["-v", "--version"],
+            description="shows the current version of insight",
+        )
 
-
-def handle_version_command() -> None:
-    print(f"insight-cli v{insight_cli.__version__}")
+    def execute(self) -> None:
+        print(f"insight-cli v{insight_cli.__version__}")
