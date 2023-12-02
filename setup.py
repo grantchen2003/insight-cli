@@ -6,7 +6,7 @@ setuptools.setup(
     version=insight_cli.__version__,
     packages=setuptools.find_packages(),
     entry_points={
-        "console_scripts": ["insight = insight_cli:insight_cli"],
+        "console_scripts": ["insight = insight_cli:main"],
     },
     install_requires=[
         "pip>=23.3.1",

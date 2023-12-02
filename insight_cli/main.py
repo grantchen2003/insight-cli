@@ -5,7 +5,7 @@ from insight_cli.commands.uninitialize_command import UninitializeCommand
 from insight_cli.commands.version_command import VersionCommand
 
 
-def insight_cli() -> None:
+def main() -> None:
     cli = CLI(
         commands=[
             InitializeCommand(),
@@ -22,4 +22,4 @@ def insight_cli() -> None:
 
 
 if __name__ == "__main__":
-    insight_cli()
+    main()

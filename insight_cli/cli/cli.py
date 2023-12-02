@@ -37,6 +37,14 @@ class CLI:
         if any(not isinstance(command, Command) for command in commands):
             raise TypeError("each element in commands must be of type Command")
 
+        flag_strings = []
+        for command in commands:
+            parsed_command = ParsedCommand(command)
+            flag_strings.extend(parsed_command["flag_strings"])
+
+        if len(set(flag_strings)) != len(flag_strings):
+            raise ValueError("all flags strings must be unique")
+
     @staticmethod
     def _parse_command(command: Command) -> ParsedCommand:
         def get_name() -> str:
@@ -81,7 +89,7 @@ class CLI:
             "flag_strings": get_flag_strings(),
             "options": get_options(),
         }
-        
+
         return parsed_command
 
     def __init__(self, commands: list[Command], description: str, max_width: int = 50):
@@ -102,11 +110,6 @@ class CLI:
         parsed_commands.sort(key=lambda parsed_command: parsed_command["name"])
 
         for parsed_command in parsed_commands:
-            if parsed_command["name"] in self._parsed_commands:
-                raise ValueError(
-                    f"A command with a name of {parsed_command['name']} already exists"
-                )
-
             self._parser.add_argument(
                 *parsed_command["flag_strings"], **parsed_command["options"]
             )
