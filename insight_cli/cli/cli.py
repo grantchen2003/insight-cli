@@ -1,21 +1,38 @@
-from insight_cli.cli.interfaces.cli_parser_interface import CLIParserInterface
-from insight_cli.cli.cli_argument_validator import CLIArgumentValidator
+from insight_cli.cli.cli_parser import CLIParser
 from insight_cli.commands.base.command import Command
 
 
 class CLI:
-    def __init__(
-        self, commands: list[Command], description: str, cli_parser: CLIParserInterface
-    ):
-        CLIArgumentValidator.raise_for_invalid_args(commands, description)
-        self._parser: CLIParserInterface = cli_parser(commands, description)
+    @staticmethod
+    def _raise_for_invalid_args(commands: list[Command], description: str) -> None:
+        CLI._raise_for_invalid_commands(commands)
+        CLI._raise_for_invalid_description(description)
+
+    @staticmethod
+    def _raise_for_invalid_description(description: str) -> None:
+        if not isinstance(description, str):
+            raise TypeError("description must be a str")
+
+        if description.strip() == "":
+            raise ValueError("description cannot be empty")
+
+    @staticmethod
+    def _raise_for_invalid_commands(commands: list[Command]) -> None:
+        if not isinstance(commands, list):
+            raise TypeError("commands must be a list")
+
+        if not commands:
+            raise ValueError("commands must be a non-empty list")
+
+        if any(not isinstance(command, Command) for command in commands):
+            raise TypeError("each element in commands must be of type Command")
+
+    def __init__(self, commands: list[Command], description: str):
+        CLI._raise_for_invalid_args(commands, description)
+        self._parser = CLIParser(commands, description)
 
     def run(self) -> None:
-        invoked_commands_and_executor_args = self._parser.parse_arguments()
+        self._parser.parse_arguments()
 
-        # invoked_commands_and_executor_args = (
-        #     self._parser.get_invoked_commands_and_executor_args()
-        # )
-
-        for command, command_executor_args in invoked_commands_and_executor_args:
+        for command, command_executor_args in self._parser.invoked_commands_with_args:
             command.execute(*command_executor_args)

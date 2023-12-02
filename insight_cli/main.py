@@ -1,12 +1,11 @@
 from insight_cli.cli import CLI
-from insight_cli.cli.cli_parser import CLIParser
 from insight_cli.commands.initialize_command import InitializeCommand
 from insight_cli.commands.query_command import QueryCommand
 from insight_cli.commands.uninitialize_command import UninitializeCommand
 from insight_cli.commands.version_command import VersionCommand
 
 
-def main() -> None:
+def insight_cli() -> None:
     cli = CLI(
         commands=[
             InitializeCommand(),
@@ -15,11 +14,10 @@ def main() -> None:
             VersionCommand(),
         ],
         description="insight-cli",
-        parser=CLIParser,
     )
 
     cli.run()
 
 
 if __name__ == "__main__":
-    main()
+    insight_cli()
