@@ -1,7 +1,7 @@
 import inspect, typing
 from abc import ABC, abstractmethod
 
-from insight_cli.commands.base.flag import Flag
+from insight_cli.commands.base.command_flag import CommandFlag
 
 
 class Command(ABC):
@@ -42,11 +42,11 @@ class Command(ABC):
 
     def __init__(self, flags: list[str], description: str):
         Command._raise_for_invalid_args(flags, description)
-        self._flags: list[Flag] = [Flag(flag) for flag in flags]
+        self._flags: list[CommandFlag] = [CommandFlag(flag) for flag in flags]
         self._description: str = description
 
     @property
-    def flags(self) -> list[Flag]:
+    def flags(self) -> list[CommandFlag]:
         return self._flags
 
     @property

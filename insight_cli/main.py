@@ -16,9 +16,7 @@ def insight_cli() -> None:
         description="insight-cli",
     )
 
-    cli.parse_arguments()
-
-    cli.execute_invoked_commands()
+    cli.run()
 
 
 if __name__ == "__main__":
