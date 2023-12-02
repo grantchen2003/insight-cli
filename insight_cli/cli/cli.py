@@ -39,7 +39,7 @@ class CLI:
 
         flag_strings = []
         for command in commands:
-            parsed_command = ParsedCommand(command)
+            parsed_command = CLI._parse_command(command)
             flag_strings.extend(parsed_command["flag_strings"])
 
         if len(set(flag_strings)) != len(flag_strings):
