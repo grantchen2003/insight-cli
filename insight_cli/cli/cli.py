@@ -48,13 +48,13 @@ class CLI:
     @staticmethod
     def _parse_command(command: Command) -> ParsedCommand:
         def get_name() -> str:
-            command_name_flag_prefix_priority = ["--"]
+            command_name_flag_prefix_priority = ["--", "---", "-"]
             for flag_prefix in command_name_flag_prefix_priority:
                 for flag in command.flags:
                     if flag.prefix == flag_prefix:
                         return flag.name
 
-        def get_executor_args(command_args: str) -> list[Any]:
+        def get_executor_args(command_args: list[str]) -> list[Any]:
             return [
                 param_type(arg)
                 for arg, param_type in zip(command_args, command.executor_param_types)
@@ -68,10 +68,7 @@ class CLI:
                 return {
                     "help": command.description,
                     "metavar": tuple(
-                        [
-                            f"<{param_name}>"
-                            for param_name in command.executor_param_names
-                        ]
+                        f"<{param_name}>" for param_name in command.executor_param_names
                     ),
                     "nargs": command.num_executor_params,
                 }
@@ -124,7 +121,7 @@ class CLI:
             command_is_not_invoked = command_args is None
             if command_is_not_invoked:
                 continue
-
+            
             parsed_command = self._parsed_commands[command_name]
             command = parsed_command["command"]
             command_executor_args = parsed_command["get_executor_args"](command_args)
