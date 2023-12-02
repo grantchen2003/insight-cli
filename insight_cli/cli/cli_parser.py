@@ -87,7 +87,7 @@ class CLIParser(CLIParserInterface):
     def parse_arguments(self) -> None:
         self._arguments = self._parser.parse_args() 
 
-    def _get_invoked_commands_and_executor_args(self) -> list[tuple[Command, list[Any]]]:
+    def get_invoked_commands_and_executor_args(self) -> list[tuple[Command, list[Any]]]:
         invoked_commands_and_executor_args = []
 
         for command_name, command_args in vars(self._arguments).items():
