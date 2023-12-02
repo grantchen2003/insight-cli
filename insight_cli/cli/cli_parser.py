@@ -1,6 +1,8 @@
-from typing import Any, TypedDict, Callable
+from typing import Any, Callable, TypedDict
 import argparse, operator
 
+from insight_cli.cli.interfaces.cli_parser_interface import CLIParserInterface
+from insight_cli.cli.cli_argument_validator import CLIArgumentValidator
 from insight_cli.commands.base.command import Command
 
 
@@ -12,7 +14,7 @@ class ParsedCommand(TypedDict):
     options: dict
 
 
-class CLIParser:
+class CLIParser(CLIParserInterface):
     # make this function cleaner, handle prefix priority better
     @staticmethod
     def _parse_command(command: Command) -> ParsedCommand:
@@ -53,7 +55,8 @@ class CLIParser:
 
         return parsed_command
 
-    def __init__(self, commands, description, max_width: int = 50):
+    def __init__(self, commands: list[Command], description: str, max_width: int = 50):
+        CLIArgumentValidator.raise_for_invalid_args(commands, description)
         self._arguments: argparse.Namespace = None
         self._parsed_commands: dict[str, ParsedCommand] = {}
         self._parser = argparse.ArgumentParser(
@@ -67,7 +70,9 @@ class CLIParser:
     def _add_commands(self, commands: list[Command]) -> None:
         parsed_commands = [CLIParser._parse_command(command) for command in commands]
 
-        for parsed_command in sorted(parsed_commands, key=operator.itemgetter("name")):
+        parsed_commands.sort(key=operator.itemgetter("name"))
+
+        for parsed_command in parsed_commands:
             if parsed_command["name"] in self._parsed_commands:
                 raise ValueError(
                     f"A command with a name of {parsed_command['name']} already exists"
@@ -80,28 +85,20 @@ class CLIParser:
             self._parsed_commands[parsed_command["name"]] = parsed_command
 
     def parse_arguments(self) -> None:
-        self._arguments = self._parser.parse_args()
+        self._arguments = self._parser.parse_args() 
 
-    def _get_invoked_command_names_and_args(self) -> list[tuple[Command, list[Any]]]:
-        invoked_command_names_and_args = []
+    def _get_invoked_commands_and_executor_args(self) -> list[tuple[Command, list[Any]]]:
+        invoked_commands_and_executor_args = []
 
         for command_name, command_args in vars(self._arguments).items():
-            command_is_invoked = command_args is not None
-            if command_is_invoked:
-                invoked_command_names_and_args.append((command_name, command_args))
+            command_is_not_invoked = command_args is None
+            if command_is_not_invoked:
+                continue
 
-        return invoked_command_names_and_args
-
-    @property
-    def invoked_commands_and_args(self) -> list[tuple[Command, list[Any]]]:
-        commands_and_args = []
-
-        for command_name, command_args in self._get_invoked_command_names_and_args():
             parsed_command = self._parsed_commands[command_name]
-
             command = parsed_command["command"]
             command_executor_args = parsed_command["get_executor_args"](command_args)
 
-            commands_and_args.append((command, command_executor_args))
+            invoked_commands_and_executor_args.append((command, command_executor_args))
 
-        return commands_and_args
+        return invoked_commands_and_executor_args
