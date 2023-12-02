@@ -1,4 +1,4 @@
-class CommandFlag:
+class Flag:
     _MIN_NAME_LENGTH = 1
     _MIN_PREFIX_LENGTH = 1
     _PREFIX_CHAR = '-'
@@ -23,12 +23,12 @@ class CommandFlag:
                 f"the first {cls._MIN_PREFIX_LENGTH} characters of the string must all be '{cls._PREFIX_CHAR}'"
             )
 
-        name = string.lstrip(CommandFlag._PREFIX_CHAR)
+        name = string.lstrip(Flag._PREFIX_CHAR)
         if len(name) < cls._MIN_NAME_LENGTH:
             raise ValueError(f"string must have a name of at least length {cls._MIN_NAME_LENGTH}")
 
     def __init__(self, string: str):
-        CommandFlag._raise_for_invalid_args(string)
+        Flag._raise_for_invalid_args(string)
         self._string = string
 
     def __str__(self) -> str:
@@ -40,4 +40,4 @@ class CommandFlag:
 
     @property
     def name(self) -> str:
-        return self._string.lstrip(CommandFlag._PREFIX_CHAR)
+        return self._string.lstrip(Flag._PREFIX_CHAR)
