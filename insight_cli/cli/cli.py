@@ -1,4 +1,4 @@
-from typing import Any, Callable, TypedDict
+from typing import Callable, TypedDict
 import argparse
 
 from insight_cli.commands.base.command import Command
@@ -6,6 +6,7 @@ from insight_cli.commands.base.command import Command
 
 class ParsedCommand(TypedDict):
     command: Command
+    flag_names: list[str]
     flag_strings: list[str]
     get_executor_args: Callable
     name: str
@@ -21,44 +22,58 @@ class CLI:
     @staticmethod
     def _raise_for_invalid_description(description: str) -> None:
         if not isinstance(description, str):
-            raise TypeError("description must be a str")
-
-        if description.strip() == "":
-            raise ValueError("description cannot be empty")
+            raise TypeError("[description] must be a str")
 
     @staticmethod
     def _raise_for_invalid_commands(commands: list[Command]) -> None:
         if not isinstance(commands, list):
-            raise TypeError("commands must be a list")
+            raise TypeError("[commands] must be of type list")
 
         if not commands:
-            raise ValueError("commands must be a non-empty list")
+            raise ValueError("[commands] must be a non-empty list")
 
         if any(not isinstance(command, Command) for command in commands):
-            raise TypeError("each element in commands must be of type Command")
+            raise TypeError("each command in [commands] must be of type Command")
 
-        flag_strings = []
+        flag_strings, flag_names = [], []
         for command in commands:
             parsed_command = CLI._parse_command(command)
             flag_strings.extend(parsed_command["flag_strings"])
+            flag_names.extend(parsed_command["flag_names"])
 
         if len(set(flag_strings)) != len(flag_strings):
-            raise ValueError("all flags strings must be unique")
+            raise ValueError("all flag strings in [commands] must be unique")
+
+        if len(set(flag_names)) != len(flag_names):
+            raise ValueError("all flag names in [commands] must be unique")
 
     @staticmethod
     def _parse_command(command: Command) -> ParsedCommand:
         def get_name() -> str:
-            command_name_flag_prefix_priority = ["--", "---", "-"]
-            for flag_prefix in command_name_flag_prefix_priority:
+            """
+            [prefixes] contains the prefixes sorted in descending
+            priority. Priorities are determined the argparse library.
+
+            The name of the command flag with the highest priority
+            prefix will be the name of the command.
+            """
+            prefixes = ["--", "---", "-"]
+
+            for prefix in prefixes:
                 for flag in command.flags:
-                    if flag.prefix == flag_prefix:
+                    if flag.prefix == prefix:
                         return flag.name
 
-        def get_executor_args(command_args: list[str]) -> list[Any]:
+            raise ValueError("No name found")
+
+        def get_executor_args(command_args: list[str]) -> list:
             return [
                 param_type(arg)
                 for arg, param_type in zip(command_args, command.executor_param_types)
             ]
+
+        def get_flag_names() -> list[str]:
+            return [flag.name for flag in command.flags]
 
         def get_flag_strings() -> list[str]:
             return [str(flag) for flag in command.flags]
@@ -72,45 +87,46 @@ class CLI:
                     ),
                     "nargs": command.num_executor_params,
                 }
-            else:
-                return {
-                    "action": "store_const",
-                    "const": [],
-                    "help": command.description,
-                }
+
+            return {
+                "action": "store_const",
+                "const": [],
+                "help": command.description,
+            }
 
         parsed_command = {
             "command": command,
             "get_executor_args": get_executor_args,
             "name": get_name(),
+            "flag_names": get_flag_names(),
             "flag_strings": get_flag_strings(),
             "options": get_options(),
         }
 
         return parsed_command
 
-    def __init__(self, commands: list[Command], description: str, max_width: int = 50):
+    def __init__(self, commands: list[Command], description: str):
         CLI._raise_for_invalid_args(commands, description)
         self._arguments: argparse.Namespace = argparse.Namespace()
         self._parsed_commands: dict[str, ParsedCommand] = {}
         self._parser: argparse.ArgumentParser = argparse.ArgumentParser(
             description=description,
             formatter_class=lambda prog: argparse.HelpFormatter(
-                prog, max_help_position=max_width
+                prog, max_help_position=50
             ),
         )
         self._add_commands(commands)
 
     def _add_commands(self, commands: list[Command]) -> None:
-        parsed_commands = [CLI._parse_command(command) for command in commands]
+        sorted_parsed_commands: list[ParsedCommand] = sorted(
+            [CLI._parse_command(command) for command in commands],
+            key=lambda parsed_command: parsed_command["name"],
+        )
 
-        parsed_commands.sort(key=lambda parsed_command: parsed_command["name"])
-
-        for parsed_command in parsed_commands:
+        for parsed_command in sorted_parsed_commands:
             self._parser.add_argument(
                 *parsed_command["flag_strings"], **parsed_command["options"]
             )
-
             self._parsed_commands[parsed_command["name"]] = parsed_command
 
     def parse_arguments(self) -> None:
@@ -121,7 +137,7 @@ class CLI:
             command_is_not_invoked = command_args is None
             if command_is_not_invoked:
                 continue
-            
+
             parsed_command = self._parsed_commands[command_name]
             command = parsed_command["command"]
             command_executor_args = parsed_command["get_executor_args"](command_args)
