@@ -64,7 +64,7 @@ class CLI:
                     if flag.prefix == prefix:
                         return flag.name
 
-            raise ValueError("No name found")
+            raise ValueError("no name found")
 
         def get_executor_args(command_args: list[str]) -> list:
             return [
