@@ -1,9 +1,10 @@
-import setuptools, insight_cli
+import setuptools
+from insight_cli.config import config
 
 
 setuptools.setup(
     name="insight-cli",
-    version=insight_cli.__version__,
+    version=config.INSIGHT_VERSION,
     packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": ["insight = insight_cli:main"],

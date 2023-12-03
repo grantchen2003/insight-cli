@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import shutil
 
-from insight_cli.api import make_validate_repository_id_request
+from insight_cli.api import API
 from insight_cli.repository.config_file import ConfigFile, ConfigFileData
 
 
@@ -26,7 +26,7 @@ class CoreDir:
     @property
     def is_valid(self) -> bool:
         try:
-            response_data: dict[str, str] = make_validate_repository_id_request(
+            response_data: dict[str, str] = API.make_validate_repository_id_request(
                 self._config_file.data["repository_id"]
             )
 

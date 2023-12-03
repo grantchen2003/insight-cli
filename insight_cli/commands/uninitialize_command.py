@@ -15,10 +15,9 @@ class UninitializeCommand(Command):
     def execute(self) -> None:
         repository = Repository(Path.cwd())
 
-        if not repository.is_valid:
+        try:
+            repository.uninitialize()
+            print(Color.green("The current insight repository has been uninitialized."))
+
+        except FileNotFoundError:
             print(Color.red("The current directory is not an insight repository."))
-            return
-
-        repository.uninitialize()
-
-        print(Color.green("The current insight repository has been uninitialized."))

@@ -1,5 +1,5 @@
 from insight_cli.commands.base.command import Command
-import insight_cli
+from insight_cli.config import config
 
 
 class VersionCommand(Command):
@@ -10,4 +10,4 @@ class VersionCommand(Command):
         )
 
     def execute(self) -> None:
-        print(f"insight-cli v{insight_cli.__version__}")
+        print(f"insight-cli v{config.INSIGHT_VERSION}")

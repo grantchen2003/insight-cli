@@ -43,11 +43,10 @@ class QueryCommand(Command):
 
     def execute(self, query_string: str) -> None:
         repository = Repository(Path.cwd())
+        
+        try:
+            matches = repository.query(query_string)
+            self._print_matches(matches)
 
-        if not repository.is_valid:
+        except FileNotFoundError:
             print(Color.red("The current directory is not an insight repository."))
-            return
-
-        matches = repository.query(query_string)
-
-        self._print_matches(matches)

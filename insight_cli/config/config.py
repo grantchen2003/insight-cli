@@ -1,0 +1,2 @@
+INSIGHT_VERSION = "0.0.0"
+INSIGHT_API_BASE_URL = "http://localhost:5000"
