@@ -22,7 +22,7 @@ class CLI:
     @staticmethod
     def _raise_for_invalid_description(description: str) -> None:
         if not isinstance(description, str):
-            raise TypeError("[description] must be a str")
+            raise TypeError("[description] must be of type str")
 
     @staticmethod
     def _raise_for_invalid_commands(commands: list[Command]) -> None:

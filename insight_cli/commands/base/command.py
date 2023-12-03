@@ -18,23 +18,21 @@ class Command(ABC):
             raise TypeError("flags must be a list")
 
         if len(flags) < cls._MIN_NUM_REQUIRED_FLAGS:
-            raise ValueError(
-                f"There must be at least {cls._MIN_NUM_REQUIRED_FLAGS} flags"
-            )
+            raise ValueError(f"at least {cls._MIN_NUM_REQUIRED_FLAGS} flag(s) required")
 
         if any(not isinstance(flag, str) for flag in flags):
-            raise TypeError("every flag in flags must be of type string")
+            raise TypeError("every flag in [flags] must be of type str")
 
         if len(flags) != len(set(flags)):
-            raise ValueError("the flag strings must all be unique")
+            raise ValueError("every flag in [flags] must be unique")
 
     @staticmethod
     def _raise_for_invalid_description(description: str) -> None:
         if not isinstance(description, str):
-            raise TypeError("description must be a str")
+            raise TypeError("[description] must be of type str")
 
         if description.strip() == "":
-            raise ValueError("description cannot be empty")
+            raise ValueError("[description] must non-empty")
 
     @abstractmethod
     def execute(self, *args, **kwargs):
@@ -46,12 +44,12 @@ class Command(ABC):
         self._description: str = description
 
     @property
-    def flags(self) -> list[Flag]:
-        return self._flags
-
-    @property
     def description(self) -> str:
         return self._description
+
+    @property
+    def flags(self) -> list[Flag]:
+        return self._flags
 
     @property
     def has_executor_params(self) -> bool:
