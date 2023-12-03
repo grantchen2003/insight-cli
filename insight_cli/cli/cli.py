@@ -1,7 +1,7 @@
 from typing import Callable, TypedDict
 import argparse
 
-from insight_cli.commands.base.command import Command
+from insight_cli.commands import Command
 
 
 class ParsedCommand(TypedDict):
@@ -14,39 +14,6 @@ class ParsedCommand(TypedDict):
 
 
 class CLI:
-    @staticmethod
-    def _raise_for_invalid_args(commands: list[Command], description: str) -> None:
-        CLI._raise_for_invalid_commands(commands)
-        CLI._raise_for_invalid_description(description)
-
-    @staticmethod
-    def _raise_for_invalid_description(description: str) -> None:
-        if not isinstance(description, str):
-            raise TypeError("[description] must be of type str")
-
-    @staticmethod
-    def _raise_for_invalid_commands(commands: list[Command]) -> None:
-        if not isinstance(commands, list):
-            raise TypeError("[commands] must be of type list")
-
-        if not commands:
-            raise ValueError("[commands] must be a non-empty list")
-
-        if any(not isinstance(command, Command) for command in commands):
-            raise TypeError("each command in [commands] must be of type Command")
-
-        flag_strings, flag_names = [], []
-        for command in commands:
-            parsed_command = CLI._parse_command(command)
-            flag_strings.extend(parsed_command["flag_strings"])
-            flag_names.extend(parsed_command["flag_names"])
-
-        if len(set(flag_strings)) != len(flag_strings):
-            raise ValueError("all flag strings in [commands] must be unique")
-
-        if len(set(flag_names)) != len(flag_names):
-            raise ValueError("all flag names in [commands] must be unique")
-
     @staticmethod
     def _parse_command(command: Command) -> ParsedCommand:
         def get_name() -> str:
@@ -94,7 +61,7 @@ class CLI:
                 "help": command.description,
             }
 
-        parsed_command = {
+        parsed_command: ParsedCommand = {
             "command": command,
             "get_executor_args": get_executor_args,
             "name": get_name(),
@@ -104,6 +71,39 @@ class CLI:
         }
 
         return parsed_command
+
+    @staticmethod
+    def _raise_for_invalid_args(commands: list[Command], description: str) -> None:
+        CLI._raise_for_invalid_commands(commands)
+        CLI._raise_for_invalid_description(description)
+
+    @staticmethod
+    def _raise_for_invalid_commands(commands: list[Command]) -> None:
+        if not isinstance(commands, list):
+            raise TypeError("[commands] must be of type list")
+
+        if not commands:
+            raise ValueError("[commands] must be a non-empty list")
+
+        if any(not isinstance(command, Command) for command in commands):
+            raise TypeError("each command in [commands] must be of type Command")
+
+        flag_strings, flag_names = [], []
+        for command in commands:
+            parsed_command = CLI._parse_command(command)
+            flag_strings.extend(parsed_command["flag_strings"])
+            flag_names.extend(parsed_command["flag_names"])
+
+        if len(set(flag_strings)) != len(flag_strings):
+            raise ValueError("all flag strings in [commands] must be unique")
+
+        if len(set(flag_names)) != len(flag_names):
+            raise ValueError("all flag names in [commands] must be unique")
+
+    @staticmethod
+    def _raise_for_invalid_description(description: str) -> None:
+        if not isinstance(description, str):
+            raise TypeError("[description] must be of type str")
 
     def __init__(self, commands: list[Command], description: str):
         CLI._raise_for_invalid_args(commands, description)

@@ -1,5 +1,5 @@
-from insight_cli.commands.base.command import Command
 from insight_cli.config import config
+from .base.command import Command
 
 
 class VersionCommand(Command):

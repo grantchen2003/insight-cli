@@ -3,7 +3,7 @@ import os
 import shutil
 
 from insight_cli.api import API
-from insight_cli.repository.config_file import ConfigFile, ConfigFileData
+from .config_file import ConfigFile, ConfigFileData
 
 
 class CoreDir:
@@ -15,9 +15,7 @@ class CoreDir:
 
     def create(self, repository_id: str) -> None:
         os.makedirs(self._path, exist_ok=True)
-
         config_file_data: ConfigFileData = {"repository_id": repository_id}
-
         self._config_file.create(config_file_data)
 
     def delete(self) -> None:

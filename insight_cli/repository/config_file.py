@@ -19,10 +19,10 @@ class ConfigFile:
             file.write(content)
 
     @property
-    def is_valid(self) -> bool:
-        return self._path.is_file()
-
-    @property
     def data(self) -> ConfigFileData:
         with open(self._path, "r") as file:
             return json.load(file)
+
+    @property
+    def is_valid(self) -> bool:
+        return self._path.is_file()

@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from insight_cli.commands.base.command import Command
 from insight_cli.repository import Repository
 from insight_cli.utils import Color
+from .base.command import Command
 
 
 class QueryCommand(Command):
@@ -30,6 +30,7 @@ class QueryCommand(Command):
                 match_text += (
                     f"\tLine {match['start_line']}: {Color.green(match['content'])}"
                 )
+
             else:
                 match_text += f"\tLine {match['start_line']} - {match['end_line']}: {Color.green(match['content'])}"
 
@@ -43,9 +44,10 @@ class QueryCommand(Command):
 
     def execute(self, query_string: str) -> None:
         repository = Repository(Path.cwd())
-        
+
         try:
             matches = repository.query(query_string)
+
             self._print_matches(matches)
 
         except FileNotFoundError:

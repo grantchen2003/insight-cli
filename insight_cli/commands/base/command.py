@@ -1,7 +1,7 @@
 import inspect, typing
 from abc import ABC, abstractmethod
 
-from insight_cli.commands.base.flag import Flag
+from .flag import Flag
 
 
 class Command(ABC):

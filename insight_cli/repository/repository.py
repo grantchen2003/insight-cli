@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from insight_cli.repository.core_dir import CoreDir
-from insight_cli.repository.ignore_file import IgnoreFile
 from insight_cli.api import API
 from insight_cli.utils import Directory
+from .core_dir import CoreDir
+from .ignore_file import IgnoreFile
 
 
 class Repository:
@@ -37,7 +37,7 @@ class Repository:
     def uninitialize(self) -> None:
         self._core_dir.delete()
 
-    def query(self, query_string: str):
+    def query(self, query_string: str) -> list[dict]:
         return API.make_query_repository_request(
             self._core_dir.repository_id, query_string
         )

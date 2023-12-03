@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from insight_cli.commands.base.command import Command
 from insight_cli.repository import Repository
-from insight_cli.utils.color import Color
+from insight_cli.utils import Color
+from .base.command import Command
 
 
 class UninitializeCommand(Command):
