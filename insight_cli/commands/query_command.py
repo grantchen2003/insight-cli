@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from insight_cli.commands.base.command import Command
-from insight_cli.core import repository, dot_insight_dir
+from insight_cli.repository import Repository
 from insight_cli.utils import Color
 
 
@@ -27,7 +27,9 @@ class QueryCommand(Command):
             match_text += f"{match['path']}\n"
 
             if match["start_line"] == match["end_line"]:
-                match_text += f"\tLine {match['start_line']}: {Color.green(match['content'])}"
+                match_text += (
+                    f"\tLine {match['start_line']}: {Color.green(match['content'])}"
+                )
             else:
                 match_text += f"\tLine {match['start_line']} - {match['end_line']}: {Color.green(match['content'])}"
 
@@ -40,15 +42,12 @@ class QueryCommand(Command):
         )
 
     def execute(self, query_string: str) -> None:
-        repository_dir_path = Path.cwd()
+        repository = Repository(Path.cwd())
 
-        dot_insight_dir_path: Path = repository_dir_path / dot_insight_dir.get_dir_name()
-
-        if not dot_insight_dir.is_valid(dot_insight_dir_path):
+        if not repository.is_valid:
             print(Color.red("The current directory is not an insight repository."))
             return
 
-        matches = repository.query(repository_dir_path, query_string)
+        matches = repository.query(query_string)
 
         self._print_matches(matches)
-

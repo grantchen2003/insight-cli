@@ -3,8 +3,8 @@ import os
 
 import requests
 
-from ..utils.directory import Directory
-from ..utils import requests as requests_utils
+from insight_cli.utils.directory import Directory
+from insight_cli import utils
 
 
 def get_base_api_url() -> str:
@@ -18,7 +18,7 @@ def get_base_api_url() -> str:
     return env_to_base_api_url[env]
 
 
-@requests_utils.handle_make_request_exceptions
+@utils.handle_make_request_exceptions
 def make_initialize_repository_request(repository_dir: Directory) -> dict[str, str]:
     request_url = f"{get_base_api_url()}/initialize_repository"
 
@@ -36,7 +36,7 @@ def make_initialize_repository_request(repository_dir: Directory) -> dict[str, s
     return response.json()
 
 
-@requests_utils.handle_make_request_exceptions
+@utils.handle_make_request_exceptions
 def make_reinitialize_repository_request(
     repository_dir: Directory, repository_id: str
 ) -> None:
@@ -57,7 +57,7 @@ def make_reinitialize_repository_request(
     return response.json()
 
 
-@requests_utils.handle_make_request_exceptions
+@utils.handle_make_request_exceptions
 def make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
     request_url = f"{get_base_api_url()}/validate_repository_id"
 
@@ -73,7 +73,7 @@ def make_validate_repository_id_request(repository_id: str) -> dict[str, str]:
     return response.json()
 
 
-@requests_utils.handle_make_request_exceptions
+@utils.handle_make_request_exceptions
 def make_query_repository_request(repository_id: str, query_string: str) -> list | dict:
     request_url = f"{get_base_api_url()}/query?repository-id={repository_id}&query-string={query_string}"
 
