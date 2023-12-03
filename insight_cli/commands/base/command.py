@@ -69,9 +69,9 @@ class Command(ABC):
         ]
 
     @property
-    def executor_param_names(self):
+    def executor_param_names(self) -> list[str]:
         return [param["name"] for param in self.executor_params]
 
     @property
-    def executor_param_types(self):
+    def executor_param_types(self) -> list:
         return [param["type"] for param in self.executor_params]
