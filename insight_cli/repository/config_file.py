@@ -25,4 +25,4 @@ class ConfigFile:
 
     @property
     def is_valid(self) -> bool:
-        return self._path.is_file()
+        return self._path.is_file() and isinstance(self.data, ConfigFileData)
