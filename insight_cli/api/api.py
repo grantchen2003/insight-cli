@@ -11,7 +11,7 @@ class API:
         request_url = f"{config.INSIGHT_API_BASE_URL}/initialize_repository"
 
         request_json_body = json.dumps(
-            {"repository": repository_dir.to_dict()}, default=str
+            {"repository_dir": repository_dir.to_dict()}, default=str
         )
 
         response = requests.post(url=request_url, json=request_json_body)
@@ -39,7 +39,7 @@ class API:
         request_url = f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository"
 
         request_json_body = json.dumps(
-            {"repository": repository_dir.to_dict(), "repository_id": repository_id},
+            {"repository_dir": repository_dir.to_dict(), "repository_id": repository_id},
             default=str,
         )
 

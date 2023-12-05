@@ -105,7 +105,7 @@ class CLI:
         if not isinstance(description, str):
             raise TypeError("[description] must be of type str")
 
-    def __init__(self, commands: list[Command], description: str):
+    def __init__(self, commands: list[Command], description: str = ""):
         CLI._raise_for_invalid_args(commands, description)
         self._arguments: argparse.Namespace = argparse.Namespace()
         self._parsed_commands: dict[str, ParsedCommand] = {}
