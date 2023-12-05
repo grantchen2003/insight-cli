@@ -1,6 +1,8 @@
+from pathlib import Path
 from unittest.mock import patch
 import contextlib, io, unittest
 
+from insight_cli.repository import InvalidRepositoryError
 from insight_cli.commands import QueryCommand
 from insight_cli.utils import Color
 
@@ -85,20 +87,35 @@ class TestQueryCommand(unittest.TestCase):
 
     @patch("builtins.print")
     @patch("insight_cli.repository.Repository.query")
-    def test_execute_with_no_repository_found(
+    def test_execute_with_invalid_repository(
         self, mock_repository_query, mock_print
     ) -> None:
         query_command = QueryCommand()
         query_string = "sample_query_string"
 
-        mock_repository_query.side_effect = FileNotFoundError()
+        mock_repository_query.side_effect = InvalidRepositoryError(Path.cwd())
 
         query_command.execute(query_string)
 
         mock_repository_query.assert_called_once_with(query_string)
         mock_print.assert_called_once_with(
-            Color.red("The current directory is not an insight repository.")
+            Color.red(f"{Path.cwd()} is an invalid insight repository.")
         )
+
+    @patch("builtins.print")
+    @patch("insight_cli.repository.Repository.query")
+    def test_execute_with_connection_error(
+        self, mock_repository_query, mock_print
+    ) -> None:
+        query_command = QueryCommand()
+        query_string = "sample_query_string"
+
+        mock_repository_query.side_effect = ConnectionError("error message")
+
+        query_command.execute(query_string)
+
+        mock_repository_query.assert_called_once_with(query_string)
+        mock_print.assert_called_once_with(Color.red("error message"))
 
 
 if __name__ == "__main__":

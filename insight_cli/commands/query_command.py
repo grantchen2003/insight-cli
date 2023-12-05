@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from insight_cli.repository import Repository
+from insight_cli.repository import Repository, InvalidRepositoryError
 from insight_cli.utils import Color
 from .base.command import Command
 
@@ -43,12 +43,10 @@ class QueryCommand(Command):
         )
 
     def execute(self, query_string: str) -> None:
-        repository = Repository(Path.cwd())
-
         try:
+            repository = Repository(Path.cwd())
             matches = repository.query(query_string)
-
             self._print_matches(matches)
 
-        except FileNotFoundError:
-            print(Color.red("The current directory is not an insight repository."))
+        except Exception as e:
+            print(Color.red(e))

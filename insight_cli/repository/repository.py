@@ -6,7 +6,22 @@ from .core_dir import CoreDir
 from .ignore_file import IgnoreFile
 
 
+class InvalidRepositoryError(Exception):
+    def __init__(self, path):
+        self.message = f"{Path(path).resolve()} is an invalid insight repository."
+        super().__init__(self.message)
+
+
 class Repository:
+    def _raise_for_invalid_repository(func):
+        def wrapper(self: "Repository", *args, **kwargs):
+            if not self.is_valid:
+                raise InvalidRepositoryError(self._path)
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
     def __init__(self, path: Path):
         self._path = path
         self._core_dir = CoreDir(path)
@@ -25,6 +40,7 @@ class Repository:
 
         self._core_dir.create(repository_id)
 
+    @_raise_for_invalid_repository
     def reinitialize(self) -> None:
         repository_dir: Directory = Directory.create_from_path(
             dir_path=self._path, ignorable_names=self._ignore_file.names
@@ -34,9 +50,11 @@ class Repository:
             repository_dir, self._core_dir.repository_id
         )
 
+    @_raise_for_invalid_repository
     def uninitialize(self) -> None:
         self._core_dir.delete()
 
+    @_raise_for_invalid_repository
     def query(self, query_string: str) -> list[dict]:
         return API.make_query_repository_request(
             self._core_dir.repository_id, query_string
