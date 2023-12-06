@@ -2,6 +2,14 @@ from pathlib import Path
 from typing import TypedDict
 import json
 
+from insight_cli.api import API
+
+
+class InvalidConfigFileDataError(Exception):
+    def __init__(self, data) -> None:
+        self.message = f"{data} is not valid config file data."
+        super().__init__(self.message)
+
 
 class ConfigFileData(TypedDict):
     repository_id: str
@@ -10,10 +18,20 @@ class ConfigFileData(TypedDict):
 class ConfigFile:
     _NAME = "config.json"
 
+    @staticmethod
+    def _is_config_file_data_instance(data):
+        return isinstance(data, dict)\
+               and len(data) == len(ConfigFileData.__annotations__)\
+               and all(key in data and isinstance(data[key], val)
+                       for key, val in ConfigFileData.__annotations__.items())
+
     def __init__(self, parent_dir_path: Path):
         self._path = parent_dir_path / ConfigFile._NAME
 
     def create(self, data: ConfigFileData) -> None:
+        if not ConfigFile._is_config_file_data_instance(data):
+            raise InvalidConfigFileDataError(data)
+
         with open(self._path, "w") as file:
             content = json.dumps(data, indent=4)
             file.write(content)
@@ -21,8 +39,20 @@ class ConfigFile:
     @property
     def data(self) -> ConfigFileData:
         with open(self._path, "r") as file:
-            return json.load(file)
+            data = json.load(file)
+
+        if not ConfigFile._is_config_file_data_instance(data):
+            raise InvalidConfigFileDataError(data)
+
+        return data
 
     @property
     def is_valid(self) -> bool:
-        return self._path.is_file() and isinstance(self.data, ConfigFileData)
+        try:
+            response_data: dict[str, bool] = API.make_validate_repository_id_request(
+                self.data["repository_id"]
+            )
+
+            return response_data["repository_id_is_valid"]
+        except Exception:
+            return False

@@ -23,15 +23,7 @@ class CoreDir:
 
     @property
     def is_valid(self) -> bool:
-        try:
-            response_data: dict[str, str] = API.make_validate_repository_id_request(
-                self._config_file.data["repository_id"]
-            )
-
-            return response_data["repository_id_is_valid"]
-
-        except Exception:
-            return False
+        return self._config_file.is_valid
 
     @property
     def repository_id(self) -> str:
