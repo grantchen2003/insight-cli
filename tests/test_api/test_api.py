@@ -22,13 +22,9 @@ class TestAPI(unittest.TestCase):
         response = API.make_initialize_repository_request(repository_dir)
 
         mock_request_post.assert_called_with(
+            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            json=json.dumps(
-                {
-                    "repository_dir": repository_dir.to_dict(),
-                },
-                default=str,
-            ),
+            json={"repository_dir": repository_dir.to_dict()},
         )
         self.assertTrue("repository_id" in response)
         self.assertIsInstance(response["repository_id"], str)
@@ -50,14 +46,11 @@ class TestAPI(unittest.TestCase):
         response = API.make_initialize_repository_request(repository_dir)
 
         mock_request_post.assert_called_with(
+            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            json=json.dumps(
-                {
-                    "repository_dir": repository_dir.to_dict(),
-                },
-                default=str,
-            ),
-        )
+            json={"repository_dir": repository_dir.to_dict()},
+        ),
+
         self.assertTrue("repository_id" in response)
         self.assertIsInstance(response["repository_id"], str)
 
@@ -77,14 +70,12 @@ class TestAPI(unittest.TestCase):
         API.make_reinitialize_repository_request(repository_dir, repository_id)
 
         mock_request_post.assert_called_with(
+            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-            json=json.dumps(
-                {
-                    "repository_dir": repository_dir.to_dict(),
-                    "repository_id": repository_id,
-                },
-                default=str,
-            ),
+            json={
+                "repository_dir": repository_dir.to_dict(),
+                "repository_id": repository_id,
+            },
         )
 
     @patch("requests.post")
@@ -103,11 +94,9 @@ class TestAPI(unittest.TestCase):
         response = API.make_validate_repository_id_request(repository_id)
 
         mock_request_post.assert_called_with(
+            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/validate_repository_id",
-            json=json.dumps(
-                {"repository_id": repository_id},
-                default=str,
-            ),
+            json={"repository_id": repository_id},
         )
         self.assertEqual(response["repository_id_is_valid"], repository_id_is_valid)
 
@@ -127,11 +116,9 @@ class TestAPI(unittest.TestCase):
         response = API.make_validate_repository_id_request(repository_id)
 
         mock_request_post.assert_called_with(
+            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/validate_repository_id",
-            json=json.dumps(
-                {"repository_id": repository_id},
-                default=str,
-            ),
+            json={"repository_id": repository_id},
         )
         self.assertEqual(response["repository_id_is_valid"], repository_id_is_valid)
 

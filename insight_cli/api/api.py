@@ -1,4 +1,4 @@
-import json, requests
+import requests
 
 from insight_cli import config
 from insight_cli.utils.directory import Directory
@@ -7,14 +7,11 @@ from insight_cli.utils.directory import Directory
 class API:
     @staticmethod
     def make_initialize_repository_request(repository_dir: Directory) -> dict[str, str]:
-        request_url = f"{config.INSIGHT_API_BASE_URL}/initialize_repository"
-
-        request_json_body = json.dumps(
-            {"repository_dir": repository_dir.to_dict()},
-            default=str,
+        response = requests.post(
+            headers={"Content-Type": "application/json"},
+            url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
+            json={"repository_dir": repository_dir.to_dict()},
         )
-
-        response = requests.post(url=request_url, json=request_json_body)
 
         response.raise_for_status()
 
@@ -24,9 +21,9 @@ class API:
     def make_query_repository_request(
         repository_id: str, query_string: str
     ) -> list[dict]:
-        request_url = f"{config.INSIGHT_API_BASE_URL}/query?repository-id={repository_id}&query-string={query_string}"
-
-        response = requests.get(url=request_url)
+        response = requests.get(
+            url=f"{config.INSIGHT_API_BASE_URL}/query?repository-id={repository_id}&query-string={query_string}"
+        )
 
         response.raise_for_status()
 
@@ -36,17 +33,14 @@ class API:
     def make_reinitialize_repository_request(
         repository_dir: Directory, repository_id: str
     ) -> None:
-        request_url = f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository"
-
-        request_json_body = json.dumps(
-            {
+        response = requests.post(
+            headers={"Content-Type": "application/json"},
+            url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
+            json={
                 "repository_dir": repository_dir.to_dict(),
                 "repository_id": repository_id,
             },
-            default=str,
         )
-
-        response = requests.post(url=request_url, json=request_json_body)
 
         response.raise_for_status()
 
@@ -54,11 +48,11 @@ class API:
 
     @staticmethod
     def make_validate_repository_id_request(repository_id: str) -> dict[str, bool]:
-        request_url = f"{config.INSIGHT_API_BASE_URL}/validate_repository_id"
-
-        request_json_body = json.dumps({"repository_id": repository_id}, default=str)
-
-        response = requests.post(url=request_url, json=request_json_body)
+        response = requests.post(
+            headers={"Content-Type": "application/json"},
+            url=f"{config.INSIGHT_API_BASE_URL}/validate_repository_id",
+            json={"repository_id": repository_id},
+        )
 
         response.raise_for_status()
 
