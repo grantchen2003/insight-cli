@@ -20,10 +20,14 @@ class ConfigFile:
 
     @staticmethod
     def _is_config_file_data_instance(data):
-        return isinstance(data, dict)\
-               and len(data) == len(ConfigFileData.__annotations__)\
-               and all(key in data and isinstance(data[key], val)
-                       for key, val in ConfigFileData.__annotations__.items())
+        return (
+            isinstance(data, dict)
+            and len(data) == len(ConfigFileData.__annotations__)
+            and all(
+                key in data and isinstance(data[key], val)
+                for key, val in ConfigFileData.__annotations__.items()
+            )
+        )
 
     def __init__(self, parent_dir_path: Path):
         self._path = parent_dir_path / ConfigFile._NAME
