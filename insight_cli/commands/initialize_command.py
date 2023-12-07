@@ -22,19 +22,15 @@ class InitializeCommand(Command):
                         "The current directory is already an insight repository. This insight repository will be reinitialized."
                     )
                 )
-
                 repository.reinitialize()
-
                 print(Color.green("The current insight repository has been reinitialized."))
 
-                return
-
-            repository.initialize()
-
-            print(
-                Color.green(
-                    "The current directory has been initialized as an insight repository."
+            else:
+                repository.initialize()
+                print(
+                    Color.green(
+                        "The current directory has been initialized as an insight repository."
+                    )
                 )
-            )
         except Exception as e:
             print(Color.red(e))

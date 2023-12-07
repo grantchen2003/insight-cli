@@ -9,6 +9,7 @@ from insight_cli.utils import Color
 
 class TestQueryCommand(unittest.TestCase):
     def test_print_matches_with_no_matches(self) -> None:
+        Color.init()
         matches = []
 
         with io.StringIO() as buffer, contextlib.redirect_stdout(buffer):
@@ -18,6 +19,7 @@ class TestQueryCommand(unittest.TestCase):
         self.assertEqual(output, [Color.yellow("0 matches found")])
 
     def test_print_matches_with_one_match(self) -> None:
+        Color.init()
         matches = [
             {
                 "path": "/example_path",
@@ -90,6 +92,7 @@ class TestQueryCommand(unittest.TestCase):
     def test_execute_with_invalid_repository(
         self, mock_repository_query, mock_print
     ) -> None:
+        Color.init()
         query_command = QueryCommand()
         query_string = "sample_query_string"
 
@@ -107,6 +110,7 @@ class TestQueryCommand(unittest.TestCase):
     def test_execute_with_connection_error(
         self, mock_repository_query, mock_print
     ) -> None:
+        Color.init()
         query_command = QueryCommand()
         query_string = "sample_query_string"
 

@@ -16,9 +16,8 @@ for dir in "${directories[@]}"; do
     fi
 done
 
+python setup.py sdist bdist_wheel
 
-python setup.py sdist bdist_wheel 
-
-python -m pip install dist/insight_cli-0.0.0-py3-none-any.whl --force-reinstall
+pip install dist/insight_cli-0.0.0-py3-none-any.whl --force-reinstall
 
 read -p "Press Enter to exit"

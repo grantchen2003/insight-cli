@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 import shutil
 
-from insight_cli.api import API
 from .config_file import ConfigFile, ConfigFileData
 
 

@@ -10,8 +10,8 @@ setuptools.setup(
         "console_scripts": ["insight = insight_cli:main"],
     },
     install_requires=[
-        "pip>=23.3.1",
+        "colorama==0.4.6",
         "requests==2.31.0",
     ],
-    python_requires=">=3.12.0",
+    python_requires=">=3.9.7",
 )

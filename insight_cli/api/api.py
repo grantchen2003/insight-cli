@@ -1,13 +1,14 @@
-import json
-import requests
+import json, requests
 
-from insight_cli.config import config
+from insight_cli import config
 from insight_cli.utils.directory import Directory
 
 
 class API:
     @staticmethod
-    def make_initialize_repository_request(repository_dir: Directory) -> dict[str, str]:
+    def make_initialize_repository_request(
+            repository_dir: Directory
+    ) -> dict[str, str]:
         request_url = f"{config.INSIGHT_API_BASE_URL}/initialize_repository"
 
         request_json_body = json.dumps(
@@ -21,9 +22,7 @@ class API:
         return response.json()
 
     @staticmethod
-    def make_query_repository_request(
-        repository_id: str, query_string: str
-    ) -> list[dict]:
+    def make_query_repository_request(repository_id: str, query_string: str) -> list[dict]:
         request_url = f"{config.INSIGHT_API_BASE_URL}/query?repository-id={repository_id}&query-string={query_string}"
 
         response = requests.get(url=request_url)
