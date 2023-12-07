@@ -9,7 +9,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.INSIGHT_VERSION, expected_version)
 
     def test_api_base_url(self):
-        expected_base_url = "http://localhost:5000"
+        expected_base_url = "http://127.0.0.1:5000"
         self.assertEqual(config.INSIGHT_API_BASE_URL, expected_base_url)
 
 
