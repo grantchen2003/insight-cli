@@ -14,11 +14,7 @@ class API:
             default=str,
         )
 
-        response = requests.post(
-            headers={"Content-Type": "application/json"},
-            url=request_url,
-            json=request_json_body,
-        )
+        response = requests.post(url=request_url, json=request_json_body)
 
         response.raise_for_status()
 

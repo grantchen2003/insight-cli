@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 from typing import TypedDict
 
@@ -7,15 +6,13 @@ from .file import File, FileDict
 
 class DirectoryDict(TypedDict):
     name: str
-    last_updated: datetime
     files: list[FileDict]
     directories: list["DirectoryDict"]
 
 
 class Directory:
-    def __init__(self, name: str, last_updated: datetime):
+    def __init__(self, name: str):
         self._name: str = name
-        self._last_updated: datetime = last_updated
         self._files: list[File] = []
         self._subdirectories: list[Directory] = []
 
@@ -23,10 +20,7 @@ class Directory:
     def create_from_path(
         cls, dir_path: Path, ignorable_names: set[str] = None
     ) -> "Directory":
-        directory = Directory(
-            name=dir_path.name,
-            last_updated=datetime.fromtimestamp(dir_path.stat().st_mtime),
-        )
+        directory = Directory(name=dir_path.name)
 
         if ignorable_names is None:
             ignorable_names = set()
@@ -54,7 +48,6 @@ class Directory:
     def to_dict(self) -> DirectoryDict:
         return {
             "name": self._name,
-            "last_updated": self._last_updated,
             "files": [file.to_dict() for file in self._files],
             "subdirectories": [
                 subdirectory.to_dict() for subdirectory in self._subdirectories

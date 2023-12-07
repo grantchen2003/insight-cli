@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 import os
 import unittest
@@ -27,7 +26,6 @@ class TestFile(unittest.TestCase):
     def test_to_dict_with_empty_file(self) -> None:
         empty_file = File(
             name="empty_file_name.txt",
-            last_updated=datetime.now(),
             content=[],
         )
 
@@ -35,7 +33,6 @@ class TestFile(unittest.TestCase):
             empty_file.to_dict(),
             {
                 "name": "empty_file_name.txt",
-                "last_updated": datetime.now(),
                 "content": [],
             },
         )
@@ -43,7 +40,6 @@ class TestFile(unittest.TestCase):
     def test_to_dict_with_non_empty_file(self) -> None:
         non_empty_file = File(
             name="non_empty_file_name.txt",
-            last_updated=datetime.now(),
             content=["line 1\nline2"],
         )
 
@@ -51,7 +47,6 @@ class TestFile(unittest.TestCase):
             non_empty_file.to_dict(),
             {
                 "name": "non_empty_file_name.txt",
-                "last_updated": datetime.now(),
                 "content": ["line 1\nline2"],
             },
         )

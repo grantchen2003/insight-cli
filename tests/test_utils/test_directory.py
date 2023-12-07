@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 import tempfile
 import unittest
@@ -21,10 +20,6 @@ class TestDirectory(unittest.TestCase):
         directory = Directory.create_from_path(empty_dir_path)
 
         self.assertEqual(directory._name, "empty_dir")
-        self.assertEqual(
-            directory._last_updated,
-            datetime.fromtimestamp(empty_dir_path.stat().st_mtime),
-        )
         self.assertEqual(len(directory._files), 0)
         self.assertEqual(len(directory._subdirectories), 0)
 
@@ -46,26 +41,18 @@ class TestDirectory(unittest.TestCase):
 
         expected_dict = {
             "name": "directory",
-            "last_updated": datetime.fromtimestamp(dir_path.stat().st_mtime),
             "files": [
                 {
                     "name": "directory_file",
-                    "last_updated": datetime.fromtimestamp(
-                        dir_file_path.stat().st_mtime
-                    ),
                     "content": ["hello there"],
                 }
             ],
             "subdirectories": [
                 {
                     "name": "subdirectory",
-                    "last_updated": datetime.fromtimestamp(subdir_path.stat().st_mtime),
                     "files": [
                         {
                             "name": "subdirectory_file",
-                            "last_updated": datetime.fromtimestamp(
-                                subdir_file_path.stat().st_mtime
-                            ),
                             "content": ["hello there2"],
                         }
                     ],
@@ -77,25 +64,25 @@ class TestDirectory(unittest.TestCase):
         self.assertEqual(directory.to_dict(), expected_dict)
 
     def test_add_file_with_one_empty_file(self) -> None:
-        directory = Directory("example_directory", datetime.now())
-        file = File("empty_file", datetime.now(), [])
+        directory = Directory("example_directory")
+        file = File("empty_file", [])
 
         directory.add_file(file)
 
         self.assertIn(file, directory._files)
 
     def test_add_file_with_one_non_empty_file(self) -> None:
-        directory = Directory("example_directory", datetime.now())
-        file = File("non_empty_file", datetime.now(), ["example_content"])
+        directory = Directory("example_directory")
+        file = File("non_empty_file", ["example_content"])
 
         directory.add_file(file)
 
         self.assertIn(file, directory._files)
 
     def test_add_file_with_two_empty_files(self) -> None:
-        directory = Directory("example_directory", datetime.now())
-        file1 = File("empty_file1", datetime.now(), [])
-        file2 = File("empty_file2", datetime.now(), [])
+        directory = Directory("example_directory")
+        file1 = File("empty_file1", [])
+        file2 = File("empty_file2", [])
 
         directory.add_file(file1)
         directory.add_file(file2)
@@ -104,9 +91,9 @@ class TestDirectory(unittest.TestCase):
         self.assertIn(file2, directory._files)
 
     def test_add_file_with_one_empty_file_and_one_non_empty_file(self) -> None:
-        directory = Directory("example_directory", datetime.now())
-        file1 = File("empty_file", datetime.now(), [])
-        file2 = File("non_empty_file", datetime.now(), ["example_content"])
+        directory = Directory("example_directory")
+        file1 = File("empty_file", [])
+        file2 = File("non_empty_file", ["example_content"])
 
         directory.add_file(file1)
         directory.add_file(file2)
@@ -115,9 +102,9 @@ class TestDirectory(unittest.TestCase):
         self.assertIn(file2, directory._files)
 
     def test_add_file_with_two_non_empty_files(self) -> None:
-        directory = Directory("example_directory", datetime.now())
-        file1 = File("non_empty_file1", datetime.now(), ["example_content"])
-        file2 = File("non_empty_file2", datetime.now(), ["example_content"])
+        directory = Directory("example_directory")
+        file1 = File("non_empty_file1", ["example_content"])
+        file2 = File("non_empty_file2", ["example_content"])
 
         directory.add_file(file1)
         directory.add_file(file2)
@@ -126,17 +113,17 @@ class TestDirectory(unittest.TestCase):
         self.assertIn(file2, directory._files)
 
     def test_add_subdirectory_with_one_empty_subdirectory(self) -> None:
-        directory = Directory("directory", datetime.now())
-        subdirectory = Directory("empty_subdirectory", datetime.now())
+        directory = Directory("directory")
+        subdirectory = Directory("empty_subdirectory")
 
         directory.add_subdirectory(subdirectory)
 
         self.assertIn(subdirectory, directory._subdirectories)
 
     def test_add_subdirectory_with_two_empty_subdirectories(self) -> None:
-        directory = Directory("directory", datetime.now())
-        subdirectory1 = Directory("empty_subdirectory1", datetime.now())
-        subdirectory2 = Directory("empty_subdirectory2", datetime.now())
+        directory = Directory("directory")
+        subdirectory1 = Directory("empty_subdirectory1")
+        subdirectory2 = Directory("empty_subdirectory2")
 
         directory.add_subdirectory(subdirectory1)
         directory.add_subdirectory(subdirectory2)
@@ -145,24 +132,21 @@ class TestDirectory(unittest.TestCase):
         self.assertIn(subdirectory2, directory._subdirectories)
 
     def test_to_dict_with_one_empty_file_and_one_empty_subdirectory(self) -> None:
-        directory = Directory("directory", datetime.now())
-        directory.add_file(File("empty_file", datetime.now(), []))
-        directory.add_subdirectory(Directory("empty_subdirectory", datetime.now()))
+        directory = Directory("directory")
+        directory.add_file(File("empty_file", []))
+        directory.add_subdirectory(Directory("empty_subdirectory"))
 
         expected_dict = {
             "name": "directory",
-            "last_updated": datetime.now(),
             "files": [
                 {
                     "name": "empty_file",
-                    "last_updated": datetime.now(),
                     "content": [],
                 }
             ],
             "subdirectories": [
                 {
                     "name": "empty_subdirectory",
-                    "last_updated": datetime.now(),
                     "files": [],
                     "subdirectories": [],
                 }

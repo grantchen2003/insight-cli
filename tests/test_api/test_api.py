@@ -1,4 +1,3 @@
-from datetime import datetime
 from unittest.mock import Mock, patch
 import json
 import unittest
@@ -18,7 +17,7 @@ class TestAPI(unittest.TestCase):
         mock_response.json.return_value = {"repository_id": "12312"}
         mock_request_post.return_value = mock_response
 
-        repository_dir = Directory("empty_directory", datetime.now())
+        repository_dir = Directory("empty_directory")
 
         response = API.make_initialize_repository_request(repository_dir)
 
@@ -42,10 +41,10 @@ class TestAPI(unittest.TestCase):
         mock_response.json.return_value = {"repository_id": "12312"}
         mock_request_post.return_value = mock_response
 
-        subdirectory = Directory("non_empty_subdirectory", datetime.now())
-        subdirectory.add_file(File("empty_file", datetime.now(), []))
-        repository_dir = Directory("non_empty_directory", datetime.now())
-        repository_dir.add_file(File("empty_file", datetime.now(), []))
+        subdirectory = Directory("non_empty_subdirectory")
+        subdirectory.add_file(File("empty_file", []))
+        repository_dir = Directory("non_empty_directory")
+        repository_dir.add_file(File("empty_file", []))
         repository_dir.add_subdirectory(subdirectory)
 
         response = API.make_initialize_repository_request(repository_dir)
@@ -68,10 +67,10 @@ class TestAPI(unittest.TestCase):
     ) -> None:
         mock_request_post.return_value = Mock()
 
-        subdirectory = Directory("non_empty_subdirectory", datetime.now())
-        subdirectory.add_file(File("empty_file", datetime.now(), []))
-        repository_dir = Directory("non_empty_directory", datetime.now())
-        repository_dir.add_file(File("empty_file", datetime.now(), []))
+        subdirectory = Directory("non_empty_subdirectory")
+        subdirectory.add_file(File("empty_file", []))
+        repository_dir = Directory("non_empty_directory")
+        repository_dir.add_file(File("empty_file", []))
         repository_dir.add_subdirectory(subdirectory)
         repository_id = "123"
 
