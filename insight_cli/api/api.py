@@ -1,16 +1,16 @@
 import requests
 
 from insight_cli import config
-from insight_cli.utils.directory import Directory
+from insight_cli.utils.directory import DirectoryDict
 
 
 class API:
     @staticmethod
-    def make_initialize_repository_request(repository_dir: Directory) -> dict[str, str]:
+    def make_initialize_repository_request(repository_dir_dict: DirectoryDict) -> dict[str, str]:
         response = requests.post(
             headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            json={"repository_dir": repository_dir.to_dict()},
+            json={"repository_dir": repository_dir_dict},
         )
 
         response.raise_for_status()
@@ -31,13 +31,13 @@ class API:
 
     @staticmethod
     def make_reinitialize_repository_request(
-        repository_dir: Directory, repository_id: str
+        repository_dir_dict: DirectoryDict, repository_id: str
     ) -> None:
         response = requests.post(
             headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
             json={
-                "repository_dir": repository_dir.to_dict(),
+                "repository_dir": repository_dir_dict,
                 "repository_id": repository_id,
             },
         )

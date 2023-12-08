@@ -7,8 +7,8 @@ from .ignore_file import IgnoreFile
 
 
 class InvalidRepositoryError(Exception):
-    def __init__(self, path):
-        self.message = f"{Path(path).resolve()} is an invalid insight repository."
+    def __init__(self, path: Path):
+        self.message = f"{path.resolve()} is an invalid insight repository."
         super().__init__(self.message)
 
 
@@ -29,12 +29,12 @@ class Repository:
         self._ignore_file = IgnoreFile(path)
 
     def initialize(self) -> None:
-        repository: Directory = Directory.create_from_path(
-            dir_path=self._path, ignorable_names=self._ignore_file.names
+        repository_dir: Directory = Directory.create_from_path(
+            dir_path=self._path, ignorable_regex_patterns=self._ignore_file.regex_patterns
         )
 
         response_data: dict[str, str] = API.make_initialize_repository_request(
-            repository
+            repository_dir.to_dict()
         )
 
         repository_id: str = response_data["repository_id"]
@@ -44,11 +44,11 @@ class Repository:
     @_RepositoryDecorators.raise_for_invalid_repository
     def reinitialize(self) -> None:
         repository_dir: Directory = Directory.create_from_path(
-            dir_path=self._path, ignorable_names=self._ignore_file.names
+            dir_path=self._path, ignorable_regex_patterns=self._ignore_file.regex_patterns
         )
 
         API.make_reinitialize_repository_request(
-            repository_dir, self._core_dir.repository_id
+            repository_dir.to_dict(), self._core_dir.repository_id
         )
 
     @_RepositoryDecorators.raise_for_invalid_repository

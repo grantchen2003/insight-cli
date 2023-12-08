@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from insight_cli.repository import Repository
+from insight_cli.repository import Repository, InvalidRepositoryError
 from insight_cli.utils import Color
 from .base.command import Command
 
@@ -32,5 +32,5 @@ class InitializeCommand(Command):
                         "The current directory has been initialized as an insight repository."
                     )
                 )
-        except Exception as e:
+        except InvalidRepositoryError as e:
             print(Color.red(e))

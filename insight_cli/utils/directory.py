@@ -2,12 +2,12 @@ from pathlib import Path
 from typing import TypedDict
 
 from .file import File, FileDict
-
+from .string_matcher import StringMatcher
 
 class DirectoryDict(TypedDict):
     name: str
     files: list[FileDict]
-    directories: list["DirectoryDict"]
+    subdirectories: list["DirectoryDict"]
 
 
 class Directory:
@@ -16,21 +16,30 @@ class Directory:
         self._files: list[File] = []
         self._subdirectories: list[Directory] = []
 
-    @classmethod
-    def create_from_path(
-        cls, dir_path: Path, ignorable_names: set[str] = None
-    ) -> "Directory":
+    @staticmethod
+    def create_in_file_system(parent_dir_path: Path, dir_dict: DirectoryDict) -> None:
+        dir_path: Path = parent_dir_path / dir_dict["name"]
+        dir_path.mkdir()
+
+        for file_dict in dir_dict["files"]:
+            File.create_in_file_system(dir_path, file_dict)
+
+        for subdir_dict in dir_dict["subdirectories"]:
+            Directory.create_in_file_system(dir_path, subdir_dict)
+
+    @staticmethod
+    def create_from_path(dir_path: Path, ignorable_regex_patterns: list[str] = None) -> "Directory":
+        if ignorable_regex_patterns is None:
+            ignorable_regex_patterns = []
+
         directory = Directory(name=dir_path.name)
 
-        if ignorable_names is None:
-            ignorable_names = set()
-
         for path in dir_path.iterdir():
-            if path.name in ignorable_names:
+            if StringMatcher.matches_any_regex_pattern(path.name, ignorable_regex_patterns):
                 continue
 
             if path.is_dir():
-                subdirectory: Directory = cls.create_from_path(path)
+                subdirectory: Directory = Directory.create_from_path(path, ignorable_regex_patterns)
                 directory.add_subdirectory(subdirectory)
 
             if path.is_file():

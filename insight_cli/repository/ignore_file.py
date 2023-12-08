@@ -12,9 +12,9 @@ class IgnoreFile:
         return self._path.is_file()
 
     @property
-    def names(self) -> set[str]:
+    def regex_patterns(self) -> list[str]:
         if not self.is_valid:
-            return set()
+            return []
 
         with open(self._path) as file:
-            return set(line.strip() for line in file.read().splitlines())
+            return [line.strip() for line in file.read().splitlines() if line.strip() != ""]

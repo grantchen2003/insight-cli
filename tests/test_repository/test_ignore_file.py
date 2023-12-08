@@ -23,18 +23,18 @@ class TestIgnoreFile(unittest.TestCase):
 
     def test_names_with_invalid_path(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
-        self.assertEqual(ignore_file.names, set())
+        self.assertEqual(ignore_file.regex_patterns, [])
 
     def test_names_with_path_to_empty_file(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
         ignore_file._path.touch()
-        self.assertEqual(ignore_file.names, set())
+        self.assertEqual(ignore_file.regex_patterns, [])
 
     def test_names_with_path_to_non_empty_file(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
         with open(ignore_file._path, "w") as file:
             file.write("hello\nworld")
-        self.assertEqual(ignore_file.names, {"hello", "world"})
+        self.assertEqual(ignore_file.regex_patterns, ["hello", "world"])
 
 
 if __name__ == "__main__":

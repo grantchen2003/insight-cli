@@ -1,7 +1,9 @@
+from pathlib import Path
 from unittest.mock import patch, PropertyMock
 import contextlib, io, unittest
 
 from insight_cli.commands import InitializeCommand
+from insight_cli.repository import InvalidRepositoryError
 from insight_cli.utils import Color
 
 
@@ -38,18 +40,31 @@ class TestInitializeCommand(unittest.TestCase):
             Color.green("The current insight repository has been reinitialized.")
         ])
 
+    @patch("insight_cli.repository.Repository.initialize")
+    @patch("insight_cli.repository.Repository.is_valid", new_callable=PropertyMock, return_value=False)
+    def test_execute_with_non_invalid_repository_exception(self, mock_repository_is_valid, mock_initialize) -> None:
+        initialize_command = InitializeCommand()
+        mock_initialize.side_effect = TypeError("error message")
+
+        with self.assertRaises(TypeError) as context_manager:
+            initialize_command.execute()
+            self.assertEqual(str(context_manager.exception), "error message")
+
+        mock_repository_is_valid.assert_called_once()
+        mock_initialize.assert_called_once()
+
     @patch("builtins.print")
     @patch("insight_cli.repository.Repository.initialize")
     @patch("insight_cli.repository.Repository.is_valid", new_callable=PropertyMock, return_value=False)
-    def test_execute_with_invalid_repository_and_exception(self, mock_repository_is_valid, mock_reinitialize, mock_print) -> None:
+    def test_execute_with_invalid_repository_exception(self, mock_repository_is_valid, mock_initialize, mock_print) -> None:
+        path = Path()
+        mock_initialize.side_effect = InvalidRepositoryError(path)
         initialize_command = InitializeCommand()
-        mock_reinitialize.side_effect = Exception("error message")
 
         initialize_command.execute()
 
         mock_repository_is_valid.assert_called_once()
-        mock_reinitialize.assert_called_once()
-        mock_print.assert_called_once_with(Color.red("error message"))
+        mock_print.assert_called_once_with(Color.red(f"{path.resolve()} is an invalid insight repository."))
 
 
 if __name__ == "__main__":

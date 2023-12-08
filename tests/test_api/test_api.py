@@ -1,5 +1,4 @@
 from unittest.mock import Mock, patch
-import json
 import unittest
 
 from insight_cli.api import API
@@ -17,14 +16,14 @@ class TestAPI(unittest.TestCase):
         mock_response.json.return_value = {"repository_id": "12312"}
         mock_request_post.return_value = mock_response
 
-        repository_dir = Directory("empty_directory")
+        repository_dir_dict = Directory("empty_directory").to_dict()
 
-        response = API.make_initialize_repository_request(repository_dir)
+        response = API.make_initialize_repository_request(repository_dir_dict)
 
         mock_request_post.assert_called_with(
             headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            json={"repository_dir": repository_dir.to_dict()},
+            json={"repository_dir": repository_dir_dict},
         )
         self.assertTrue("repository_id" in response)
         self.assertIsInstance(response["repository_id"], str)
@@ -42,13 +41,14 @@ class TestAPI(unittest.TestCase):
         repository_dir = Directory("non_empty_directory")
         repository_dir.add_file(File("empty_file", []))
         repository_dir.add_subdirectory(subdirectory)
+        repository_dir_dict = repository_dir.to_dict()
 
-        response = API.make_initialize_repository_request(repository_dir)
+        response = API.make_initialize_repository_request(repository_dir_dict)
 
         mock_request_post.assert_called_with(
             headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            json={"repository_dir": repository_dir.to_dict()},
+            json={"repository_dir": repository_dir_dict},
         ),
 
         self.assertTrue("repository_id" in response)
@@ -65,15 +65,17 @@ class TestAPI(unittest.TestCase):
         repository_dir = Directory("non_empty_directory")
         repository_dir.add_file(File("empty_file", []))
         repository_dir.add_subdirectory(subdirectory)
+        repository_dir_dict = repository_dir.to_dict()
         repository_id = "123"
 
-        API.make_reinitialize_repository_request(repository_dir, repository_id)
+
+        API.make_reinitialize_repository_request(repository_dir_dict, repository_id)
 
         mock_request_post.assert_called_with(
             headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
             json={
-                "repository_dir": repository_dir.to_dict(),
+                "repository_dir": repository_dir_dict,
                 "repository_id": repository_id,
             },
         )
