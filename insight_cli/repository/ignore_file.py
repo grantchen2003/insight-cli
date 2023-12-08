@@ -17,4 +17,4 @@ class IgnoreFile:
             return []
 
         with open(self._path) as file:
-            return [line.strip() for line in file.read().splitlines() if line.strip() != ""]
+            return list(set(line.strip() for line in file.read().splitlines() if line.strip() != ""))
