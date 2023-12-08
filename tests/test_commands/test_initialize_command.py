@@ -10,8 +10,14 @@ from insight_cli.utils import Color
 class TestInitializeCommand(unittest.TestCase):
     @patch("builtins.print")
     @patch("insight_cli.repository.Repository.initialize")
-    @patch("insight_cli.repository.Repository.is_valid", new_callable=PropertyMock, return_value=False)
-    def test_execute_with_invalid_repository(self, mock_repository_is_valid, mock_initialize, mock_print) -> None:
+    @patch(
+        "insight_cli.repository.Repository.is_valid",
+        new_callable=PropertyMock,
+        return_value=False,
+    )
+    def test_execute_with_invalid_repository(
+        self, mock_repository_is_valid, mock_initialize, mock_print
+    ) -> None:
         initialize_command = InitializeCommand()
 
         initialize_command.execute()
@@ -19,12 +25,18 @@ class TestInitializeCommand(unittest.TestCase):
         mock_repository_is_valid.assert_called_once()
         mock_initialize.assert_called_once()
         mock_print.assert_called_once_with(
-            Color.green("The current directory has been initialized as an insight repository.")
+            Color.green(f"Initialized insight repository in {Path.cwd()}")
         )
 
     @patch("insight_cli.repository.Repository.reinitialize")
-    @patch("insight_cli.repository.Repository.is_valid", new_callable=PropertyMock, return_value=True)
-    def test_execute_with_valid_repository(self, mock_repository_is_valid, mock_reinitialize) -> None:
+    @patch(
+        "insight_cli.repository.Repository.is_valid",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
+    def test_execute_with_valid_repository(
+        self, mock_repository_is_valid, mock_reinitialize
+    ) -> None:
         initialize_command = InitializeCommand()
 
         with io.StringIO() as buffer, contextlib.redirect_stdout(buffer):
@@ -33,16 +45,19 @@ class TestInitializeCommand(unittest.TestCase):
 
         mock_repository_is_valid.assert_called_once()
         mock_reinitialize.assert_called_once()
-        self.assertEqual(output, [
-            Color.yellow(
-                "The current directory is already an insight repository. This insight repository will be reinitialized."
-            ),
-            Color.green("The current insight repository has been reinitialized.")
-        ])
+        self.assertEqual(
+            output, [Color.green("Reinitialized existing insight repository.")]
+        )
 
     @patch("insight_cli.repository.Repository.initialize")
-    @patch("insight_cli.repository.Repository.is_valid", new_callable=PropertyMock, return_value=False)
-    def test_execute_with_non_invalid_repository_exception(self, mock_repository_is_valid, mock_initialize) -> None:
+    @patch(
+        "insight_cli.repository.Repository.is_valid",
+        new_callable=PropertyMock,
+        return_value=False,
+    )
+    def test_execute_with_non_invalid_repository_exception(
+        self, mock_repository_is_valid, mock_initialize
+    ) -> None:
         initialize_command = InitializeCommand()
         mock_initialize.side_effect = TypeError("error message")
 
@@ -55,8 +70,14 @@ class TestInitializeCommand(unittest.TestCase):
 
     @patch("builtins.print")
     @patch("insight_cli.repository.Repository.initialize")
-    @patch("insight_cli.repository.Repository.is_valid", new_callable=PropertyMock, return_value=False)
-    def test_execute_with_invalid_repository_exception(self, mock_repository_is_valid, mock_initialize, mock_print) -> None:
+    @patch(
+        "insight_cli.repository.Repository.is_valid",
+        new_callable=PropertyMock,
+        return_value=False,
+    )
+    def test_execute_with_invalid_repository_exception(
+        self, mock_repository_is_valid, mock_initialize, mock_print
+    ) -> None:
         path = Path()
         mock_initialize.side_effect = InvalidRepositoryError(path)
         initialize_command = InitializeCommand()
@@ -64,7 +85,9 @@ class TestInitializeCommand(unittest.TestCase):
         initialize_command.execute()
 
         mock_repository_is_valid.assert_called_once()
-        mock_print.assert_called_once_with(Color.red(f"{path.resolve()} is an invalid insight repository."))
+        mock_print.assert_called_once_with(
+            Color.red(f"{path.resolve()} is an invalid insight repository.")
+        )
 
 
 if __name__ == "__main__":

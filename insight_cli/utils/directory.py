@@ -4,6 +4,7 @@ from typing import TypedDict
 from .file import File, FileDict
 from .string_matcher import StringMatcher
 
+
 class DirectoryDict(TypedDict):
     name: str
     files: list[FileDict]

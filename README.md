@@ -13,7 +13,7 @@ To install the insight-cli globally, run the following command:
 $ pip install insight-cli
 ```
 
-To ensure the insight-cli was successfully installed, check your insight-cli version by running: 
+To ensure the insight-cli was successfully installed, check your insight-cli version by running:
 
 ```bash
 $ insight --version
@@ -23,7 +23,7 @@ $ insight --version
 
 The following commands require an internet connection.
 
-To initialize the current directory as an insight repository, run the following command: 
+To initialize the current directory as an insight repository, run the following command:
 
 ```bash
 $ insight --initialize
@@ -31,16 +31,37 @@ $ insight --initialize
 
 The following commands must be ran in a directory that has been initialized as an insight repository.
 
-To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command: 
+To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command:
 
 ```bash
 $ insight --query "<query>"
 ```
 
-To uninitialize an insight repository, run the following command: 
+To uninitialize an insight repository, run the following command:
 
 ```bash
 $ insight --uninitialize
+```
+
+## .insightignore
+
+The .insightignore file allows you to use regex patterns to specify directory and file names to ignore in the repository.
+
+<ul>
+    <li>Empty lines will be ignored.</li>
+    <li>Each line must contain at most 1 regex pattern.</li>
+    <li>Lines starting with # serve as comments. Put a backslash '\' in front of the first hash for patterns that begin with a hash.</li>
+</ul>
+
+```.insightignore
+# Ignore all directories and files with names ending in ".log"
+\.log$
+
+# Ignore all directories and files with name starting with "test_"
+^test_
+
+# Ignore all directories and files with names containing '#'
+\#
 ```
 
 ## Example Usage
@@ -68,7 +89,7 @@ The current directory has been successfully initialized as an insight repository
 Create a .insightignore file in the current directory and specify that we don't want to search the .git directory.
 
 ```bash
-$ echo ".git" > .insightignore
+$ echo "^.git$" > .insightignore
 ```
 
 Search in the current insight repository (excluding the .git directory) for the "function that makes a connection to the mongodb database".
@@ -78,7 +99,7 @@ $ insight --query "function that makes a connection to the mongodb database"
 2 matches found in the following files:
 /server/insight_cli/config/database.js
     Line 3 - 15: const connectToDatabase = async () => {...};
-    
+
 /server/insight_cli/server.js
     Line 25: await connectToDatabase(app);
 ```
@@ -88,4 +109,5 @@ $ insight --query "function that makes a connection to the mongodb database"
 Feel free to contribute to the development of the insight-cli. Submit bug reports, feature requests, or pull requests through GitHub.
 
 ## License
+
 This project is licensed under the [MIT License](./LICENSE).

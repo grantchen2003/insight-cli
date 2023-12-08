@@ -20,12 +20,12 @@ class StringMatcher:
                         f"{pattern} is an invalid regex pattern. {e}"
                     )
 
-        if cache[patterns]:
+        if isinstance(cache[patterns], Exception):
             raise cache[patterns]
 
     @staticmethod
-    def matches_any_regex_pattern(query_string: str, regex_patterns: list[str]) -> bool:
+    def matches_any_regex_pattern(string: str, regex_patterns: list[str]) -> bool:
         StringMatcher._raise_for_invalid_regex_patterns(regex_patterns)
         return any(
-            re.match(regex_pattern, query_string) for regex_pattern in regex_patterns
+            re.search(regex_pattern, string) for regex_pattern in regex_patterns
         )

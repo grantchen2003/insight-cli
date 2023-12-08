@@ -17,20 +17,12 @@ class InitializeCommand(Command):
             repository = Repository(Path.cwd())
 
             if repository.is_valid:
-                print(
-                    Color.yellow(
-                        "The current directory is already an insight repository. This insight repository will be reinitialized."
-                    )
-                )
                 repository.reinitialize()
-                print(Color.green("The current insight repository has been reinitialized."))
+                print(Color.green("Reinitialized existing insight repository."))
 
             else:
                 repository.initialize()
-                print(
-                    Color.green(
-                        "The current directory has been initialized as an insight repository."
-                    )
-                )
+                print(Color.green(f"Initialized insight repository in {Path.cwd()}"))
+
         except InvalidRepositoryError as e:
             print(Color.red(e))

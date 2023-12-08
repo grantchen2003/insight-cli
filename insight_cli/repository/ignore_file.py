@@ -16,5 +16,20 @@ class IgnoreFile:
         if not self.is_valid:
             return []
 
+        regex_patterns = set()
         with open(self._path) as file:
-            return list(set(line.strip() for line in file.read().splitlines() if line.strip() != ""))
+            for line in file.read().splitlines():
+                line = line.strip()
+
+                line_is_empty = line == ""
+                line_is_a_comment = line.startswith("#")
+
+                if line_is_empty or line_is_a_comment:
+                    continue
+
+                if line.startswith("\#"):
+                    line = line[1::]
+
+                regex_patterns.add(line)
+
+        return list(regex_patterns)

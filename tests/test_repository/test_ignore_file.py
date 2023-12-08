@@ -34,7 +34,18 @@ class TestIgnoreFile(unittest.TestCase):
         ignore_file = IgnoreFile(self._temp_dir_path)
         with open(ignore_file._path, "w") as file:
             file.write("hello\nworld")
-        self.assertEqual(ignore_file.regex_patterns, ["hello", "world"])
+        self.assertSetEqual(set(ignore_file.regex_patterns), {"hello", "world"})
+
+    def test_names_with_path_to_file_with_comments(self) -> None:
+        ignore_file = IgnoreFile(self._temp_dir_path)
+        with open(ignore_file._path, "w") as file:
+            file.write("\n".join([
+                "#", "# comment", "#", "\#", ".venv", ".git # a", "\# a # is"
+            ]))
+
+        self.assertSetEqual(set(ignore_file.regex_patterns), {
+            "#", ".venv", ".git # a", "# a # is"
+        })
 
 
 if __name__ == "__main__":
