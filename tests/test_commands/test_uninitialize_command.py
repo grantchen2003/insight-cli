@@ -19,7 +19,7 @@ class TestUninitializeCommand(unittest.TestCase):
         uninitialize_command.execute()
 
         mock_print.assert_called_once_with(
-            Color.red(f"{Path.cwd()} is an invalid insight repository.")
+            Color.red(f"{Path.cwd()} is not an insight repository")
         )
 
     @patch("builtins.print")
@@ -33,7 +33,7 @@ class TestUninitializeCommand(unittest.TestCase):
 
         mock_uninitialize.assert_called_once()
         mock_print.assert_called_once_with(
-            Color.green("The current insight repository has been uninitialized.")
+            Color.green(f"Uninitialized insight repository in {Path.cwd().resolve()}")
         )
 
 

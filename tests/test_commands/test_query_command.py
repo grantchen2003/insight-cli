@@ -102,7 +102,7 @@ class TestQueryCommand(unittest.TestCase):
 
         mock_repository_query.assert_called_once_with(query_string)
         mock_print.assert_called_once_with(
-            Color.red(f"{Path.cwd()} is an invalid insight repository.")
+            Color.red(f"{Path.cwd()} is not an insight repository")
         )
 
     @patch("builtins.print")

@@ -46,7 +46,12 @@ class TestInitializeCommand(unittest.TestCase):
         mock_repository_is_valid.assert_called_once()
         mock_reinitialize.assert_called_once()
         self.assertEqual(
-            output, [Color.green("Reinitialized existing insight repository.")]
+            output,
+            [
+                Color.green(
+                    f"Reinitialized existing insight repository in {Path.cwd().resolved()}"
+                )
+            ],
         )
 
     @patch("insight_cli.repository.Repository.initialize")
@@ -86,7 +91,7 @@ class TestInitializeCommand(unittest.TestCase):
 
         mock_repository_is_valid.assert_called_once()
         mock_print.assert_called_once_with(
-            Color.red(f"{path.resolve()} is an invalid insight repository.")
+            Color.red(f"{path.resolve()} is not an insight repository")
         )
 
 
