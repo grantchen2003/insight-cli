@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import Mock, patch
 import unittest
 
@@ -16,7 +17,7 @@ class TestAPI(unittest.TestCase):
         mock_response.json.return_value = {"repository_id": "12312"}
         mock_request_post.return_value = mock_response
 
-        repository_dir_dict = Directory("empty_directory").to_dict()
+        repository_dir_dict = Directory(Path("empty_directory")).to_directory_dict()
 
         response = API.make_initialize_repository_request(repository_dir_dict)
 
@@ -36,12 +37,12 @@ class TestAPI(unittest.TestCase):
         mock_response.json.return_value = {"repository_id": "12312"}
         mock_request_post.return_value = mock_response
 
-        subdirectory = Directory("non_empty_subdirectory")
-        subdirectory.add_file(File("empty_file", []))
-        repository_dir = Directory("non_empty_directory")
-        repository_dir.add_file(File("empty_file", []))
+        subdirectory = Directory(Path("non_empty_subdirectory"))
+        subdirectory.add_file(File(Path("empty_file"), []))
+        repository_dir = Directory(Path("non_empty_directory"))
+        repository_dir.add_file(File(Path("empty_file"), []))
         repository_dir.add_subdirectory(subdirectory)
-        repository_dir_dict = repository_dir.to_dict()
+        repository_dir_dict = repository_dir.to_directory_dict()
 
         response = API.make_initialize_repository_request(repository_dir_dict)
 
@@ -60,14 +61,13 @@ class TestAPI(unittest.TestCase):
     ) -> None:
         mock_request_post.return_value = Mock()
 
-        subdirectory = Directory("non_empty_subdirectory")
-        subdirectory.add_file(File("empty_file", []))
-        repository_dir = Directory("non_empty_directory")
-        repository_dir.add_file(File("empty_file", []))
+        subdirectory = Directory(Path("non_empty_subdirectory"))
+        subdirectory.add_file(File(Path("empty_file"), []))
+        repository_dir = Directory(Path("non_empty_directory"))
+        repository_dir.add_file(File(Path("empty_file"), []))
         repository_dir.add_subdirectory(subdirectory)
-        repository_dir_dict = repository_dir.to_dict()
+        repository_dir_dict = repository_dir.to_directory_dict()
         repository_id = "123"
-
 
         API.make_reinitialize_repository_request(repository_dir_dict, repository_id)
 

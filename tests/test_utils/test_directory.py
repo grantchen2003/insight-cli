@@ -15,47 +15,54 @@ class TestDirectory(unittest.TestCase):
 
     def test_create_in_file_system_with_empty_dir_dict(self) -> None:
         dir_dict: DirectoryDict = {
-            "name": "empty dir name",
+            "path": self._temp_dir_path / "empty dir name",
             "files": [],
-            "subdirectories": []
+            "subdirectories": [],
         }
-        dir_path = self._temp_dir_path / dir_dict["name"]
 
-        Directory.create_in_file_system(self._temp_dir_path, dir_dict)
+        Directory.create_in_file_system(dir_dict)
 
-        self.assertEqual(Directory.create_from_path(dir_path).to_dict(), dir_dict)
+        self.assertEqual(
+            Directory.create_from_path(dir_dict["path"]).to_directory_dict(), dir_dict
+        )
 
     def test_create_in_file_system_with_non_empty_dir_dict(self) -> None:
         dir_dict: DirectoryDict = {
-            "name": "non empty dir name",
+            "path": self._temp_dir_path / "non empty dir name",
             "files": [
                 {
-                    "name": "file1_name",
-                    "lines": []
+                    "path": self._temp_dir_path / "non empty dir name" / "file1_name",
+                    "lines": [],
                 },
                 {
-                    "name": "file2_name",
-                    "lines": ["hello"]
-                }
+                    "path": self._temp_dir_path / "non empty dir name" / "file2_name",
+                    "lines": ["hello"],
+                },
             ],
             "subdirectories": [
                 {
-                    "name": "subdir dir name",
+                    "path": self._temp_dir_path
+                    / "non empty dir name"
+                    / "subdir dir name",
                     "files": [
                         {
-                            "name": "file3_name",
-                            "lines": ["yo", "whats", "good"]
+                            "path": self._temp_dir_path
+                            / "non empty dir name"
+                            / "subdir dir name"
+                            / "file3_name",
+                            "lines": ["yo", "whats", "good"],
                         },
                     ],
-                    "subdirectories": []
+                    "subdirectories": [],
                 }
-            ]
+            ],
         }
 
-        Directory.create_in_file_system(self._temp_dir_path, dir_dict)
+        Directory.create_in_file_system(dir_dict)
 
-        dir_path = self._temp_dir_path / dir_dict["name"]
-        self.assertEqual(Directory.create_from_path(dir_path).to_dict(), dir_dict)
+        self.assertEqual(
+            Directory.create_from_path(dir_dict["path"]).to_directory_dict(), dir_dict
+        )
 
     def test_create_from_path_with_path_of_empty_dir(self) -> None:
         empty_dir_path = self._temp_dir_path / "empty_dir"
@@ -63,7 +70,7 @@ class TestDirectory(unittest.TestCase):
 
         directory = Directory.create_from_path(empty_dir_path)
 
-        self.assertEqual(directory._name, "empty_dir")
+        self.assertEqual(directory._path, self._temp_dir_path / "empty_dir")
         self.assertEqual(len(directory._files), 0)
         self.assertEqual(len(directory._subdirectories), 0)
 
@@ -84,19 +91,22 @@ class TestDirectory(unittest.TestCase):
         directory = Directory.create_from_path(dir_path)
 
         expected_dict = {
-            "name": "directory",
+            "path": self._temp_dir_path / "directory",
             "files": [
                 {
-                    "name": "directory_file",
+                    "path": self._temp_dir_path / "directory" / "directory_file",
                     "lines": ["hello there"],
                 }
             ],
             "subdirectories": [
                 {
-                    "name": "subdirectory",
+                    "path": self._temp_dir_path / "directory" / "subdirectory",
                     "files": [
                         {
-                            "name": "subdirectory_file",
+                            "path": self._temp_dir_path
+                            / "directory"
+                            / "subdirectory"
+                            / "subdirectory_file",
                             "lines": ["hello there2"],
                         }
                     ],
@@ -105,59 +115,75 @@ class TestDirectory(unittest.TestCase):
             ],
         }
 
-        self.assertEqual(directory.to_dict(), expected_dict)
+        self.assertEqual(directory.to_directory_dict(), expected_dict)
 
     def test_create_from_path_with_invalid_ignorable_names(self) -> None:
         dir_dict: DirectoryDict = {
-            "name": "non empty dir name",
-            "files": [{"name": "file1_name", "lines": []}],
-            "subdirectories": []
+            "path": self._temp_dir_path / "non empty dir name",
+            "files": [
+                {
+                    "path": self._temp_dir_path / "non empty dir name" / "file1_name",
+                    "lines": [],
+                }
+            ],
+            "subdirectories": [],
         }
 
-        Directory.create_in_file_system(self._temp_dir_path, dir_dict)
-
-        dir_path = self._temp_dir_path / dir_dict["name"]
+        Directory.create_in_file_system(dir_dict)
 
         with self.assertRaises(ValueError):
-            Directory.create_from_path(dir_path, ["file1_name", "*."])
+            Directory.create_from_path(dir_dict["path"], ["file1_name", "*."])
 
     def test_create_from_path_with_valid_ignorable_names(self) -> None:
         dir_dict: DirectoryDict = {
-            "name": "non empty dir name",
+            "path": self._temp_dir_path / "non empty dir name",
             "files": [
                 {
-                    "name": "file1_name",
-                    "lines": []
+                    "path": self._temp_dir_path / "non empty dir name" / "file1_name",
+                    "lines": [],
                 },
                 {
-                    "name": "file2_name",
-                    "lines": ["hello"]
-                }
+                    "path": self._temp_dir_path / "non empty dir name" / "file2_name",
+                    "lines": ["hello"],
+                },
             ],
             "subdirectories": [
                 {
-                    "name": "subdir dir name",
+                    "path": self._temp_dir_path
+                    / "non empty dir name"
+                    / "subdir dir name",
                     "files": [
                         {
-                            "name": "file3_name",
-                            "lines": ["yo", "whats", "good"]
+                            "path": self._temp_dir_path
+                            / "non empty dir name"
+                            / "subdir dir name"
+                            / "file3_name",
+                            "lines": ["yo", "whats", "good"],
                         },
                     ],
-                    "subdirectories": []
+                    "subdirectories": [],
                 }
-            ]
+            ],
         }
 
-        Directory.create_in_file_system(self._temp_dir_path, dir_dict)
+        Directory.create_in_file_system(dir_dict)
 
-        dir_path = self._temp_dir_path / dir_dict["name"]
         self.assertEqual(
-            Directory.create_from_path(dir_path, ["file1_name", "subdir dir name"]).to_dict(),
+            Directory.create_from_path(
+                dir_dict["path"], ["file1_name", "subdir dir name"]
+            ).to_directory_dict(),
             {
-                "name": "non empty dir name",
-                "files": [{"name": "file2_name", "lines": ["hello"]}],
-                "subdirectories": []
-            }
+                "path": self._temp_dir_path / "non empty dir name",
+                "files": [
+                    {
+                        "path": self._temp_dir_path
+                        / "non empty dir name"
+                        / "file2_name",
+                        "lines": ["hello"],
+                    }
+                ],
+                "subdirectories": [],
+            },
         )
 
     def test_add_file_with_one_empty_file(self) -> None:
@@ -229,28 +255,30 @@ class TestDirectory(unittest.TestCase):
         self.assertIn(subdirectory2, directory._subdirectories)
 
     def test_to_dict_with_one_empty_file_and_one_empty_subdirectory(self) -> None:
-        directory = Directory("directory")
-        directory.add_file(File("empty_file", []))
-        directory.add_subdirectory(Directory("empty_subdirectory"))
+        directory = Directory(self._temp_dir_path / "directory")
+        directory.add_file(File(self._temp_dir_path / "directory" / "empty_file", []))
+        directory.add_subdirectory(
+            Directory(self._temp_dir_path / "directory" / "empty_subdirectory")
+        )
 
         expected_dict = {
-            "name": "directory",
+            "path": self._temp_dir_path / "directory",
             "files": [
                 {
-                    "name": "empty_file",
+                    "path": self._temp_dir_path / "directory" / "empty_file",
                     "lines": [],
                 }
             ],
             "subdirectories": [
                 {
-                    "name": "empty_subdirectory",
+                    "path": self._temp_dir_path / "directory" / "empty_subdirectory",
                     "files": [],
                     "subdirectories": [],
                 }
             ],
         }
 
-        self.assertEqual(directory.to_dict(), expected_dict)
+        self.assertEqual(directory.to_directory_dict(), expected_dict)
 
 
 if __name__ == "__main__":
