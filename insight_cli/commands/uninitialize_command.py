@@ -16,7 +16,11 @@ class UninitializeCommand(Command):
         try:
             repository = Repository(Path(""))
             repository.uninitialize()
-            print(Color.green("The current insight repository has been uninitialized."))
+            print(
+                Color.green(
+                    f"Uninitialized insight repository in {repository.path.resolve()}"
+                )
+            )
 
         except Exception as e:
             print(Color.red(e))

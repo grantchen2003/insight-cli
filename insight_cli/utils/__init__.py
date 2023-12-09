@@ -1,2 +1,2 @@
 from .color import Color
-from .directory import DirectoryDict, Directory
+from .directory import Directory

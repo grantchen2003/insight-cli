@@ -1,14 +1,8 @@
+from io import BufferedReader
 from pathlib import Path
-from typing import TypedDict
 
-from .file import File, FileDict
+from .file import File
 from .string_matcher import StringMatcher
-
-
-class DirectoryDict(TypedDict):
-    path: Path
-    files: list[FileDict]
-    subdirectories: list["DirectoryDict"]
 
 
 class Directory:
@@ -18,14 +12,14 @@ class Directory:
         self._subdirectories: list[Directory] = []
 
     @staticmethod
-    def create_in_file_system(dir_dict: DirectoryDict) -> None:
-        dir_dict["path"].mkdir()
+    def create_in_file_system(directory: "Directory") -> None:
+        directory.path.mkdir()
 
-        for file_dict in dir_dict["files"]:
-            File.create_in_file_system(file_dict)
+        for file in directory.files:
+            File.create_in_file_system(file)
 
-        for subdir_dict in dir_dict["subdirectories"]:
-            Directory.create_in_file_system(subdir_dict)
+        for subdirectory in directory.subdirectories:
+            Directory.create_in_file_system(subdirectory)
 
     @staticmethod
     def create_from_path(
@@ -36,20 +30,18 @@ class Directory:
 
         directory = Directory(dir_path)
 
-        for path in dir_path.iterdir():
-            if path.is_dir() and not StringMatcher.matches_any_regex_pattern(
-                str(path), ignorable_regex_patterns["directory"]
+        for entry_path in directory.path.iterdir():
+            if entry_path.is_dir() and not StringMatcher.matches_any_regex_pattern(
+                str(entry_path), ignorable_regex_patterns["directory"]
             ):
-                subdirectory: Directory = Directory.create_from_path(
-                    path, ignorable_regex_patterns
+                directory.add_subdirectory(
+                    Directory.create_from_path(entry_path, ignorable_regex_patterns)
                 )
-                directory.add_subdirectory(subdirectory)
 
-            if path.is_file() and not StringMatcher.matches_any_regex_pattern(
-                str(path), ignorable_regex_patterns["file"]
+            if entry_path.is_file() and not StringMatcher.matches_any_regex_pattern(
+                str(entry_path), ignorable_regex_patterns["file"]
             ):
-                file: File = File.create_from_path(path)
-                directory.add_file(file)
+                directory.add_file(File.create_from_path(entry_path))
 
         return directory
 
@@ -59,22 +51,27 @@ class Directory:
     def add_subdirectory(self, subdirectory: "Directory") -> None:
         self._subdirectories.append(subdirectory)
 
-    def to_directory_dict(self) -> DirectoryDict:
-        return {
-            "path": self._path,
-            "files": [file.to_file_dict() for file in self._files],
-            "subdirectories": [
-                subdirectory.to_directory_dict()
-                for subdirectory in self._subdirectories
-            ],
+    @property
+    def path(self) -> Path:
+        return self._path
+
+    @property
+    def files(self) -> list[File]:
+        return self._files
+
+    @property
+    def subdirectories(self) -> list["Directory"]:
+        return self._subdirectories
+
+    @property
+    def nested_files_path_to_binary_data(self) -> dict[str:BufferedReader]:
+        file_path_to_binary_data = {
+            str(file.path): file.binary_data for file in self._files
         }
-    
-    def to_binary_dict(self) -> dict:
-        ans = {}
-        for file in self._files:
-            ans.update(file.to_binary_dict())
-            
+
         for subdirectory in self._subdirectories:
-            ans.update(subdirectory.to_binary_dict())
-            
-        return ans
+            file_path_to_binary_data.update(
+                subdirectory.nested_files_path_to_binary_data
+            )
+
+        return file_path_to_binary_data

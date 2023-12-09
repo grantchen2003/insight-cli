@@ -1,31 +1,25 @@
+from io import BufferedReader
 from pathlib import Path
-from typing import TypedDict
-
-
-class FileDict(TypedDict):
-    path: Path
-    lines: list[str]
 
 
 class File:
-    def __init__(self, path: Path, lines: list[str]):
+    def __init__(self, path: Path, binary_data: BufferedReader):
         self._path: Path = path
-        self._lines: list[str] = lines
+        self._binary_data: BufferedReader = binary_data
 
     @staticmethod
-    def create_in_file_system(file_dict: FileDict) -> None:
-        with open(file_dict["path"], "w") as file:
-            file.write("\n".join(file_dict["lines"]))
+    def create_in_file_system(file: "File") -> None:
+        with open(file.path, "w") as f:
+            f.write(file.binary_data)
 
     @staticmethod
     def create_from_path(file_path: Path) -> "File":
-        return File(path=file_path, lines=open(file_path, "rb"))
+        return File(path=file_path, binary_data=open(file_path, "rb"))
 
-    def to_file_dict(self) -> FileDict:
-        return {
-            "path": self._path,
-            "lines": self._lines,
-        }
+    @property
+    def path(self) -> Path:
+        return self._path
 
-    def to_binary_dict(self) -> dict:
-        return {str(self._path): self._lines}
+    @property
+    def binary_data(self) -> BufferedReader:
+        return self._binary_data

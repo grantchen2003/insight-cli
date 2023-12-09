@@ -1,18 +1,17 @@
+from io import BufferedReader
 import requests
 
 from insight_cli import config
-from insight_cli.utils.directory import DirectoryDict
 
 
 class API:
     @staticmethod
     def make_initialize_repository_request(
-        repository_dir_dict: DirectoryDict,
+        repository_nested_files: dict[str:BufferedReader],
     ) -> dict[str, str]:
         response = requests.post(
-            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            json={"repository_dir": repository_dir_dict},
+            files=repository_nested_files,
         )
 
         response.raise_for_status()
@@ -33,11 +32,12 @@ class API:
 
     @staticmethod
     def make_reinitialize_repository_request(
-        repository_dir_dict: DirectoryDict, repository_id: str
+        repository_nested_files: dict[str:BufferedReader], repository_id: str
     ) -> None:
         response = requests.post(
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-            files=repository_dir_dict,
+            files=repository_nested_files,
+            json={"repository_id": repository_id},
         )
 
         response.raise_for_status()
