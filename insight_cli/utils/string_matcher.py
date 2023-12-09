@@ -5,7 +5,7 @@ class StringMatcher:
     _cache = {"_raise_for_invalid_regex_patterns": {}}
 
     @classmethod
-    def _raise_for_invalid_regex_patterns(cls, patterns: list[str]) -> None:
+    def _raise_for_invalid_regex_patterns(cls, patterns: set[str]) -> None:
         cache = cls._cache["_raise_for_invalid_regex_patterns"]
         patterns = tuple(patterns)
 
@@ -24,7 +24,7 @@ class StringMatcher:
             raise cache[patterns]
 
     @staticmethod
-    def matches_any_regex_pattern(string: str, regex_patterns: list[str]) -> bool:
+    def matches_any_regex_pattern(string: str, regex_patterns: set[str]) -> bool:
         StringMatcher._raise_for_invalid_regex_patterns(regex_patterns)
         return any(
             re.search(regex_pattern, string) for regex_pattern in regex_patterns

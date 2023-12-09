@@ -12,24 +12,36 @@ class IgnoreFile:
         return self._path.is_file()
 
     @property
-    def regex_patterns(self) -> list[str]:
-        if not self.is_valid:
-            return []
+    def regex_patterns(self) -> dict[str, set]:
+        scope_to_regex_patterns = {"directory": set(), "file": set()}
 
-        regex_patterns = set()
+        if not self.is_valid:
+            return scope_to_regex_patterns
+
+        active_pattern_scopes = list(scope_to_regex_patterns.keys())
+
         with open(self._path) as file:
             for line in file.read().splitlines():
                 line = line.strip()
 
-                line_is_empty = line == ""
-                line_is_a_comment = line.startswith("#")
+                if line == "":
+                    continue
 
-                if line_is_empty or line_is_a_comment:
+                elif line == "## _directory_":
+                    active_pattern_scopes = ["directory"]
+                    continue
+
+                elif line == "## _file_":
+                    active_pattern_scopes = ["file"]
+                    continue
+
+                elif line.startswith("#"):
                     continue
 
                 if line.startswith("\#"):
                     line = line[1::]
 
-                regex_patterns.add(line)
+                for pattern_scope in active_pattern_scopes:
+                    scope_to_regex_patterns[pattern_scope].add(line)
 
-        return list(regex_patterns)
+        return scope_to_regex_patterns

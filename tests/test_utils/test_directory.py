@@ -132,7 +132,10 @@ class TestDirectory(unittest.TestCase):
         Directory.create_in_file_system(dir_dict)
 
         with self.assertRaises(ValueError):
-            Directory.create_from_path(dir_dict["path"], ["file1_name", "*."])
+            Directory.create_from_path(
+                dir_dict["path"],
+                {"directory": {"file1_name", "*."}, "file": {"file1_name", "*."}},
+            )
 
     def test_create_from_path_with_valid_ignorable_names(self) -> None:
         dir_dict: DirectoryDict = {
@@ -170,7 +173,11 @@ class TestDirectory(unittest.TestCase):
 
         self.assertEqual(
             Directory.create_from_path(
-                dir_dict["path"], ["file1_name", "subdir dir name"]
+                dir_dict["path"],
+                {
+                    "directory": {"file1_name", "subdir dir name"},
+                    "file": {"file1_name", "subdir dir name"},
+                },
             ).to_directory_dict(),
             {
                 "path": self._temp_dir_path / "non empty dir name",

@@ -23,29 +23,39 @@ class TestIgnoreFile(unittest.TestCase):
 
     def test_names_with_invalid_path(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
-        self.assertEqual(ignore_file.regex_patterns, [])
+        self.assertDictEqual(
+            ignore_file.regex_patterns, {"directory": set(), "file": set()}
+        )
 
     def test_names_with_path_to_empty_file(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
         ignore_file._path.touch()
-        self.assertEqual(ignore_file.regex_patterns, [])
+        self.assertDictEqual(
+            ignore_file.regex_patterns, {"directory": set(), "file": set()}
+        )
 
     def test_names_with_path_to_non_empty_file(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
         with open(ignore_file._path, "w") as file:
             file.write("hello\nworld")
-        self.assertSetEqual(set(ignore_file.regex_patterns), {"hello", "world"})
+        self.assertSetEqual(ignore_file.regex_patterns["directory"], {"hello", "world"})
+        self.assertSetEqual(ignore_file.regex_patterns["file"], {"hello", "world"})
 
     def test_names_with_path_to_file_with_comments(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
         with open(ignore_file._path, "w") as file:
-            file.write("\n".join([
-                "#", "# comment", "#", "\#", ".venv", ".git # a", "\# a # is"
-            ]))
-
-        self.assertSetEqual(set(ignore_file.regex_patterns), {
-            "#", ".venv", ".git # a", "# a # is"
-        })
+            file.write(
+                "\n".join(
+                    ["#", "# comment", "#", "\#", ".venv", ".git # a", "\# a # is"]
+                )
+            )
+        self.assertSetEqual(
+            ignore_file.regex_patterns["directory"],
+            {"#", ".venv", ".git # a", "# a # is"},
+        )
+        self.assertSetEqual(
+            ignore_file.regex_patterns["file"], {"#", ".venv", ".git # a", "# a # is"}
+        )
 
 
 if __name__ == "__main__":

@@ -29,26 +29,25 @@ class Directory:
 
     @staticmethod
     def create_from_path(
-        dir_path: Path, ignorable_regex_patterns: list[str] = None
+        dir_path: Path, ignorable_regex_patterns: dict[str, set] = None
     ) -> "Directory":
         if ignorable_regex_patterns is None:
-            ignorable_regex_patterns = []
+            ignorable_regex_patterns = {"directory": set(), "file": set()}
 
         directory = Directory(dir_path)
 
         for path in dir_path.iterdir():
-            if StringMatcher.matches_any_regex_pattern(
-                str(path), ignorable_regex_patterns
+            if path.is_dir() and not StringMatcher.matches_any_regex_pattern(
+                str(path), ignorable_regex_patterns["directory"]
             ):
-                continue
-
-            if path.is_dir():
                 subdirectory: Directory = Directory.create_from_path(
                     path, ignorable_regex_patterns
                 )
                 directory.add_subdirectory(subdirectory)
 
-            if path.is_file():
+            if path.is_file() and not StringMatcher.matches_any_regex_pattern(
+                str(path), ignorable_regex_patterns["file"]
+            ):
                 file: File = File.create_from_path(path)
                 directory.add_file(file)
 
