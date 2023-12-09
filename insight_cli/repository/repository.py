@@ -34,7 +34,7 @@ class Repository:
         )
 
         response_data: dict[str, str] = API.make_initialize_repository_request(
-            repository_dir.to_dict()
+            repository_dir.to_json_dict()
         )
 
         repository_id: str = response_data["repository_id"]
@@ -48,7 +48,7 @@ class Repository:
         )
 
         API.make_reinitialize_repository_request(
-            repository_dir.to_dict(), self._core_dir.repository_id
+            repository_dir.to_json_dict(), self._core_dir.repository_id
         )
 
     @_RepositoryDecorators.raise_for_invalid_repository

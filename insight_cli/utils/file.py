@@ -23,5 +23,14 @@ class File:
             lines = file.read().decode("utf-8", errors="ignore").splitlines()
         return File(path=file_path, lines=lines)
 
-    def to_dict(self) -> FileDict:
-        return {"path": str(self._path), "lines": self._lines}
+    def to_file_dict(self) -> FileDict:
+        return {
+            "path": self._path,
+            "lines": self._lines,
+        }
+
+    def to_json_dict(self) -> dict:
+        return {
+            "path": str(self._path),
+            "lines": self._lines,
+        }
