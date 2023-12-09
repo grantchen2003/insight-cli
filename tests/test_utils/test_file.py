@@ -13,26 +13,25 @@ class TestFile(unittest.TestCase):
         self._temp_dir.cleanup()
 
     def test_create_in_file_system_with_empty_file(self) -> None:
-        file_dict: FileDict = {
-            "name": "example.txt",
-            "lines": []
-        }
-        file_path = self._temp_dir_path / file_dict["name"]
+        file_dict: FileDict = {"path": self._temp_dir_path / "example.txt", "lines": []}
 
-        File.create_in_file_system(self._temp_dir_path, file_dict)
+        File.create_in_file_system(file_dict)
 
-        self.assertEqual(File.create_from_path(file_path).to_dict(), file_dict)
+        self.assertEqual(
+            File.create_from_path(file_dict["path"]).to_file_dict(), file_dict
+        )
 
     def test_create_in_file_system_with_non_empty_file(self) -> None:
         file_dict: FileDict = {
-            "name": "example.txt",
-            "lines": ["line1", "line2", "line3"]
+            "path": self._temp_dir_path / "example.txt",
+            "lines": ["line1", "line2", "line3"],
         }
-        file_path = self._temp_dir_path / file_dict["name"]
 
-        File.create_in_file_system(self._temp_dir_path, file_dict)
+        File.create_in_file_system(file_dict)
 
-        self.assertEqual(File.create_from_path(file_path).to_dict(), file_dict)
+        self.assertEqual(
+            File.create_from_path(file_dict["path"]).to_file_dict(), file_dict
+        )
 
     def test_create_from_path_with_empty_path(self) -> None:
         empty_path = Path()
@@ -53,28 +52,28 @@ class TestFile(unittest.TestCase):
 
     def test_to_dict_with_empty_file(self) -> None:
         empty_file = File(
-            name="empty_file_name.txt",
+            path=self._temp_dir_path / "empty_file_name.txt",
             lines=[],
         )
 
         self.assertEqual(
-            empty_file.to_dict(),
+            empty_file.to_file_dict(),
             {
-                "name": "empty_file_name.txt",
+                "path": self._temp_dir_path / "empty_file_name.txt",
                 "lines": [],
             },
         )
 
     def test_to_dict_with_non_empty_file(self) -> None:
         non_empty_file = File(
-            name="non_empty_file_name.txt",
+            path=self._temp_dir_path / "non_empty_file_name.txt",
             lines=["line 1\nline2"],
         )
 
         self.assertEqual(
-            non_empty_file.to_dict(),
+            non_empty_file.to_file_dict(),
             {
-                "name": "non_empty_file_name.txt",
+                "path": self._temp_dir_path / "non_empty_file_name.txt",
                 "lines": ["line 1\nline2"],
             },
         )
