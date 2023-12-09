@@ -43,18 +43,63 @@ class TestIgnoreFile(unittest.TestCase):
 
     def test_names_with_path_to_file_with_comments(self) -> None:
         ignore_file = IgnoreFile(self._temp_dir_path)
+
         with open(ignore_file._path, "w") as file:
             file.write(
                 "\n".join(
-                    ["#", "# comment", "#", "\#", ".venv", ".git # a", "\# a # is"]
+                    [
+                        "#",
+                        "# comment",
+                        "#",
+                        r"\#",
+                        ".venv",
+                        ".git # a",
+                        r"\# a # is",
+                    ]
                 )
             )
+
         self.assertSetEqual(
             ignore_file.regex_patterns["directory"],
-            {"#", ".venv", ".git # a", "# a # is"},
+            {".venv", ".git # a", "# a # is", "#"},
         )
         self.assertSetEqual(
-            ignore_file.regex_patterns["file"], {"#", ".venv", ".git # a", "# a # is"}
+            ignore_file.regex_patterns["file"], {".venv", ".git # a", "# a # is","#"}
+        )
+
+    def test_names_with_path_to_file_with_scope(self) -> None:
+        ignore_file = IgnoreFile(self._temp_dir_path)
+        with open(ignore_file._path, "w") as file:
+            file.write(
+                "\n".join(
+                    [
+                        "pattern1",
+                        "pattern2",
+                        "#",
+                        "",
+                        "# comment",
+                        "## _directory_",
+                        "dir_pattern1",
+                        "## comment",
+                        "dir_pattern2",
+                        "## _file_",
+                        "file_pattern1",
+                        "##",
+                        "## _directory_",
+                        "dir_pattern3",
+                        "## _file_",
+                        "file_pattern2",
+                    ]
+                )
+            )
+
+        self.assertSetEqual(
+            ignore_file.regex_patterns["directory"],
+            {"pattern1", "pattern2", "dir_pattern1", "dir_pattern2", "dir_pattern3"},
+        )
+        self.assertSetEqual(
+            ignore_file.regex_patterns["file"],
+            {"pattern1", "pattern2", "file_pattern1", "file_pattern2"},
         )
 
 

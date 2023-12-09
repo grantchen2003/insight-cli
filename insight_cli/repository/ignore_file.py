@@ -38,7 +38,7 @@ class IgnoreFile:
                 elif line.startswith("#"):
                     continue
 
-                if line.startswith("\#"):
+                if line.startswith(r"\#"):
                     line = line[1::]
 
                 for pattern_scope in active_pattern_scopes:
