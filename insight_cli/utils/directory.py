@@ -68,12 +68,13 @@ class Directory:
                 for subdirectory in self._subdirectories
             ],
         }
-
-    def to_json_dict(self) -> DirectoryDict:
-        return {
-            "path": str(self._path),
-            "files": [file.to_json_dict() for file in self._files],
-            "subdirectories": [
-                subdirectory.to_json_dict() for subdirectory in self._subdirectories
-            ],
-        }
+    
+    def to_binary_dict(self) -> dict:
+        ans = {}
+        for file in self._files:
+            ans.update(file.to_binary_dict())
+            
+        for subdirectory in self._subdirectories:
+            ans.update(subdirectory.to_binary_dict())
+            
+        return ans

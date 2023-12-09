@@ -6,7 +6,9 @@ from insight_cli.utils.directory import DirectoryDict
 
 class API:
     @staticmethod
-    def make_initialize_repository_request(repository_dir_dict: DirectoryDict) -> dict[str, str]:
+    def make_initialize_repository_request(
+        repository_dir_dict: DirectoryDict,
+    ) -> dict[str, str]:
         response = requests.post(
             headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
@@ -34,12 +36,8 @@ class API:
         repository_dir_dict: DirectoryDict, repository_id: str
     ) -> None:
         response = requests.post(
-            headers={"Content-Type": "application/json"},
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-            json={
-                "repository_dir": repository_dir_dict,
-                "repository_id": repository_id,
-            },
+            files=repository_dir_dict,
         )
 
         response.raise_for_status()

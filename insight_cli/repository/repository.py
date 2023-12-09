@@ -48,7 +48,7 @@ class Repository:
         )
 
         API.make_reinitialize_repository_request(
-            repository_dir.to_json_dict(), self._core_dir.repository_id
+            repository_dir.to_binary_dict(), self._core_dir.repository_id
         )
 
     @_RepositoryDecorators.raise_for_invalid_repository

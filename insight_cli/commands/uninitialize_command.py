@@ -14,7 +14,7 @@ class UninitializeCommand(Command):
 
     def execute(self) -> None:
         try:
-            repository = Repository(Path.cwd())
+            repository = Repository(Path(""))
             repository.uninitialize()
             print(Color.green("The current insight repository has been uninitialized."))
 

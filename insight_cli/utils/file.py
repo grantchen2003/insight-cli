@@ -19,9 +19,7 @@ class File:
 
     @staticmethod
     def create_from_path(file_path: Path) -> "File":
-        with open(file_path, "rb") as file:
-            lines = file.read().decode("utf-8", errors="ignore").splitlines()
-        return File(path=file_path, lines=lines)
+        return File(path=file_path, lines=open(file_path, "rb"))
 
     def to_file_dict(self) -> FileDict:
         return {
@@ -29,8 +27,5 @@ class File:
             "lines": self._lines,
         }
 
-    def to_json_dict(self) -> dict:
-        return {
-            "path": str(self._path),
-            "lines": self._lines,
-        }
+    def to_binary_dict(self) -> dict:
+        return {str(self._path): self._lines}

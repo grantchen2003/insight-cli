@@ -44,7 +44,7 @@ class QueryCommand(Command):
 
     def execute(self, query_string: str) -> None:
         try:
-            repository = Repository(Path.cwd())
+            repository = Repository(Path(""))
             matches = repository.query(query_string)
             self._print_matches(matches)
 

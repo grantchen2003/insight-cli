@@ -14,7 +14,8 @@ class InitializeCommand(Command):
 
     def execute(self):
         try:
-            repository = Repository(Path.cwd())
+            repository_path = Path("")
+            repository = Repository(repository_path)
 
             if repository.is_valid:
                 repository.reinitialize()
@@ -22,7 +23,9 @@ class InitializeCommand(Command):
 
             else:
                 repository.initialize()
-                print(Color.green(f"Initialized insight repository in {Path.cwd()}"))
+                print(
+                    Color.green(f"Initialized insight repository in {repository_path}")
+                )
 
         except InvalidRepositoryError as e:
             print(Color.red(e))
