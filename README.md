@@ -45,11 +45,11 @@ $ insight --uninitialize
 
 ## .insightignore
 
-The .insightignore file allows you to use regex patterns to specify directory and file paths to ignore in the repository.
+The .insightignore file allows you to use regex patterns to specify directory and file paths to ignore in the insight repository.
 
 <ul>
-    <li>Empty lines will be ignored.</li>
-    <li>Each line must contain at most 1 regex pattern.</li>
+    <li>Empty lines are not matchable, they serve as separators for readability</li>
+    <li>Non-comment lines will be considered as a single regex pattern.</li>
     <li>Lines starting with # serve as comments. Put a backslash '\' in front of the first hash for patterns that begin with a hash.</li>
     <li>Scope comments designate patterns to apply exclusively within the specified scope until encountering another scope comment. '## _directory_' and '## _file_' are scope comments which target patterns within directory and file path scopes, respectively.</li>
 </ul>
@@ -67,10 +67,11 @@ The .insightignore file allows you to use regex patterns to specify directory an
 ## _directory_
 # Patterns now only apply to directory paths
 
-# Ignore all directories paths starting with 'main'
+# Ignore all directory paths starting with 'main'
 ^main
 
 ## _file_
+# Patterns now only apply to file paths
 
 # Ignore all file paths starting with 'cache'
 ^cache
