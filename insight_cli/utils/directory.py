@@ -64,14 +64,10 @@ class Directory:
         return self._subdirectories
 
     @property
-    def nested_files_path_to_binary_data(self) -> dict[str:BufferedReader]:
-        file_path_to_binary_data = {
-            str(file.path): file.binary_data for file in self._files
-        }
+    def nested_files(self) -> list[File]:
+        nested_files = self._files
 
         for subdirectory in self._subdirectories:
-            file_path_to_binary_data.update(
-                subdirectory.nested_files_path_to_binary_data
-            )
+            nested_files.extend(subdirectory.nested_files)
 
-        return file_path_to_binary_data
+        return nested_files
