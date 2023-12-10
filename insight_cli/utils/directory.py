@@ -1,4 +1,3 @@
-from io import BufferedReader
 from pathlib import Path
 
 from .file import File
@@ -10,16 +9,6 @@ class Directory:
         self._path: Path = path
         self._files: list[File] = []
         self._subdirectories: list[Directory] = []
-
-    @staticmethod
-    def create_in_file_system(directory: "Directory") -> None:
-        directory.path.mkdir()
-
-        for file in directory.files:
-            File.create_in_file_system(file)
-
-        for subdirectory in directory.subdirectories:
-            Directory.create_in_file_system(subdirectory)
 
     @staticmethod
     def create_from_path(
@@ -41,7 +30,7 @@ class Directory:
             if entry_path.is_file() and not StringMatcher.matches_any_regex_pattern(
                 str(entry_path), ignorable_regex_patterns["file"]
             ):
-                directory.add_file(File.create_from_path(entry_path))
+                directory.add_file(File(entry_path))
 
         return directory
 
@@ -71,3 +60,7 @@ class Directory:
             nested_files.extend(subdirectory.nested_files)
 
         return nested_files
+
+    @property
+    def nested_files_path_to_bytes(self) -> dict[str:bytes]:
+        return {str(file.path): file.content for file in self.nested_files}
