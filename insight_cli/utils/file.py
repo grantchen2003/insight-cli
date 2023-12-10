@@ -15,7 +15,8 @@ class File:
 
     @staticmethod
     def create_from_path(file_path: Path) -> "File":
-        return File(path=file_path, binary_data=None)
+        with open(file_path, 'rb') as binary_file:
+            return File(path=file_path, binary_data=binary_file.read())
 
     @property
     def path(self) -> Path:

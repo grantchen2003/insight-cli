@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 from insight_cli.api import API
 from insight_cli.utils import Directory
@@ -44,15 +45,20 @@ class Repository:
 
     @_RepositoryDecorators.raise_for_invalid_repository
     def reinitialize(self) -> None:
+        start = time.perf_counter()
         repository_dir: Directory = Directory.create_from_path(
             dir_path=self._path,
             ignorable_regex_patterns=self._ignore_file.regex_patterns,
         )
+        print(f"dir time: {time.perf_counter() - start}")
 
-        API.make_reinitialize_repository_request(
-            repository_dir.nested_files,
-            self._core_dir.repository_id,
-        )
+        start = time.perf_counter()
+        files = repository_dir.nested_files
+        print(f"nested file time: {time.perf_counter() - start}")
+
+        start = time.perf_counter()
+        API.make_reinitialize_repository_request(files, self._core_dir.repository_id)
+        print(f"api time: {time.perf_counter() - start}")
 
     @_RepositoryDecorators.raise_for_invalid_repository
     def uninitialize(self) -> None:
