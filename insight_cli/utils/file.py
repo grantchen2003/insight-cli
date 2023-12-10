@@ -1,5 +1,6 @@
 from io import BufferedReader
 from pathlib import Path
+import os
 
 
 class File:
@@ -14,7 +15,7 @@ class File:
 
     @staticmethod
     def create_from_path(file_path: Path) -> "File":
-        return File(path=file_path, binary_data=open(file_path, "rb"))
+        return File(path=file_path, binary_data=None)
 
     @property
     def path(self) -> Path:
@@ -23,3 +24,7 @@ class File:
     @property
     def binary_data(self) -> BufferedReader:
         return self._binary_data
+
+    @property
+    def size_bytes(self) -> int:
+        return os.path.getsize(self.path)
