@@ -34,9 +34,7 @@ class API:
     def make_reinitialize_repository_request(
         repository_files: dict[str:bytes], repository_id: str
     ) -> None:
-        NUM_FILES_PER_BATCH = 10  # Adjust this based on your needs
-
-        def upload_batch(batch_files):
+        def make_batch_request(batch_files):
             response = requests.post(
                 url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
                 files=batch_files,
@@ -44,17 +42,25 @@ class API:
             )
             response.raise_for_status()
 
-        with ThreadPoolExecutor() as executor:
+        BYTES_PER_BATCH = 10 * 1024 * 1024
+
+        with ThreadPoolExecutor(max_workers=10) as executor:
             batch_files = {}
+            batch_size = 0
             futures = []
-            for i, (file_path, file_data) in enumerate(repository_files.items()):
+            for file_path, file_data in repository_files.items():
+                file_size = len(file_data)
+
+                if batch_size + file_size > BYTES_PER_BATCH and batch_files:
+                    futures.append(executor.submit(make_batch_request, batch_files))
+                    batch_files = {}
+                    batch_size = 0
+
                 batch_files[file_path] = file_data
-                if (i + 1) % NUM_FILES_PER_BATCH == 0 or (i + 1) == len(
-                    repository_files
-                ):
-                    # When the batch is full or it's the last file, submit the batch for upload
-                    futures.append(executor.submit(upload_batch, batch_files))
-                    batch_files = {}  # Start a new batch
+                batch_size += file_size
+
+            if batch_files:
+                futures.append(executor.submit(make_batch_request, batch_files))
 
             for future in futures:
                 future.result()
