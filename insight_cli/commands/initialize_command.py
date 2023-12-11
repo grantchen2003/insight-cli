@@ -14,7 +14,7 @@ class InitializeCommand(Command):
 
     def execute(self):
         try:
-            repository = Repository(Path(""))
+            repository = Repository(Path.cwd())
 
             if repository.is_valid:
                 repository.reinitialize()

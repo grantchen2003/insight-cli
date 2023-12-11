@@ -34,6 +34,8 @@ class API:
     def make_reinitialize_repository_request(
         repository_files: dict[str:bytes], repository_id: str
     ) -> None:
+        # TODO need to implement
+        return
         def make_batch_request(batch_files):
             response = requests.post(
                 url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",

@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from datetime import datetime
 
 from .file import File
 from .string_matcher import StringMatcher
@@ -44,6 +45,19 @@ class Directory:
     def add_subdirectory(self, subdirectory: "Directory") -> None:
         self._subdirectories.append(subdirectory)
 
+    def compare_file_paths(
+        self, other_file_paths: dict[Path, datetime]
+    ) -> dict[str : list[Path]]:
+        # TODO need to implement
+        other_file_paths: dict[str, datetime] = {
+            str(path): last_updated for path, last_updated in other_file_paths.items()
+        }
+
+        def traverse():
+            pass
+
+        return {"add": [], "update": [], "delete": []}
+
     @property
     def path(self) -> Path:
         return self._path
@@ -66,5 +80,14 @@ class Directory:
         return nested_files
 
     @property
-    def nested_files_path_to_bytes(self) -> dict[str:bytes]:
+    def nested_file_paths(self) -> list[Path]:
+        nested_file_paths = [file.path for file in self._files]
+
+        for subdirectory in self._subdirectories:
+            nested_file_paths.extend(subdirectory.nested_file_paths)
+
+        return nested_file_paths
+
+    @property
+    def nested_files_path_to_bytes(self) -> dict[str, bytes]:
         return {str(file.path): file.content for file in self.nested_files}
