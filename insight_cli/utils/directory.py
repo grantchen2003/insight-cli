@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from datetime import datetime
+import os
 
 from .file import File
 from .string_matcher import StringMatcher
@@ -46,17 +47,33 @@ class Directory:
         self._subdirectories.append(subdirectory)
 
     def compare_file_paths(
-        self, other_file_paths: dict[Path, datetime]
-    ) -> dict[str : list[Path]]:
-        # TODO need to implement
-        other_file_paths: dict[str, datetime] = {
-            str(path): last_updated for path, last_updated in other_file_paths.items()
-        }
+        self, previous_file_paths: dict[Path, datetime]
+    ) -> dict[str, list[Path]]:
+        file_paths_to_reinitialize = {"add": [], "update": [], "delete": []}
 
-        def traverse():
-            pass
+        def traverse(directory: Directory) -> None:
+            nonlocal file_paths_to_reinitialize
+            for file in directory.files:
+                if file.path not in previous_file_paths:
+                    file_paths_to_reinitialize["add"].append(file.path)
+                    continue
 
-        return {"add": [], "update": [], "delete": []}
+                if (
+                    datetime.fromtimestamp(os.path.getmtime(file.path))
+                    != previous_file_paths[file.path]
+                ):
+                    file_paths_to_reinitialize["update"].append(file.path)
+
+                del previous_file_paths[file.path]
+
+            for subdirectory in directory.subdirectories:
+                traverse(subdirectory)
+
+        traverse(self)
+
+        file_paths_to_reinitialize["delete"] = list(previous_file_paths.keys())
+
+        return file_paths_to_reinitialize
 
     @property
     def path(self) -> Path:
@@ -89,5 +106,5 @@ class Directory:
         return nested_file_paths
 
     @property
-    def nested_files_path_to_bytes(self) -> dict[str, bytes]:
+    def nested_files_path_to_content(self) -> dict[str, bytes]:
         return {str(file.path): file.content for file in self.nested_files}

@@ -1,5 +1,5 @@
 from pathlib import Path
-import time
+import time, json
 
 from insight_cli.api import API
 from insight_cli.utils import Directory, File
@@ -39,7 +39,7 @@ class Repository:
 
         start = time.perf_counter()
         response_data: dict[str, str] = API.make_initialize_repository_request(
-            repository_dir.nested_files_path_to_bytes
+            repository_dir.nested_files_path_to_content
         )
         print(f"api time: {time.perf_counter() - start}")
 
@@ -65,8 +65,17 @@ class Repository:
         print(f"compare time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
+        files_path_to_data: dict[str, tuple[bytes, str]] = {}
+        for action, file_paths in file_paths_to_reinitialize.items():
+            for file_path in file_paths:
+                file = File(file_path)
+                file_content = file.content if action != "paths_to_delete" else None
+                files_path_to_data[str(file.path)] = (file_content, action)
+        print(f"format time: {time.perf_counter() - start}")
+
+        start = time.perf_counter()
         API.make_reinitialize_repository_request(
-            file_paths_to_reinitialize,
+            files_path_to_data,
             self._core_dir.repository_id,
         )
         print(f"api time: {time.perf_counter() - start}")

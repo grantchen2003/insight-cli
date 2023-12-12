@@ -32,37 +32,39 @@ class API:
 
     @staticmethod
     def make_reinitialize_repository_request(
-        repository_files: dict[str:bytes], repository_id: str
+        repository_files: dict[str:tuple[bytes, str]], repository_id: str
     ) -> None:
-        # TODO need to implement
-        return
-        def make_batch_request(batch_files):
+        def make_batch_request(payload):
             response = requests.post(
                 url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-                files=batch_files,
-                json={"repository_id": repository_id},
+                files=payload["files"],
+                data={"repository_id": repository_id, **payload["actions"]}
             )
             response.raise_for_status()
 
         BYTES_PER_BATCH = 10 * 1024 * 1024
 
         with ThreadPoolExecutor(max_workers=10) as executor:
-            batch_files = {}
+            batch_payload = {"files": {}, "actions": {}}
             batch_size = 0
             futures = []
+
             for file_path, file_data in repository_files.items():
-                file_size = len(file_data)
+                file_content, file_action = file_data
+                file_size = len(file_content)
 
-                if batch_size + file_size > BYTES_PER_BATCH and batch_files:
-                    futures.append(executor.submit(make_batch_request, batch_files))
-                    batch_files = {}
+                if batch_size + file_size > BYTES_PER_BATCH and batch_payload:
+                    futures.append(executor.submit(make_batch_request, batch_payload))
+                    batch_payload = {"files": {}, "actions": {}}
                     batch_size = 0
-
-                batch_files[file_path] = file_data
+                
+                if file_action != "delete":
+                    batch_payload["files"][file_path] = file_content
+                batch_payload["actions"][file_path] = file_action
                 batch_size += file_size
 
-            if batch_files:
-                futures.append(executor.submit(make_batch_request, batch_files))
+            if batch_payload:
+                futures.append(executor.submit(make_batch_request, batch_payload))
 
             for future in futures:
                 future.result()

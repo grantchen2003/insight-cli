@@ -24,9 +24,11 @@ class CoreDir:
         self._updates_file.create(nested_repository_file_paths)
 
     def reinitialize(self, file_paths_to_reinitialize: dict[str, list[Path]]) -> None:
-        self._updates_file.add(file_paths_to_reinitialize["add"])
-        self._updates_file.update(file_paths_to_reinitialize["update"])
-        self._updates_file.delete(file_paths_to_reinitialize["delete"])
+        self._updates_file.reinitialize(
+            paths_to_add=file_paths_to_reinitialize["add"],
+            paths_to_update=file_paths_to_reinitialize["update"],
+            paths_to_delete=file_paths_to_reinitialize["delete"],
+        )
 
     def delete(self) -> None:
         shutil.rmtree(self._path)
