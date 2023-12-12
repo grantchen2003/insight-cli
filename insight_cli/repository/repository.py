@@ -70,13 +70,15 @@ class Repository:
                 file_content = file.content if action != "paths_to_delete" else None
                 files_path_to_data[str(file.path)] = (file_content, action)
         print(f"format time: {time.perf_counter() - start}")
+        
 
         start = time.perf_counter()
-        API.make_reinitialize_repository_request(
-            files_path_to_data,
-            self._core_dir.repository_id,
-        )
-        print(f"api time: {time.perf_counter() - start}")
+        if any(files_path_to_data[path] for path in files_path_to_data.keys()):
+            API.make_reinitialize_repository_request(
+                files_path_to_data,
+                self._core_dir.repository_id,
+            )
+            print(f"api time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
         self._core_dir.reinitialize(file_paths_to_reinitialize)
