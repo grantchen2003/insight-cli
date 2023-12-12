@@ -55,11 +55,11 @@ class Repository:
         file_paths_to_reinitialize: dict[
             str, list[Path]
         ] = Directory.compare_file_paths(
-            previous_file_paths=self._core_dir.files_path_to_last_updated,
+            previous_file_paths=self._core_dir.path_to_last_updated_times,
             current_dir_path=self._path,
             ignorable_regex_patterns=self._ignore_file.regex_patterns,
         )
-        
+
         print(f"compare time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
@@ -70,7 +70,6 @@ class Repository:
                 file_content = file.content if action != "paths_to_delete" else None
                 files_path_to_data[str(file.path)] = (file_content, action)
         print(f"format time: {time.perf_counter() - start}")
-        
 
         start = time.perf_counter()
         if any(files_path_to_data[path] for path in files_path_to_data.keys()):

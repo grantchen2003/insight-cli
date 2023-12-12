@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from insight_cli.repository import Repository
+from insight_cli.repository import Repository, InvalidRepositoryError
 from insight_cli.utils import Color
 from .base.command import Command
 
@@ -22,5 +22,5 @@ class UninitializeCommand(Command):
                 )
             )
 
-        except Exception as e:
+        except InvalidRepositoryError as e:
             print(Color.red(e))

@@ -3,18 +3,18 @@ from pathlib import Path
 import json, os
 
 
-class UpdatesFile:
-    _NAME = "updates.json"
+class TrackerFile:
+    _NAME = "tracker.json"
 
     def __init__(self, parent_dir_path: Path):
-        self._path: Path = parent_dir_path / UpdatesFile._NAME
-        self._data: dict[str, float] = self._read_from_updates_file()
+        self._path: Path = parent_dir_path / TrackerFile._NAME
+        self._data: dict[str, float] = self._read_from_file()
 
-    def _write_to_updates_file(self) -> None:
+    def _write_to_file(self) -> None:
         with open(self._path, "w") as file:
             file.write(json.dumps(self._data, indent=4))
 
-    def _read_from_updates_file(self) -> dict[str, float]:
+    def _read_from_file(self) -> dict[str, float]:
         if not self._path.is_file():
             return {}
         with open(self._path, "r") as file:
@@ -23,39 +23,39 @@ class UpdatesFile:
     def _add(self, paths: list[Path]) -> None:
         for path in paths:
             if str(path) in self._data:
-                raise ValueError(f"{path} is already exists")
+                raise ValueError(f"cannot add path that already exists: {path}")
             self._data[str(path)] = os.path.getmtime(path)
 
     def _update(self, paths: list[Path]) -> None:
         for path in paths:
             if str(path) not in self._data:
-                raise ValueError(f"{path} does not exists")
+                raise ValueError(f"cannot update path that does not exist: {path}")
             self._data[str(path)] = os.path.getmtime(path)
 
     def _delete(self, paths: list[Path]) -> None:
         for path in paths:
             if str(path) not in self._data:
-                raise ValueError(f"{path} does not exists")
+                raise ValueError(f"cannot delete path that does not exist: {path}")
             del self._data[str(path)]
 
     def create(self, paths: list[Path]) -> None:
         self._data = {str(path): os.path.getmtime(path) for path in paths}
-        self._write_to_updates_file()
+        self._write_to_file()
 
     def reinitialize(
-            self,
-            paths_to_add: list[Path],
-            paths_to_update: list[Path],
-            paths_to_delete: list[Path]
+        self,
+        paths_to_add: list[Path],
+        paths_to_update: list[Path],
+        paths_to_delete: list[Path],
     ) -> None:
         self._add(paths_to_add)
         self._update(paths_to_update)
         self._delete(paths_to_delete)
-        self._write_to_updates_file()
+        self._write_to_file()
 
     @property
-    def data(self) -> dict[Path, datetime]:
+    def path_to_last_updated_times(self) -> dict[Path, datetime]:
         return {
-            Path(file_path): datetime.fromtimestamp(last_updated)
-            for file_path, last_updated in self._data.items()
+            Path(path): datetime.fromtimestamp(last_updated_time)
+            for path, last_updated_time in self._data.items()
         }
