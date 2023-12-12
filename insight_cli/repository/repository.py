@@ -1,5 +1,5 @@
 from pathlib import Path
-import time, json
+import time
 
 from insight_cli.api import API
 from insight_cli.utils import Directory, File
@@ -51,6 +51,7 @@ class Repository:
 
     @_RepositoryDecorators.raise_for_invalid_repository
     def reinitialize(self) -> None:
+        # compare times
         start = time.perf_counter()
         file_paths_to_reinitialize: dict[
             str, list[Path]
@@ -59,9 +60,9 @@ class Repository:
             current_dir_path=self._path,
             ignorable_regex_patterns=self._ignore_file.regex_patterns,
         )
-
         print(f"compare time: {time.perf_counter() - start}")
 
+        # format times
         start = time.perf_counter()
         files_path_to_data: dict[str, tuple[bytes, str]] = {}
         for action, file_paths in file_paths_to_reinitialize.items():
@@ -71,6 +72,7 @@ class Repository:
                 files_path_to_data[str(file.path)] = (file_content, action)
         print(f"format time: {time.perf_counter() - start}")
 
+        # api times
         start = time.perf_counter()
         if any(files_path_to_data[path] for path in files_path_to_data.keys()):
             API.make_reinitialize_repository_request(
@@ -79,9 +81,10 @@ class Repository:
             )
             print(f"api time: {time.perf_counter() - start}")
 
+        # core dir times
         start = time.perf_counter()
         self._core_dir.reinitialize(file_paths_to_reinitialize)
-        print(f"local reinit time: {time.perf_counter() - start}")
+        print(f"core dir time: {time.perf_counter() - start}")
 
     @_RepositoryDecorators.raise_for_invalid_repository
     def uninitialize(self) -> None:
