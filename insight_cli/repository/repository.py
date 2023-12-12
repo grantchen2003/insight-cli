@@ -52,16 +52,14 @@ class Repository:
     @_RepositoryDecorators.raise_for_invalid_repository
     def reinitialize(self) -> None:
         start = time.perf_counter()
-        repository_dir = Directory.create_from_path(
-            dir_path=self._path,
-            ignorable_regex_patterns=self._ignore_file.regex_patterns,
-        )
-        print(f"dir time: {time.perf_counter() - start}")
-
-        start = time.perf_counter()
         file_paths_to_reinitialize: dict[
             str, list[Path]
-        ] = repository_dir.compare_file_paths(self._core_dir.files_path_to_last_updated)
+        ] = Directory.compare_file_paths(
+            previous_file_paths=self._core_dir.files_path_to_last_updated,
+            current_dir_path=self._path,
+            ignorable_regex_patterns=self._ignore_file.regex_patterns,
+        )
+        
         print(f"compare time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
