@@ -44,25 +44,24 @@ class API:
 
     @staticmethod
     def make_reinitialize_repository_request(
-        repository_files: dict[str : tuple[bytes, str]], repository_id: str
+        repository_id: str, changed_repository_files: list[tuple[str, bytes, str]]
     ) -> None:
         def make_batch_request(payload):
             response = requests.post(
                 url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
                 files=payload["files"],
-                data={"repository_id": repository_id, **payload["actions"]},
+                data={"repository_id": repository_id, **payload["changes"]},
             )
             response.raise_for_status()
 
         BYTES_PER_BATCH = 10 * 1024 * 1024
 
         with ThreadPoolExecutor(max_workers=10) as executor:
-            batch_payload = {"files": {}, "actions": {}}
+            batch_payload = {"files": {}, "changes": {}}
             batch_size = 0
             futures = []
 
-            for file_path, file_data in repository_files.items():
-                file_content, file_action = file_data
+            for file_path, file_content, change in changed_repository_files:
                 file_size = len(file_content)
 
                 if batch_size + file_size > BYTES_PER_BATCH and batch_payload:
@@ -70,9 +69,8 @@ class API:
                     batch_payload = {"files": {}, "actions": {}}
                     batch_size = 0
 
-                if file_action != "delete":
-                    batch_payload["files"][file_path] = file_content
-                batch_payload["actions"][file_path] = file_action
+                batch_payload["files"][file_path] = file_content
+                batch_payload["changes"][file_path] = change
                 batch_size += file_size
 
             if batch_payload:

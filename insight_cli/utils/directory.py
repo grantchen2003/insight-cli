@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
-import os
+import functools, os
 
 from .file import File
 from .string_matcher import StringMatcher
@@ -29,28 +29,40 @@ class Directory:
                 files.extend(self._get_files(entry_path))
         return files
 
-    # NEED TO RENAME
-    def compare(
-        self, previous_file_paths: dict[Path, datetime]
+    @functools.lru_cache(maxsize=None)
+    def get_file_differences(
+        self, previous_files: dict[Path, datetime]
     ) -> dict[str, list[Path]]:
-        file_paths_to_reinitialize = {"add": [], "update": [], "delete": []}
+        previous_file_paths = set(previous_files.keys())
+        current_file_paths = set(self.file_paths)
 
-        for file_path in self.file_paths:
-            if file_path not in previous_file_paths:
-                file_paths_to_reinitialize["add"].append(file_path)
-                continue
+        added_file_paths = list(current_file_paths - previous_file_paths)
+        deleted_file_paths = list(previous_file_paths - current_file_paths)
+        updated_file_paths = [
+            path
+            for path in current_file_paths.intersection(previous_file_paths)
+            if datetime.fromtimestamp(os.path.getmtime(path)) != previous_files[path]
+        ]
 
-            if (
-                datetime.fromtimestamp(os.path.getmtime(file_path))
-                != previous_file_paths[file_path]
-            ):
-                file_paths_to_reinitialize["update"].append(file_path)
+        return {
+            "add": added_file_paths,
+            "update": updated_file_paths,
+            "delete": deleted_file_paths,
+        }
 
-            del previous_file_paths[file_path]
+    def get_changed_files_content(
+        self, previous_files: dict[Path, datetime]
+    ) -> list[tuple[str, bytes, str]]:
+        file_differences = self.get_file_differences(previous_files)
 
-        file_paths_to_reinitialize["delete"] = list(previous_file_paths.keys())
+        changed_repository_files = []
+        for change, file_paths in file_differences.items():
+            for file_path in file_paths:
+                changed_repository_files.append(
+                    (str(file_path), File(file_path).content, change)
+                )
 
-        return file_paths_to_reinitialize
+        return changed_repository_files
 
     @property
     def files(self) -> list[File]:

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 import time
 
 from insight_cli.api import API
@@ -57,33 +58,21 @@ class Repository:
         print(f"dir time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
-        file_paths_to_reinitialize: dict[str, list[Path]] = repository_dir.compare(
+        changed_repository_files: list[
+            tuple[str, bytes, str]
+        ] = repository_dir.get_changed_files_content(
             self._core_dir.path_to_last_updated_times
         )
-        print(f"compare time: {time.perf_counter() - start}")
+        API.make_reinitialize_repository_request(
+            self._core_dir.repository_id, changed_repository_files
+        )
+        print(f"api time: {time.perf_counter() - start}")
 
-        # format times
         start = time.perf_counter()
-        files_path_to_data: dict[str, tuple[bytes, str]] = {}
-        for action, file_paths in file_paths_to_reinitialize.items():
-            for file_path in file_paths:
-                file = File(file_path)
-                file_content = file.content if action != "paths_to_delete" else None
-                files_path_to_data[str(file.path)] = (file_content, action)
-        print(f"format time: {time.perf_counter() - start}")
-
-        # api times
-        start = time.perf_counter()
-        if any(files_path_to_data[path] for path in files_path_to_data.keys()):
-            API.make_reinitialize_repository_request(
-                files_path_to_data,
-                self._core_dir.repository_id,
-            )
-            print(f"api time: {time.perf_counter() - start}")
-
-        # core dir times
-        start = time.perf_counter()
-        self._core_dir.reinitialize(file_paths_to_reinitialize)
+        file_differences: dict[str, list[Path]] = repository_dir.get_file_differences(
+            previous_files=self._core_dir.path_to_last_updated_times
+        )
+        self._core_dir.reinitialize(file_differences)
         print(f"core dir time: {time.perf_counter() - start}")
 
     @_RepositoryDecorators.raise_for_invalid_repository
