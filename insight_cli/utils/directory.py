@@ -1,6 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from datetime import datetime
 import os
 
 from .file import File
@@ -32,24 +31,17 @@ class Directory:
         self._files.append(file)
 
     @property
-    def path(self) -> Path:
-        return self._path
-
-    @property
     def files(self) -> list[File]:
         return self._files
 
     @property
-    def nested_file_paths(self) -> list[Path]:
+    def file_paths(self) -> list[Path]:
         return [file.path for file in self._files]
 
     @property
-    def files_path_to_content(self) -> dict[str:bytes]:
-        def process_file(file: File) -> tuple[Path, bytes]:
-            return file.path, file.content
-
+    def file_paths_to_content(self) -> dict[str:bytes]:
         with ThreadPoolExecutor() as executor:
-            return {
-                str(path): content
-                for path, content in executor.map(process_file, self._files)
-            }
+            path_content_pairs = executor.map(
+                lambda file: (file.path, file.content), self._files
+            )
+            return {str(path): content for path, content in path_content_pairs}

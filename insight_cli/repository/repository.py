@@ -38,14 +38,14 @@ class Repository:
 
         start = time.perf_counter()
         response_data: dict[str, str] = API.make_initialize_repository_request(
-            repository_dir.files_path_to_content
+            repository_dir.file_paths_to_content
         )
         print(f"api time: {time.perf_counter() - start}")
 
         repository_id: str = response_data["repository_id"]
 
         start = time.perf_counter()
-        self._core_dir.create(repository_id, repository_dir.nested_file_paths)
+        self._core_dir.create(repository_id, repository_dir.file_paths)
         print(f"create time: {time.perf_counter() - start}")
 
     @_RepositoryDecorators.raise_for_invalid_repository
