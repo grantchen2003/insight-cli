@@ -11,25 +11,23 @@ class Directory:
     def __init__(self, path: Path, ignorable_regex_patterns: dict[str, str] = None):
         self._path: Path = path
         self._ignorable_regex_patterns = ignorable_regex_patterns
-        self._files: list[File] = []
-        self._populate_with_files_in_dir(self._path)
+        self._files: list[File] = self._get_files(self._path)
 
-    def _populate_with_files_in_dir(self, dir_path: Path) -> None:
+    def _get_files(self, dir_path: Path) -> list[File]:
+        files = []
         for entry_path in os.scandir(dir_path):
             entry_path = Path(entry_path)
 
             if entry_path.is_file() and not StringMatcher.matches_any_regex_pattern(
                 str(entry_path), self._ignorable_regex_patterns["file"]
             ):
-                self._add_file(File(entry_path))
+                files.append(File(entry_path))
 
             if entry_path.is_dir() and not StringMatcher.matches_any_regex_pattern(
                 str(entry_path), self._ignorable_regex_patterns["directory"]
             ):
-                self._populate_with_files_in_dir(entry_path)
-
-    def _add_file(self, file: File) -> None:
-        self._files.append(file)
+                files.extend(self._get_files(entry_path))
+        return files
 
     # NEED TO RENAME
     def compare(
