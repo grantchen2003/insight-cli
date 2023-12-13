@@ -72,7 +72,7 @@ class Directory:
 
         directory = Directory(dir_path)
 
-        def add_directory_entry(entry_path):
+        def add_directory_entry(entry_path: Path) -> None:
             if entry_path.is_dir() and not StringMatcher.matches_any_regex_pattern(
                 str(entry_path), ignorable_regex_patterns["directory"]
             ):
@@ -86,7 +86,8 @@ class Directory:
                 directory.add_file(File(entry_path))
 
         with ThreadPoolExecutor() as executor:
-            executor.map(add_directory_entry, directory.path.iterdir())
+            for entry_path in os.scandir(directory.path):
+                executor.submit(add_directory_entry, Path(entry_path))
 
         return directory
 

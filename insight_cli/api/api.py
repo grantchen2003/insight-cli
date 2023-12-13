@@ -26,8 +26,7 @@ class API:
             current_batch["files"][file_path] = file_content
             current_batch_size += file_size
 
-        if current_batch["files"]:
-            batches.append(current_batch)
+        batches.append(current_batch)
 
         print(f"batch time: {time.perf_counter() - start}")
 
