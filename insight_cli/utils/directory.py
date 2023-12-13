@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from pathlib import Path
 import os
 
@@ -29,6 +30,29 @@ class Directory:
 
     def _add_file(self, file: File) -> None:
         self._files.append(file)
+
+    # NEED TO RENAME
+    def compare(
+        self, previous_file_paths: dict[Path, datetime]
+    ) -> dict[str, list[Path]]:
+        file_paths_to_reinitialize = {"add": [], "update": [], "delete": []}
+
+        for file_path in self.file_paths:
+            if file_path not in previous_file_paths:
+                file_paths_to_reinitialize["add"].append(file_path)
+                continue
+
+            if (
+                datetime.fromtimestamp(os.path.getmtime(file_path))
+                != previous_file_paths[file_path]
+            ):
+                file_paths_to_reinitialize["update"].append(file_path)
+
+            del previous_file_paths[file_path]
+
+        file_paths_to_reinitialize["delete"] = list(previous_file_paths.keys())
+
+        return file_paths_to_reinitialize
 
     @property
     def files(self) -> list[File]:
