@@ -31,15 +31,14 @@ class Repository:
 
     def initialize(self) -> None:
         start = time.perf_counter()
-        repository_dir: Directory = Directory.create_from_path(
-            dir_path=self._path,
-            ignorable_regex_patterns=self._ignore_file.regex_patterns,
+        repository_dir: Directory = Directory(
+            self._path, self._ignore_file.regex_patterns
         )
         print(f"dir time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
         response_data: dict[str, str] = API.make_initialize_repository_request(
-            repository_dir.nested_files_path_to_content
+            repository_dir.files_path_to_content
         )
         print(f"api time: {time.perf_counter() - start}")
 
@@ -51,6 +50,7 @@ class Repository:
 
     @_RepositoryDecorators.raise_for_invalid_repository
     def reinitialize(self) -> None:
+        return
         # compare times
         start = time.perf_counter()
         file_paths_to_reinitialize: dict[
