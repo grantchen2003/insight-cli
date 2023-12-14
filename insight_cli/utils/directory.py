@@ -8,25 +8,32 @@ from .string_matcher import StringMatcher
 
 
 class Directory:
-    def __init__(self, path: Path, ignorable_regex_patterns: dict[str, str] = None):
+    def __init__(self, path: Path, ignorable_regex_patterns: dict[str, set]):
         self._path: Path = path
         self._ignorable_regex_patterns = ignorable_regex_patterns
         self._files: list[File] = self._get_files(self._path)
 
     def _get_files(self, dir_path: Path) -> list[File]:
         files = []
-        for entry_path in os.scandir(dir_path):
-            entry_path = Path(entry_path)
+        for root, directories, file_names in os.walk(dir_path):
+            root_path = Path(root)
 
-            if entry_path.is_file() and not StringMatcher.matches_any_regex_pattern(
-                str(entry_path), self._ignorable_regex_patterns["file"]
-            ):
-                files.append(File(entry_path))
+            directories[:] = [
+                directory
+                for directory in directories
+                if not StringMatcher.matches_any_regex_pattern(
+                    str(root_path / directory),
+                    self._ignorable_regex_patterns["directory"],
+                )
+            ]
 
-            if entry_path.is_dir() and not StringMatcher.matches_any_regex_pattern(
-                str(entry_path), self._ignorable_regex_patterns["directory"]
-            ):
-                files.extend(self._get_files(entry_path))
+            for file_name in file_names:
+                file_path = root_path / file_name
+                if not StringMatcher.matches_any_regex_pattern(
+                    str(file_path), self._ignorable_regex_patterns["file"]
+                ):
+                    files.append(File(file_path))
+
         return files
 
     def get_file_changes(
@@ -51,7 +58,9 @@ class Directory:
 
         with ThreadPoolExecutor() as executor:
             return {
-                change: list(executor.map(lambda path: (str(path), File(path).content), paths))
+                change: list(
+                    executor.map(lambda path: (str(path), File(path).content), paths)
+                )
                 for change, paths in file_path_changes.items()
             }
 
