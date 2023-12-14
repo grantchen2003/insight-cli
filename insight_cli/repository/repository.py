@@ -2,7 +2,7 @@ from pathlib import Path
 import time
 
 from insight_cli.api import InitializeRepositoryAPI, ReinitializeRepositoryAPI, QueryRepositoryAPI
-from insight_cli.utils import Directory, File
+from insight_cli.utils import Directory
 from .core_dir import CoreDir
 from .ignore_file import IgnoreFile
 
