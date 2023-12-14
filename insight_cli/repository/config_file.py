@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import TypedDict
 import json
 
-from insight_cli.api import API
+from insight_cli.api import ValidateRepositoryIdAPI
 
 
 class InvalidConfigFileDataError(Exception):
@@ -42,6 +42,9 @@ class ConfigFile:
 
     @property
     def data(self) -> ConfigFileData:
+        if not self._path.is_file():
+            raise FileNotFoundError()
+
         with open(self._path, "r") as file:
             data = json.load(file)
 
@@ -53,10 +56,11 @@ class ConfigFile:
     @property
     def is_valid(self) -> bool:
         try:
-            response_data: dict[str, bool] = API.make_validate_repository_id_request(
+            response_data: dict[str, bool] = ValidateRepositoryIdAPI.make_request(
                 self.data["repository_id"]
             )
 
             return response_data["repository_id_is_valid"]
-        except Exception:
+
+        except FileNotFoundError:
             return False

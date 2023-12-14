@@ -22,11 +22,11 @@ class CoreDir:
         self._config_file.create(config_file_data)
         self._tracker_file.create(nested_repository_file_paths)
 
-    def reinitialize(self, file_paths_to_reinitialize: dict[str, list[Path]]) -> None:
-        self._tracker_file.reinitialize(
-            paths_to_add=file_paths_to_reinitialize["add"],
-            paths_to_update=file_paths_to_reinitialize["update"],
-            paths_to_delete=file_paths_to_reinitialize["delete"],
+    def update(self, repository_file_changes: dict[str, list[tuple[str, bytes]]]) -> None:
+        self._tracker_file.change_paths(
+            paths_to_add=[Path(path) for path, _ in repository_file_changes["add"]],
+            paths_to_update=[Path(path) for path, _ in repository_file_changes["update"]],
+            paths_to_delete=[Path(path) for path, _ in repository_file_changes["delete"]],
         )
 
     def delete(self) -> None:

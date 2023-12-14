@@ -21,28 +21,34 @@ class TrackerFile:
             return json.load(file)
 
     def _add(self, paths: list[Path]) -> None:
-        for path in paths:
+        for path in set(paths):
             if str(path) in self._data:
-                raise ValueError(f"cannot add path that already exists: {path}")
+                raise ValueError(
+                    f"cannot add path that already exists: {path}"
+                )
             self._data[str(path)] = os.path.getmtime(path)
 
     def _update(self, paths: list[Path]) -> None:
         for path in paths:
             if str(path) not in self._data:
-                raise ValueError(f"cannot update path that does not exist: {path}")
+                raise ValueError(
+                    f"cannot update path that does not exist: {path}"
+                )
             self._data[str(path)] = os.path.getmtime(path)
 
     def _delete(self, paths: list[Path]) -> None:
         for path in paths:
             if str(path) not in self._data:
-                raise ValueError(f"cannot delete path that does not exist: {path}")
+                raise ValueError(
+                    f"cannot delete path that does not exist: {path}"
+                )
             del self._data[str(path)]
 
     def create(self, paths: list[Path]) -> None:
-        self._data = {str(path): os.path.getmtime(path) for path in paths}
+        self._add(paths)
         self._write_to_file()
 
-    def reinitialize(
+    def change_paths(
         self,
         paths_to_add: list[Path],
         paths_to_update: list[Path],
