@@ -1,7 +1,11 @@
 from pathlib import Path
 import time
 
-from insight_cli.api import InitializeRepositoryAPI, ReinitializeRepositoryAPI, QueryRepositoryAPI
+from insight_cli.api import (
+    InitializeRepositoryAPI,
+    ReinitializeRepositoryAPI,
+    QueryRepositoryAPI,
+)
 from insight_cli.utils import Directory
 from .core_dir import CoreDir
 from .ignore_file import IgnoreFile
@@ -14,15 +18,14 @@ class InvalidRepositoryError(Exception):
 
 
 class Repository:
-    class _RepositoryDecorators:
-        @staticmethod
-        def raise_for_invalid_repository(func):
-            def wrapper(self: "Repository", *args, **kwargs):
-                if not self.is_valid:
-                    raise InvalidRepositoryError(self._path)
-                return func(self, *args, **kwargs)
+    @staticmethod
+    def _raise_for_invalid_repository(func):
+        def wrapper(self: "Repository", *args, **kwargs):
+            if not self.is_valid:
+                raise InvalidRepositoryError(self._path)
+            return func(self, *args, **kwargs)
 
-            return wrapper
+        return wrapper
 
     def __init__(self, path: Path):
         self._path = path
@@ -46,7 +49,7 @@ class Repository:
         self._core_dir.create(response_data["repository_id"], repository_dir.file_paths)
         print(f"create time: {time.perf_counter() - start}")
 
-    @_RepositoryDecorators.raise_for_invalid_repository
+    @_raise_for_invalid_repository
     def reinitialize(self) -> None:
         start = time.perf_counter()
         repository_dir: Directory = Directory(
@@ -70,11 +73,11 @@ class Repository:
         self._core_dir.update(repository_file_changes)
         print(f"core dir time: {time.perf_counter() - start}")
 
-    @_RepositoryDecorators.raise_for_invalid_repository
+    @_raise_for_invalid_repository
     def uninitialize(self) -> None:
         self._core_dir.delete()
 
-    @_RepositoryDecorators.raise_for_invalid_repository
+    @_raise_for_invalid_repository
     def query(self, query_string: str) -> list[dict]:
         return QueryRepositoryAPI.make_request(
             self._core_dir.repository_id, query_string
