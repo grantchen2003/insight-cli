@@ -24,9 +24,9 @@ class CoreDir:
 
     def update(self, repository_file_changes: dict[str, list[tuple[str, bytes]]]) -> None:
         self._tracker_file.change_paths(
-            paths_to_add=[Path(path) for path, _ in repository_file_changes["add"]],
-            paths_to_update=[Path(path) for path, _ in repository_file_changes["update"]],
-            paths_to_delete=[Path(path) for path, _ in repository_file_changes["delete"]],
+            paths_to_add=[Path(path) for path in repository_file_changes["add"]],
+            paths_to_update=[Path(path) for path in repository_file_changes["update"]],
+            paths_to_delete=[Path(path) for path in repository_file_changes["delete"]],
         )
 
     def delete(self) -> None:
@@ -41,5 +41,5 @@ class CoreDir:
         return self._config_file.data["repository_id"]
 
     @property
-    def path_to_last_updated_times(self) -> dict[Path, datetime]:
-        return self._tracker_file.path_to_last_updated_times
+    def tracked_file_modified_times(self) -> dict[Path, datetime]:
+        return self._tracker_file.tracked_file_modified_times

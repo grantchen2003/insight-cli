@@ -1,8 +1,10 @@
 from insight_cli.cli import CLI
-from insight_cli.commands import InitializeCommand
-from insight_cli.commands import QueryCommand
-from insight_cli.commands import UninitializeCommand
-from insight_cli.commands import VersionCommand
+from insight_cli.commands import (
+    InitializeCommand,
+    QueryCommand,
+    UninitializeCommand,
+    VersionCommand,
+)
 
 
 def main() -> None:

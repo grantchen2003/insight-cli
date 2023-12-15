@@ -6,7 +6,7 @@ from insight_cli.api import (
     ReinitializeRepositoryAPI,
     QueryRepositoryAPI,
 )
-from insight_cli.utils import Directory
+from insight_cli.utils import Directory, FileChangesDetector
 from .core_dir import CoreDir
 from .ignore_file import IgnoreFile
 
@@ -51,6 +51,7 @@ class Repository:
 
     @_raise_for_invalid_repository
     def reinitialize(self) -> None:
+        total_start = time.perf_counter()
         start = time.perf_counter()
         repository_dir: Directory = Directory(
             self._path, self._ignore_file.regex_patterns
@@ -58,20 +59,40 @@ class Repository:
         print(f"dir time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
-        repository_file_changes = repository_dir.get_file_changes(
-            previous_files=self._core_dir.path_to_last_updated_times
+        tracked_file_times = self._core_dir.tracked_file_modified_times
+        print(f"tracked_file_times time: {time.perf_counter() - start}")
+
+        start = time.perf_counter()
+        repo_file_modified_times = repository_dir.file_modified_times
+        print(f"repo_file_modified_times time: {time.perf_counter() - start}")
+
+        start = time.perf_counter()
+        file_changes_detector = FileChangesDetector(
+            previous_file_modified_times=tracked_file_times,
+            current_file_modified_times=repo_file_modified_times
         )
-        print(f"changed files time: {time.perf_counter() - start}")
+        print(f"create detector time: {time.perf_counter() - start}")
+
+        start = time.perf_counter()
+        repository_file_changes = file_changes_detector.file_changes
+        print(f"file changes time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
         ReinitializeRepositoryAPI.make_request(
-            self._core_dir.repository_id, repository_file_changes
+            repository_id=self._core_dir.repository_id,
+            repository_file_changes=repository_file_changes
         )
         print(f"api time: {time.perf_counter() - start}")
 
         start = time.perf_counter()
-        self._core_dir.update(repository_file_changes)
+        repository_file_path_changes = file_changes_detector.file_path_changes
+        print(f"file path changes time: {time.perf_counter() - start}")
+
+        start = time.perf_counter()
+        self._core_dir.update(repository_file_path_changes)
         print(f"core dir time: {time.perf_counter() - start}")
+
+        print(f"total time: {time.perf_counter() - total_start}")
 
     @_raise_for_invalid_repository
     def uninitialize(self) -> None:

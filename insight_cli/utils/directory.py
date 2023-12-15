@@ -36,34 +36,6 @@ class Directory:
 
         return files
 
-    def get_file_changes(
-        self, previous_files: dict[Path, datetime]
-    ) -> dict[str, list[tuple[str, bytes]]]:
-        previous_file_paths = set(previous_files.keys())
-        current_file_paths = set(self.file_paths)
-
-        added_file_paths = list(current_file_paths - previous_file_paths)
-        deleted_file_paths = list(previous_file_paths - current_file_paths)
-        updated_file_paths = [
-            path
-            for path in current_file_paths.intersection(previous_file_paths)
-            if datetime.fromtimestamp(os.path.getmtime(path)) != previous_files[path]
-        ]
-
-        file_path_changes = {
-            "add": added_file_paths,
-            "update": updated_file_paths,
-            "delete": deleted_file_paths,
-        }
-
-        with ThreadPoolExecutor() as executor:
-            return {
-                change: list(
-                    executor.map(lambda path: (str(path), File(path).content), paths)
-                )
-                for change, paths in file_path_changes.items()
-            }
-
     @property
     def files(self) -> list[File]:
         return self._files
@@ -71,6 +43,14 @@ class Directory:
     @property
     def file_paths(self) -> list[Path]:
         return [file.path for file in self._files]
+
+    @property
+    def file_modified_times(self) -> dict[Path, datetime]:
+        # make faster with multithreading?
+        return {
+            file_path: datetime.fromtimestamp(os.path.getmtime(file_path))
+            for file_path in self.file_paths
+        }
 
     @property
     def file_paths_to_content(self) -> dict[str, bytes]:

@@ -21,7 +21,7 @@ class TrackerFile:
             return json.load(file)
 
     def _add(self, paths: list[Path]) -> None:
-        for path in set(paths):
+        for path in paths:
             if str(path) in self._data:
                 raise ValueError(
                     f"cannot add path that already exists: {path}"
@@ -60,7 +60,7 @@ class TrackerFile:
         self._write_to_file()
 
     @property
-    def path_to_last_updated_times(self) -> dict[Path, datetime]:
+    def tracked_file_modified_times(self) -> dict[Path, datetime]:
         return {
             Path(path): datetime.fromtimestamp(last_updated_time)
             for path, last_updated_time in self._data.items()
