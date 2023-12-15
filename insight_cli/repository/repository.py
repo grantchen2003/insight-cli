@@ -35,11 +35,11 @@ class Repository:
         repository_dir: Directory = Directory(
             self._path, self._ignore_file.regex_patterns
         )
-        
+
         response_data: dict[str, str] = InitializeRepositoryAPI.make_request(
             repository_dir.file_paths_to_content
         )
-        
+
         self._core_dir.create(response_data["repository_id"], repository_dir.file_paths)
 
     @_raise_for_invalid_repository
@@ -47,17 +47,20 @@ class Repository:
         repository_dir: Directory = Directory(
             self._path, self._ignore_file.regex_patterns
         )
-        
+
         file_changes_detector = FileChangesDetector(
             previous_file_modified_times=self._core_dir.tracked_file_modified_times,
             current_file_modified_times=repository_dir.file_modified_times,
         )
-        
+
+        if file_changes_detector.no_files_changes_exist:
+            return
+
         ReinitializeRepositoryAPI.make_request(
             repository_id=self._core_dir.repository_id,
             repository_file_changes=file_changes_detector.file_changes,
         )
-        
+
         self._core_dir.update(file_changes_detector.file_path_changes)
 
     @_raise_for_invalid_repository

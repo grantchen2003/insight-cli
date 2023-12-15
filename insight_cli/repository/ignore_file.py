@@ -1,4 +1,7 @@
 from pathlib import Path
+import re
+
+from .core_dir import CoreDir
 
 
 class IgnoreFile:
@@ -13,7 +16,10 @@ class IgnoreFile:
 
     @property
     def regex_patterns(self) -> dict[str, set]:
-        scope_to_regex_patterns = {"directory": set(), "file": set()}
+        scope_to_regex_patterns = {
+            "directory": {re.compile(re.escape(CoreDir.name)).pattern},
+            "file": {re.compile(re.escape(IgnoreFile._NAME)).pattern},
+        }
 
         if not self._path.is_file():
             return scope_to_regex_patterns

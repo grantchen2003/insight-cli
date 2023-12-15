@@ -9,6 +9,11 @@ from .tracker_file import TrackerFile
 class CoreDir:
     _NAME = ".insight"
 
+    @classmethod
+    @property
+    def name(cls) -> str:
+        return cls._NAME
+
     def __init__(self, parent_dir_path: Path):
         self._path = parent_dir_path / CoreDir._NAME
         self._config_file = ConfigFile(self._path)
@@ -22,7 +27,9 @@ class CoreDir:
         self._config_file.create(config_file_data)
         self._tracker_file.create(nested_repository_file_paths)
 
-    def update(self, repository_file_changes: dict[str, list[tuple[str, bytes]]]) -> None:
+    def update(
+        self, repository_file_changes: dict[str, list[tuple[str, bytes]]]
+    ) -> None:
         self._tracker_file.change_paths(
             paths_to_add=[Path(path) for path in repository_file_changes["add"]],
             paths_to_update=[Path(path) for path in repository_file_changes["update"]],

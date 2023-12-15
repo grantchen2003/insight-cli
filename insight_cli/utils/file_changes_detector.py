@@ -18,15 +18,19 @@ class FileChangesDetector:
     def __init__(
         self,
         previous_file_modified_times: dict[Path, datetime],
-        current_file_modified_times: dict[Path, datetime]
+        current_file_modified_times: dict[Path, datetime],
     ):
         """
         previous_file_modified_times and current_file_modified_times
         can never be modified once passed in. (the caching in file_path_changes)
         requires this
         """
-        self._previous_file_modified_times: dict[Path, datetime] = previous_file_modified_times
-        self._current_file_modified_times: dict[Path, datetime] = current_file_modified_times
+        self._previous_file_modified_times: dict[
+            Path, datetime
+        ] = previous_file_modified_times
+        self._current_file_modified_times: dict[
+            Path, datetime
+        ] = current_file_modified_times
 
     @property
     def _current_file_paths(self) -> set[Path]:
@@ -49,7 +53,8 @@ class FileChangesDetector:
         return [
             path
             for path in self._current_file_paths & self._previous_file_paths
-            if self._current_file_modified_times[path] != self._previous_file_modified_times[path]
+            if self._current_file_modified_times[path]
+            != self._previous_file_modified_times[path]
         ]
 
     @property
@@ -74,3 +79,10 @@ class FileChangesDetector:
                 )
                 for change, paths in self.file_path_changes.items()
             }
+
+    @property
+    def no_files_changes_exist(self) -> bool:
+        return all(
+            not changed_file_paths
+            for changed_file_paths in self.file_path_changes.values()
+        )
