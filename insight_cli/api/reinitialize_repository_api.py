@@ -42,7 +42,7 @@ class ReinitializeRepositoryAPI(API):
 
     @staticmethod
     def _make_batch_request(payload) -> None:
-        response = requests.post(
+        response = requests.put(
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
             files=payload["files"],
             data={

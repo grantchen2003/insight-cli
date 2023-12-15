@@ -2,8 +2,9 @@ from pathlib import Path
 
 from insight_cli.api import (
     InitializeRepositoryAPI,
-    ReinitializeRepositoryAPI,
     QueryRepositoryAPI,
+    ReinitializeRepositoryAPI,
+    UninitializeRepositoryAPI,
 )
 from insight_cli.utils import Directory, FileChangesDetector
 from .core_dir import CoreDir
@@ -65,6 +66,7 @@ class Repository:
 
     @_raise_for_invalid_repository
     def uninitialize(self) -> None:
+        UninitializeRepositoryAPI.make_request(self._core_dir.repository_id)
         self._core_dir.delete()
 
     @_raise_for_invalid_repository
