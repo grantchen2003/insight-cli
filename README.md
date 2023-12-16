@@ -2,11 +2,11 @@
 
 ## Overview
 
-The insight-cli provides a CLI for developers to use insight.
+The insight-cli provides a CLI for developers to use [insight](https://github.com/ChenGrant/insight).
 
 ## Installation
 
-Before installing the insight-cli, ensure that you have Python version 3.12.0+ and PIP version 23.2.1+.
+Before installing the insight-cli, ensure that you have Python version 3.10.0+.
 To install the insight-cli globally, run the following command:
 
 ```bash
@@ -99,10 +99,10 @@ $ insight --initialize
 The current directory has been successfully initialized as an insight repository.
 ```
 
-Create a .insightignore file in the current directory and specify that we don't want to search the .git directory.
+Create a .insightignore file in the current directory and specify that insight should ignore the .git directory.
 
 ```bash
-$ echo "^.git$" > .insightignore
+$ echo "^\.git$" > .insightignore
 ```
 
 Search in the current insight repository (excluding the .git directory) for the "function that makes a connection to the mongodb database".

@@ -1,7 +1,7 @@
 from pathlib import Path
 import os, tempfile, unittest
 
-from insight_cli.utils.file import File, FileDict
+from insight_cli.utils.file import File
 
 
 class TestFile(unittest.TestCase):

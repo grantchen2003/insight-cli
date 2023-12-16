@@ -8,12 +8,17 @@ from .file import File
 class FileChangesDetector:
     @staticmethod
     def _get_file_content(change, path) -> tuple[str, bytes]:
-        change_to_content = {
-            "add": File(path).content,
-            "update": File(path).content,
-            "delete": b"",
-        }
-        return str(path), change_to_content[change]
+        match change:
+            case "add":
+                content = File(path).content
+            case "update":
+                content = File(path).content
+            case "delete":
+                content = b""
+            case _:
+                raise ValueError(f"Invalid change: {change}")
+
+        return str(path), content
 
     def __init__(
         self,
@@ -21,9 +26,10 @@ class FileChangesDetector:
         current_file_modified_times: dict[Path, datetime],
     ):
         """
-        previous_file_modified_times and current_file_modified_times
-        can never be modified once passed in. (the caching in file_path_changes)
-        requires this
+        Initializes with immutable dictionaries for file paths and
+        modification times. Once provided, these dictionaries remain
+        unmodifiable to facilitate caching in the file_path_changes
+        mechanism.
         """
         self._previous_file_modified_times: dict[
             Path, datetime

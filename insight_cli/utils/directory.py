@@ -15,6 +15,7 @@ class Directory:
 
     def _get_files(self, dir_path: Path) -> list[File]:
         files = []
+
         for root, directories, file_names in os.walk(dir_path):
             root_path = Path(root)
 
@@ -29,6 +30,7 @@ class Directory:
 
             for file_name in file_names:
                 file_path = root_path / file_name
+
                 if not StringMatcher.matches_any_regex_pattern(
                     str(file_path), self._ignorable_regex_patterns["file"]
                 ):
@@ -46,7 +48,6 @@ class Directory:
 
     @property
     def file_modified_times(self) -> dict[Path, datetime]:
-        # make faster with multithreading?
         return {
             file_path: datetime.fromtimestamp(os.path.getmtime(file_path))
             for file_path in self.file_paths
