@@ -49,7 +49,7 @@ class TestInitializeCommand(unittest.TestCase):
             output,
             [
                 Color.green(
-                    f"Reinitialized existing insight repository in {Path.cwd().resolved()}"
+                    f"Reinitialized existing insight repository in {Path.cwd().resolve()}"
                 )
             ],
         )
