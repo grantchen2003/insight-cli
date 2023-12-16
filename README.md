@@ -31,7 +31,7 @@ $ insight --initialize
 
 The following commands must be ran in a directory that has been initialized as an insight repository.
 
-To display the files and lines in an insight repository (excluding the files and folders specified in the .insightignore file) that satisfy the given natural language query, run the following command:
+To display the files and lines in an insight repository (excluding the files and directories specified in the .insightignore file) that satisfy the given natural language query, run the following command:
 
 ```bash
 $ insight --query "<query>"
