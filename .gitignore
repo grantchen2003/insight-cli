@@ -8,4 +8,6 @@ build
 dist
 *.egg-info
 example
-vexample_codebase
+example_codebases
+deploy.sh
+test.sh
