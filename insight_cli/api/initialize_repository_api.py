@@ -1,9 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import Union
-import grpc, requests, secrets, time
+import requests, secrets
 
 from .base.api import API
-from .proto import repository_pb2_grpc, repository_pb2
 from insight_cli import config
 
 
@@ -16,7 +15,7 @@ class InitializeRepositoryAPI(API):
     def _get_batched_repository_files(
         repository_files: dict[str, bytes]
     ) -> list[dict[str, bytes]]:
-        MAX_BATCH_SIZE_BYTES = 4 * 1024**2
+        MAX_BATCH_SIZE_BYTES = 10 * 1024**2
 
         batches = []
         current_batch = {"files": {}}
@@ -56,25 +55,9 @@ class InitializeRepositoryAPI(API):
         return batches
 
     @staticmethod
-    def _make_batch_request_grpc(payload: dict[str, dict[str, bytes]]) -> str:
-        with grpc.insecure_channel(f"127.0.0.1:50051") as channel:
-            stub = repository_pb2_grpc.RepositoryStub(channel)
-
-            request = repository_pb2.InitializeRepositoryRequest(
-                files=payload["files"],
-                session_id=payload["session_id"],
-                batch_number=payload["batch_number"],
-                num_total_batches=payload["num_total_batches"],
-            )
-
-            response = stub.InitializeRepository(request)
-
-            return response.repository_id
-        
-    @staticmethod
-    def _make_batch_request_rest(payload: dict[str, dict[str, bytes]]) -> dict[str, str]:
+    def _make_batch_request(payload: dict[str, dict[str, bytes]]) -> dict[str, str]:
         response = requests.post(
-            url=f"http://127.0.0.1:5000/initialize_repository",
+            url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
             files=payload["files"],
             data={
                 "session_id": payload["session_id"],
@@ -94,7 +77,5 @@ class InitializeRepositoryAPI(API):
         )
 
         with ThreadPoolExecutor(max_workers=len(request_batches)) as executor:
-            start = time.perf_counter()
-            results = list(executor.map(cls._make_batch_request_grpc, request_batches))
-            print(f"time: {time.perf_counter() - start}")
-            return {"repository_id": repository_id for repository_id in results}
+            results = executor.map(cls._make_batch_request, request_batches)
+            return {"repository_id": result["repository_id"] for result in results}
