@@ -118,7 +118,8 @@ $ insight --query "function that makes a connection to the mongodb database"
 
 ## Contributing
 
-Interested in contributing? Please read our [contribution guidelines](./CONTRIBUTING.md) to get started.
+Interested in contributing? Please read the [contribution guidelines](./CONTRIBUTING.md) to get started.
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).
