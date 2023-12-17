@@ -17,6 +17,7 @@ class FileTracker:
     def _read_from_file(self) -> dict[str, float]:
         if not self._file_path.is_file():
             return {}
+
         with open(self._file_path, "r") as file:
             return json.load(file)
 
@@ -24,20 +25,24 @@ class FileTracker:
         for file_path in file_paths:
             if not file_path.is_file():
                 raise FileNotFoundError(f"cannot find file at {file_path}")
+
             if str(file_path) in self._data:
                 raise ValueError(
                     f"cannot add file path that already exists: {file_path}"
                 )
+
             self._data[str(file_path)] = os.path.getmtime(file_path)
 
     def _update(self, file_paths: list[Path]) -> None:
         for file_path in file_paths:
             if not file_path.is_file():
                 raise FileNotFoundError(f"cannot find file at {file_path}")
+
             if str(file_path) not in self._data:
                 raise ValueError(
                     f"cannot update file path that does not exist: {file_path}"
                 )
+
             self._data[str(file_path)] = os.path.getmtime(file_path)
 
     def _delete(self, file_paths: list[Path]) -> None:
@@ -46,6 +51,7 @@ class FileTracker:
                 raise ValueError(
                     f"cannot delete file path that does not exist: {file_path}"
                 )
+
             del self._data[str(file_path)]
 
     def create(self, file_paths: list[Path]) -> None:

@@ -56,5 +56,8 @@ class Authenticator:
 
             return response_data["repository_id_is_valid"]
 
+        except ValueError:
+            return False
+
         except FileNotFoundError:
             return False
