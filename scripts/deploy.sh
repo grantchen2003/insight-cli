@@ -27,5 +27,3 @@ if [ -n "$whl_file" ]; then
 else
     echo "No .whl file found in the dist directory."
 fi
-
-read -p "Press Enter to exit"
