@@ -6,7 +6,7 @@ insight is a search engine that enables developers to search codebases using nat
 
 ## Installation
 
-To use insight, ensure that Python version 3.10.0+ is installed. Then, install the insight-cli globally by running the following command:
+Before installing the insight-cli, ensure that you have Python version 3.10.0+. To install the insight-cli globally, run the following command:
 
 ```bash
 $ pip install insight-cli
@@ -118,7 +118,7 @@ $ insight --query "function that makes a connection to the mongodb database"
 
 ## Contributing
 
-Interested in contributing? Please read the [contribution guidelines](./CONTRIBUTING.md) to get started.
+Interested in contributing? Please read the [Contribution Guidelines](./CONTRIBUTING.md) to get started.
 
 ## License
 
