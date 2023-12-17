@@ -108,12 +108,14 @@ class TestRepository(unittest.TestCase):
         with self.assertRaises(InvalidRepositoryError):
             repository.uninitialize()
 
+    @patch("insight_cli.api.UninitializeRepositoryAPI.make_request")
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     @patch("insight_cli.api.InitializeRepositoryAPI.make_request")
     def test_uninitialize_with_existing_repository(
         self,
         mock_initialize_repository_request,
         mock_make_validate_repository_id_request,
+        mock_uninitialize_repository_request,
     ) -> None:
         mock_make_validate_repository_id_request.return_value = {
             "repository_id_is_valid": True
@@ -128,6 +130,8 @@ class TestRepository(unittest.TestCase):
         self.assertTrue(repository.is_valid)
 
         repository.uninitialize()
+        
+        mock_uninitialize_repository_request.assert_called_once()
 
         self.assertFalse(repository.is_valid)
 

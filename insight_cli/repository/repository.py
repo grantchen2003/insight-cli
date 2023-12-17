@@ -18,15 +18,6 @@ class InvalidRepositoryError(Exception):
 
 
 class Repository:
-    @staticmethod
-    def _raise_for_invalid_repository(func):
-        def wrapper(self: "Repository", *args, **kwargs):
-            if not self.is_valid:
-                raise InvalidRepositoryError(self._path)
-            return func(self, *args, **kwargs)
-
-        return wrapper
-
     def __init__(self, path: Path):
         self._path = path
         self._manager = Manager(path)
@@ -44,6 +35,10 @@ class Repository:
     def path(self) -> Path:
         return self._path
 
+    def _raise_for_invalid_repository(self) -> None:
+        if not self.is_valid:
+            raise InvalidRepositoryError(self._path)
+
     def initialize(self) -> None:
         repository_dir: Directory = Directory(
             self._path, self._pattern_ignorer.regex_patterns
@@ -55,8 +50,9 @@ class Repository:
 
         self._manager.create(response_data["repository_id"], repository_dir.file_paths)
 
-    @_raise_for_invalid_repository
     def reinitialize(self) -> None:
+        self._raise_for_invalid_repository()
+
         repository_dir: Directory = Directory(
             self._path, self._pattern_ignorer.regex_patterns
         )
@@ -76,12 +72,16 @@ class Repository:
 
         self._manager.update(file_changes_detector.file_path_changes)
 
-    @_raise_for_invalid_repository
     def uninitialize(self) -> None:
+        self._raise_for_invalid_repository()
+
         UninitializeRepositoryAPI.make_request(self._id)
+
         self._manager.delete()
 
-    @_raise_for_invalid_repository
     def query(self, query_string: str) -> list[dict]:
+        self._raise_for_invalid_repository()
+
         self.reinitialize()
+
         return QueryRepositoryAPI.make_request(self._id, query_string)
