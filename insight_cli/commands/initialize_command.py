@@ -1,8 +1,8 @@
 from pathlib import Path
 
+from .base.command import Command
 from insight_cli.repository import Repository, InvalidRepositoryError
 from insight_cli.utils import Color
-from .base.command import Command
 
 
 class InitializeCommand(Command):

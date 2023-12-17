@@ -1,25 +1,18 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import TypedDict
 import requests
 
 from .base.api import API
 from insight_cli import config
 
 
-class RequestBatch(TypedDict):
-    files: dict[str, bytes]
-    changes: dict[str, str]
-    repository_id: str
-
-
 class ReinitializeRepositoryAPI(API):
     @staticmethod
     def _get_batched_repository_file_changes(
         repository_id: str, repository_file_changes: dict[str, list[tuple[str, bytes]]]
-    ) -> list[RequestBatch]:
+    ) -> list[dict[str, dict[str, bytes] | dict[str, str] | str]]:
         MAX_BATCH_SIZE_BYTES = 10 * 1024**2
 
-        batches: list[RequestBatch] = []
+        batches = []
         current_batch = {"files": {}, "changes": {}, "repository_id": repository_id}
         current_batch_size_bytes = 0
 
@@ -45,7 +38,9 @@ class ReinitializeRepositoryAPI(API):
         return batches
 
     @staticmethod
-    def _make_batch_request(payload: RequestBatch) -> None:
+    def _make_batch_request(
+        payload: dict[str, dict[str, bytes] | dict[str, str] | str]
+    ) -> None:
         response = requests.put(
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
             files=payload["files"],

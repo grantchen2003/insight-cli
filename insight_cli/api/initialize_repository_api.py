@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import Union
 import requests, secrets
 
 from .base.api import API
@@ -14,7 +13,7 @@ class InitializeRepositoryAPI(API):
     @staticmethod
     def _get_batched_repository_files(
         repository_files: dict[str, bytes]
-    ) -> list[dict[str, bytes]]:
+    ) -> list[dict[str, dict[str, bytes]]]:
         MAX_BATCH_SIZE_BYTES = 10 * 1024**2
 
         batches = []
@@ -39,8 +38,8 @@ class InitializeRepositoryAPI(API):
 
     @classmethod
     def _add_batches_request_metadata(
-        cls, batches: list[dict[str, bytes]]
-    ) -> list[dict[str, Union[bytes, int, str]]]:
+        cls, batches: list[dict[str, dict[str, bytes]]]
+    ) -> list[dict[str, dict[str, bytes] | int | str]]:
         session_id = cls._generate_request_session_id()
         num_total_batches = len(batches)
 
@@ -56,7 +55,9 @@ class InitializeRepositoryAPI(API):
         return batches
 
     @staticmethod
-    def _make_batch_request(payload: dict[str, dict[str, bytes]]) -> dict[str, str]:
+    def _make_batch_request(
+        payload: dict[str, dict[str, bytes] | int | str]
+    ) -> dict[str, str]:
         response = requests.post(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
             files=payload["files"],
