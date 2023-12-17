@@ -8,8 +8,8 @@ from insight_cli import config
 
 class InitializeRepositoryAPI(API):
     @staticmethod
-    def _generate_request_session_id(length: int = 16) -> str:
-        return secrets.token_hex(length)
+    def _generate_request_session_id() -> str:
+        return secrets.token_hex()
 
     @staticmethod
     def _get_batched_repository_files(
@@ -32,7 +32,8 @@ class InitializeRepositoryAPI(API):
             current_batch["files"][file_path] = file_content
             current_batch_size_bytes += file_size_bytes
 
-        batches.append(current_batch)
+        if current_batch != {"files": {}}:
+            batches.append(current_batch)
 
         return batches
 
