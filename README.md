@@ -1,4 +1,4 @@
-## insight
+## insight-cli
 
 ## Overview
 
@@ -118,8 +118,7 @@ $ insight --query "function that makes a connection to the mongodb database"
 
 ## Contributing
 
-Feel free to contribute to the development of insight. Submit bug reports, feature requests, or pull requests through GitHub.
-
+Interested in contributing? Please read our [contribution guidelines](./CONTRIBUTING.md) to get started.
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).
