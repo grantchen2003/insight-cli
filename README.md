@@ -6,7 +6,7 @@ insight is a search engine that enables developers to search codebases using nat
 
 ## Installation
 
-Before installing the insight-cli, ensure that you have Python version 3.10.0+. To install the insight-cli globally, run the following command:
+Before installing the insight-cli, ensure that Python version 3.10.0+ is installed. To install the insight-cli globally, run the following command:
 
 ```bash
 $ pip install insight-cli
