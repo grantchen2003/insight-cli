@@ -1,27 +1,9 @@
-from unittest.mock import patch
 import unittest
 
 from insight_cli.commands import Command
 
 
 class TestCommand(unittest.TestCase):
-    @patch("insight_cli.commands.Command._raise_for_invalid_executor")
-    @patch("insight_cli.commands.Command._raise_for_invalid_description")
-    @patch("insight_cli.commands.Command._raise_for_invalid_flags")
-    def test_raise_for_invalid_args(
-            self,
-            mock_raise_for_invalid_flags,
-            mock_raise_for_invalid_description,
-            mock_raise_for_invalid_executor
-    ) -> None:
-        flags, description, executor = [], "", lambda x: 5
-
-        Command._raise_for_invalid_args(flags, description, executor)
-
-        mock_raise_for_invalid_flags.assert_called_once_with(flags)
-        mock_raise_for_invalid_description.assert_called_once_with(description)
-        mock_raise_for_invalid_executor.assert_called_once_with(executor)
-
     def test_raise_for_invalid_flags_with_non_list(self) -> None:
         invalid_flags = 3
 
@@ -29,8 +11,7 @@ class TestCommand(unittest.TestCase):
             Command._raise_for_invalid_flags(invalid_flags)
 
         self.assertEqual(
-            str(context_manager.exception),
-            f"{invalid_flags} must be a list"
+            str(context_manager.exception), f"{invalid_flags} must be a list"
         )
 
     def test_raise_for_invalid_flags_with_too_few_flags(self) -> None:
@@ -41,7 +22,7 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(
             str(context_manager.exception),
-            f"at least {Command._MIN_NUM_REQUIRED_FLAGS} flag(s) required"
+            f"at least {Command._MIN_NUM_REQUIRED_FLAGS} flag(s) required",
         )
 
     def test_raise_for_invalid_flags_with_list_containing_non_flags(self) -> None:
@@ -52,7 +33,7 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(
             str(context_manager.exception),
-            f"every flag in {invalid_flags} must be of type str"
+            f"every flag in {invalid_flags} must be of type str",
         )
 
     def test_raise_for_invalid_flags_with_non_unique_flags(self) -> None:
@@ -63,7 +44,7 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(
             str(context_manager.exception),
-            f"every flag in {invalid_flags} must be unique"
+            f"every flag in {invalid_flags} must be unique",
         )
 
     def test_raise_for_invalid_flags_with_valid_flags(self) -> None:
@@ -78,8 +59,7 @@ class TestCommand(unittest.TestCase):
             Command._raise_for_invalid_description(invalid_description)
 
         self.assertEqual(
-            str(context_manager.exception),
-            f"{invalid_description} must be of type str"
+            str(context_manager.exception), f"{invalid_description} must be of type str"
         )
 
     def test_raise_for_invalid_description_with_whitespace_string(self) -> None:
@@ -90,7 +70,7 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(
             str(context_manager.exception),
-            f"{invalid_description} must not be a whitespace string"
+            f"{invalid_description} must not be a whitespace string",
         )
 
     def test_raise_for_invalid_executor_with_invalid_executor_types(self) -> None:
@@ -102,7 +82,7 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(
             str(context_manager.exception),
-            f"the {executor} parameter 'age' does not have a type"
+            f"the {executor} parameter 'age' does not have a type",
         )
 
     def test_execute_abstract_method_raises_error_on_execute(self) -> None:

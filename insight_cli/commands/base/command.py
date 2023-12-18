@@ -8,12 +8,6 @@ from .flag import Flag
 class Command(ABC):
     _MIN_NUM_REQUIRED_FLAGS = 1
 
-    @staticmethod
-    def _raise_for_invalid_args(flags: list[str], description: str, executor: Callable) -> None:
-        Command._raise_for_invalid_flags(flags)
-        Command._raise_for_invalid_description(description)
-        Command._raise_for_invalid_executor(executor)
-
     @classmethod
     def _raise_for_invalid_flags(cls, flags: list[str]) -> None:
         if not isinstance(flags, list):
@@ -42,16 +36,21 @@ class Command(ABC):
         param_types = typing.get_type_hints(executor)
         for param_name in param_names:
             if param_name not in param_types:
-                raise ValueError(f"the {executor} parameter '{param_name}' does not have a type")
+                raise ValueError(
+                    f"the {executor} parameter '{param_name}' does not have a type"
+                )
+
+    def __init__(self, flags: list[str], description: str):
+        Command._raise_for_invalid_flags(flags)
+        Command._raise_for_invalid_description(description)
+        Command._raise_for_invalid_executor(self.execute)
+
+        self._flags: list[Flag] = [Flag(flag) for flag in flags]
+        self._description: str = description
 
     @abstractmethod
     def execute(self, *args, **kwargs):
         pass
-
-    def __init__(self, flags: list[str], description: str):
-        Command._raise_for_invalid_args(flags, description, self.execute)
-        self._flags: list[Flag] = [Flag(flag) for flag in flags]
-        self._description: str = description
 
     @property
     def description(self) -> str:
