@@ -8,8 +8,8 @@ class File:
     def __new__(cls, path: Path):
         """
         The __new__ method ensures a Singleton pattern per unique
-        path. If an instance (A) is created with a path used by
-        another instance (B), A is not a new instance but is B itself.
+        path. If an instance A is created with a path used by
+        another instance B, A is not a new instance but is B itself.
         """
         if path not in cls._instances:
             cls._instances[path] = super(File, cls).__new__(cls)
