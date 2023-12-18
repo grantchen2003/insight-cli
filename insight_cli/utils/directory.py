@@ -13,7 +13,7 @@ class Directory:
         self._ignorable_regex_patterns = ignorable_regex_patterns
         self._files: list[File] = self._get_files(self._path)
 
-    def _is_ignorable(self, entry_path: Path, pattern_scope: str) -> bool:
+    def _entry_path_is_ignorable(self, entry_path: Path, pattern_scope: str) -> bool:
         return StringMatcher.matches_any_regex_pattern(
             str(entry_path), self._ignorable_regex_patterns[pattern_scope]
         )
@@ -27,12 +27,12 @@ class Directory:
             directories[:] = [
                 directory
                 for directory in directories
-                if not self._is_ignorable(root_path / directory, "directory")
+                if not self._entry_path_is_ignorable(root_path / directory, "directory")
             ]
 
             for file_name in file_names:
                 file_path = root_path / file_name
-                if not self._is_ignorable(file_path, "file"):
+                if not self._entry_path_is_ignorable(file_path, "file"):
                     files.append(File(file_path))
 
         return files
