@@ -14,16 +14,18 @@ class Color:
             colorama.init()
 
     @classmethod
-    def red(cls, text: str) -> str:
+    def _colorize(cls, color: str, text: str) -> str:
         Color.init()
-        return f"{cls._RED}{text}{cls._RESET}"
+        return f"{color}{text}{cls._RESET}"
+
+    @classmethod
+    def red(cls, text: str) -> str:
+        return cls._colorize(cls._RED, text)
 
     @classmethod
     def green(cls, text: str) -> str:
-        Color.init()
-        return f"{cls._GREEN}{text}{cls._RESET}"
+        return cls._colorize(cls._GREEN, text)
 
     @classmethod
     def yellow(cls, text: str) -> str:
-        Color.init()
-        return f"{cls._YELLOW}{text}{cls._RESET}"
+        return cls._colorize(cls._YELLOW, text)
