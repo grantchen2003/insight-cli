@@ -22,6 +22,7 @@ class Repository:
         self._path = path
         self._manager = Manager(path)
         self._pattern_ignorer = PatternIgnorer(path)
+        self._is_valid = self._manager.is_valid
 
     @property
     def _id(self) -> str:
@@ -29,7 +30,7 @@ class Repository:
 
     @property
     def is_valid(self) -> bool:
-        return self._manager.is_valid
+        return self._is_valid
 
     @property
     def path(self) -> Path:
@@ -49,6 +50,8 @@ class Repository:
         )
 
         self._manager.create(response_data["repository_id"], repository_dir.file_paths)
+
+        self._is_valid = True
 
     def reinitialize(self) -> None:
         self._raise_for_invalid_repository()
@@ -72,12 +75,16 @@ class Repository:
 
         self._manager.update(file_changes_detector.file_path_changes)
 
+        self._is_valid = True
+
     def uninitialize(self) -> None:
         self._raise_for_invalid_repository()
 
         UninitializeRepositoryAPI.make_request(self._id)
 
         self._manager.delete()
+
+        self._is_valid = False
 
     def query(self, query_string: str) -> list[dict]:
         self._raise_for_invalid_repository()
