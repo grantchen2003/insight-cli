@@ -13,6 +13,7 @@ class File:
         """
         if path not in cls._instances:
             cls._instances[path] = super(File, cls).__new__(cls)
+
         return cls._instances[path]
 
     def __init__(self, path: Path):
