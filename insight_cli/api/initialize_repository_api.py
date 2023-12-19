@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-import requests, secrets
+import copy, requests, secrets
 
 from .base.api import API
 from insight_cli import config
@@ -17,21 +17,22 @@ class InitializeRepositoryAPI(API):
         MAX_BATCH_SIZE_BYTES = 10 * 1024**2
 
         batches = []
-        current_batch = {"files": {}}
+        empty_batch = {"files": {}}
+        current_batch = copy.deepcopy(empty_batch)
         current_batch_size_bytes = 0
 
         for file_path, file_content in repository_files.items():
             file_size_bytes = len(file_content)
 
-            if current_batch_size_bytes + file_size_bytes > MAX_BATCH_SIZE_BYTES:
-                batches.append(current_batch)
-                current_batch = {"files": {}}
-                current_batch_size_bytes = 0
-
             current_batch["files"][file_path] = file_content
             current_batch_size_bytes += file_size_bytes
 
-        if current_batch != {"files": {}}:
+            if current_batch_size_bytes + file_size_bytes > MAX_BATCH_SIZE_BYTES:
+                batches.append(current_batch)
+                current_batch = copy.deepcopy(empty_batch)
+                current_batch_size_bytes = 0
+
+        if current_batch != empty_batch:
             batches.append(current_batch)
 
         return batches
@@ -41,13 +42,12 @@ class InitializeRepositoryAPI(API):
         cls, batches: list[dict[str, dict[str, bytes]]]
     ) -> list[dict[str, dict[str, bytes] | int | str]]:
         session_id = cls._generate_request_session_id()
-        num_total_batches = len(batches)
 
         for i, batch in enumerate(batches):
             batch.update(
                 {
                     "batch_number": i + 1,
-                    "num_total_batches": num_total_batches,
+                    "num_total_batches": len(batches),
                     "session_id": session_id,
                 }
             )
@@ -60,9 +60,9 @@ class InitializeRepositoryAPI(API):
     ) -> dict[str, str]:
         response = requests.post(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
+            cookies={"session_id": payload["session_id"]},
             files=payload["files"],
             data={
-                "session_id": payload["session_id"],
                 "batch_num": payload["batch_number"],
                 "num_total_batches": payload["num_total_batches"],
             },

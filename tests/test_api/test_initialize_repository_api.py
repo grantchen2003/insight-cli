@@ -87,9 +87,9 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
 
         mock_request_post.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
+            cookies={"session_id": payload["session_id"]},
             files=payload["files"],
             data={
-                "session_id": payload["session_id"],
                 "batch_num": payload["batch_number"],
                 "num_total_batches": payload["num_total_batches"],
             },
@@ -97,7 +97,7 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
 
         self.assertEqual(result, expected_response)
 
-    @patch("requests.post")  
+    @patch("requests.post")
     def test_make_request(self, mock_post):
         mock_response_data = {"repository_id": "mock_repository_id"}
         mock_post.return_value = MagicMock(

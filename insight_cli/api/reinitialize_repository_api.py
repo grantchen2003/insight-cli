@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-import requests
+import copy, requests
 
 from .base.api import API
 from insight_cli import config
@@ -13,7 +13,8 @@ class ReinitializeRepositoryAPI(API):
         MAX_BATCH_SIZE_BYTES = 10 * 1024**2
 
         batches = []
-        current_batch = {"files": {}, "changes": {}, "repository_id": repository_id}
+        empty_batch = {"files": {}, "changes": {}, "repository_id": repository_id}
+        current_batch = copy.deepcopy(empty_batch)
         current_batch_size_bytes = 0
 
         for change, files in repository_file_changes.items():
@@ -26,14 +27,11 @@ class ReinitializeRepositoryAPI(API):
 
                 if current_batch_size_bytes + file_size_bytes > MAX_BATCH_SIZE_BYTES:
                     batches.append(current_batch)
-                    current_batch = {
-                        "files": {},
-                        "changes": {},
-                        "repository_id": repository_id,
-                    }
+                    current_batch = copy.deepcopy(empty_batch)
                     current_batch_size_bytes = 0
 
-        batches.append(current_batch)
+        if current_batch != empty_batch:
+            batches.append(current_batch)
 
         return batches
 
