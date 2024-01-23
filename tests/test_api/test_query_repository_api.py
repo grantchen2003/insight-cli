@@ -23,7 +23,7 @@ class TestQueryRepositoryAPI(unittest.TestCase):
         )
 
         mock_request_get.assert_called_once_with(
-            url=f"{config.INSIGHT_API_BASE_URL}/query",
+            url=f"{config.INSIGHT_API_BASE_URL}/query_repository",
             json={"repository_id": repository_id, "query_string": query_string},
         )
 

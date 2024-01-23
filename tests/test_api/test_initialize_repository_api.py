@@ -6,6 +6,40 @@ from insight_cli.config import config
 
 
 class TestInitializeRepositoryAPI(unittest.TestCase):
+    def test_chunkify_file_content(self) -> None:
+        self.assertEqual(
+            InitializeRepositoryAPI._chunkify_file_content(bytes(), 0),
+            [],
+        )
+
+        size = 1200
+        file_content = bytes(range(256)) * (size // 256) + bytes(range(size % 256))
+        self.assertEqual(
+            InitializeRepositoryAPI._chunkify_file_content(file_content, 500, 100),
+            [
+                {
+                    "content": file_content[:100],
+                    "chunk_index": 0,
+                    "num_total_chunks": 4,
+                },
+                {
+                    "content": file_content[100:600],
+                    "chunk_index": 1,
+                    "num_total_chunks": 4,
+                },
+                {
+                    "content": file_content[600:1100],
+                    "chunk_index": 2,
+                    "num_total_chunks": 4,
+                },
+                {
+                    "content": file_content[1100:1200],
+                    "chunk_index": 3,
+                    "num_total_chunks": 4,
+                },
+            ],
+        )
+
     def test_get_batched_repository_files(self) -> None:
         repository_files = {
             "file1": bytes(10 * 1024**2),
@@ -16,54 +50,15 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
             "file6": bytes(4 * 1024**2),
         }
 
+        batched_repository_files = (
+            InitializeRepositoryAPI._get_batched_repository_files(repository_files)
+        )
+
+        self.assertEqual(len(batched_repository_files), 4)
         self.assertEqual(
-            InitializeRepositoryAPI._get_batched_repository_files(repository_files),
-            [
-                {
-                    "files": {
-                        "file1": bytes(10 * 1024**2),
-                    }
-                },
-                {
-                    "files": {
-                        "file2": bytes(5 * 1024**2),
-                        "file3": bytes(5 * 1024**2),
-                    }
-                },
-                {
-                    "files": {
-                        "file4": bytes(4 * 1024**2),
-                        "file5": bytes(4 * 1024**2),
-                    }
-                },
-                {
-                    "files": {
-                        "file6": bytes(4 * 1024**2),
-                    }
-                },
-            ],
+            [sorted(batch["files"].keys()) for batch in batched_repository_files],
+            [["file1"], ["file2", "file3"], ["file4", "file5", "file6"], ["file6"]],
         )
-
-    def test_add_batches_request_metadata(self) -> None:
-        batches = InitializeRepositoryAPI._add_batches_request_metadata(
-            [
-                {
-                    "files": {
-                        "file1": bytes(10 * 1024**2),
-                    }
-                },
-                {
-                    "files": {
-                        "file2": bytes(5 * 1024**2),
-                        "file3": bytes(5 * 1024**2),
-                    }
-                },
-            ]
-        )
-
-        for i, batch in enumerate(batches):
-            self.assertEqual(batch["batch_number"], i + 1)
-            self.assertEqual(batch["num_total_batches"], len(batches))
 
     @patch("requests.post")
     def test_make_batch_request(self, mock_request_post) -> None:
@@ -75,11 +70,19 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
 
         payload = {
             "files": {
-                "file2": bytes(5 * 1024**2),
-                "file3": bytes(5 * 1024**2),
+                "file2": {
+                    "content": bytes(5 * 1024**2),
+                    "chunk_index": 1,
+                    "num_total_chunks": 1,
+                },
+                "file3": {
+                    "content": bytes(5 * 1024**2),
+                    "chunk_index": 1,
+                    "num_total_chunks": 1,
+                },
             },
             "session_id": "1234asdfdasfas",
-            "batch_number": "2",
+            "batch_index": "2",
             "num_total_batches": "4",
         }
 
@@ -88,9 +91,9 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
         mock_request_post.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
             cookies={"session_id": payload["session_id"]},
-            files=payload["files"],
             data={
-                "batch_num": payload["batch_number"],
+                "files": payload["files"],
+                "batch_index": payload["batch_index"],
                 "num_total_batches": payload["num_total_batches"],
             },
         )

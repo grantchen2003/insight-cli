@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import unittest
 
 from insight_cli.api import ReinitializeRepositoryAPI
@@ -29,33 +29,77 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
             ),
             [
                 {
-                    "files": {"file1": bytes(11 * 1024**2)},
+                    "files": {
+                        "file1": {
+                            "content": repository_file_changes["add"][0][1][
+                                : 10 * 1024**2
+                            ],
+                            "chunk_index": 0,
+                            "num_total_chunks": 2,
+                        }
+                    },
                     "changes": {
                         "file1": "add",
                     },
                     "repository_id": repository_id,
-                },
-                {
-                    "files": {"file2": bytes(10 * 1024**2)},
-                    "changes": {
-                        "file2": "add",
-                    },
-                    "repository_id": repository_id,
+                    "batch_index": 0,
+                    "num_total_batches": 3,
                 },
                 {
                     "files": {
-                        "file3": bytes(5 * 1024**2),
-                        "file4": bytes(2 * 1024**2),
-                        "file5": bytes(0),
-                        "file6": bytes(0),
+                        "file1": {
+                            "content": repository_file_changes["add"][0][1][
+                                10 * 1024**2 :
+                            ],
+                            "chunk_index": 1,
+                            "num_total_chunks": 2,
+                        },
+                        "file2": {
+                            "content": repository_file_changes["add"][1][1][
+                                : 9 * 1024**2
+                            ],
+                            "chunk_index": 0,
+                            "num_total_chunks": 2,
+                        },
                     },
                     "changes": {
+                        "file1": "add",
+                        "file2": "add",
+                    },
+                    "repository_id": repository_id,
+                    "batch_index": 1,
+                    "num_total_batches": 3,
+                },
+                {
+                    "files": {
+                        "file2": {
+                            "content": repository_file_changes["add"][1][1][
+                                9 * 1024**2 :
+                            ],
+                            "chunk_index": 1,
+                            "num_total_chunks": 2,
+                        },
+                        "file3": {
+                            "content": repository_file_changes["update"][0][1],
+                            "chunk_index": 0,
+                            "num_total_chunks": 1,
+                        },
+                        "file4": {
+                            "content": repository_file_changes["update"][1][1],
+                            "chunk_index": 0,
+                            "num_total_chunks": 1,
+                        },
+                    },
+                    "changes": {
+                        "file2": "add",
                         "file3": "update",
                         "file4": "update",
                         "file5": "delete",
                         "file6": "delete",
                     },
                     "repository_id": repository_id,
+                    "batch_index": 2,
+                    "num_total_batches": 3,
                 },
             ],
         )
@@ -76,16 +120,20 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
                 "file6": "delete",
             },
             "repository_id": "12312",
+            "batch_index": 1,
+            "num_total_batches": 1,
         }
 
         ReinitializeRepositoryAPI._make_batch_request(payload)
 
         mock_request_put.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-            files=payload["files"],
             data={
                 "repository_id": payload["repository_id"],
+                "files": payload["files"],
                 "changes": payload["changes"],
+                "batch_index": payload["batch_index"],
+                "num_total_batches": payload["num_total_batches"],
             },
         )
 
@@ -109,7 +157,7 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
 
         ReinitializeRepositoryAPI().make_request(repository_id, repository_file_changes)
 
-        self.assertTrue(mock_put.call_count == 3)
+        self.assertEqual(mock_put.call_count, 3)
 
 
 if __name__ == "__main__":
