@@ -1,5 +1,5 @@
 from unittest.mock import patch
-import unittest
+import base64, unittest
 
 from insight_cli.api import ReinitializeRepositoryAPI
 from insight_cli.config import config
@@ -31,9 +31,11 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
                 {
                     "files": {
                         "file1": {
-                            "content": repository_file_changes["add"][0][1][
+                            "content": base64.b64encode(repository_file_changes["add"][0][1][
                                 : 10 * 1024**2
-                            ],
+                            ]).decode("utf-8"),
+                            "size_bytes": 10 * 1024**2,
+                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 2,
                         }
@@ -48,16 +50,20 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
                 {
                     "files": {
                         "file1": {
-                            "content": repository_file_changes["add"][0][1][
+                            "content": base64.b64encode(repository_file_changes["add"][0][1][
                                 10 * 1024**2 :
-                            ],
+                            ]).decode("utf-8"),
+                            "size_bytes": 1 * 1024**2,
+                            "type": "base64",
                             "chunk_index": 1,
                             "num_total_chunks": 2,
                         },
                         "file2": {
-                            "content": repository_file_changes["add"][1][1][
+                            "content": base64.b64encode(repository_file_changes["add"][1][1][
                                 : 9 * 1024**2
-                            ],
+                            ]).decode("utf-8"),
+                            "size_bytes": 9 * 1024**2,
+                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 2,
                         },
@@ -73,19 +79,25 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
                 {
                     "files": {
                         "file2": {
-                            "content": repository_file_changes["add"][1][1][
+                            "content": base64.b64encode(repository_file_changes["add"][1][1][
                                 9 * 1024**2 :
-                            ],
+                            ]).decode("utf-8"),
+                            "size_bytes": 1 * 1024**2,
+                            "type": "base64",
                             "chunk_index": 1,
                             "num_total_chunks": 2,
                         },
                         "file3": {
-                            "content": repository_file_changes["update"][0][1],
+                            "content": base64.b64encode(repository_file_changes["update"][0][1]).decode("utf-8"),
+                            "size_bytes": 5 * 1024**2,
+                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 1,
                         },
                         "file4": {
-                            "content": repository_file_changes["update"][1][1],
+                            "content": base64.b64encode(repository_file_changes["update"][1][1]).decode("utf-8"),
+                            "size_bytes": 2 * 1024**2,
+                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 1,
                         },
@@ -128,7 +140,7 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
 
         mock_request_put.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-            data={
+            json={
                 "repository_id": payload["repository_id"],
                 "files": payload["files"],
                 "changes": payload["changes"],

@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-import copy, requests, secrets
+import base64, copy, requests, secrets
 
 from .base.api import API
 from insight_cli import config
@@ -13,7 +13,7 @@ class InitializeRepositoryAPI(API):
     @staticmethod
     def _chunkify_file_content(
         file_content: bytes, chunk_size_bytes: int, first_chunk_size_bytes: int = 0
-    ) -> list[bytes]:
+    ) -> list[dict]:
         if first_chunk_size_bytes == 0:
             first_chunk_size_bytes = chunk_size_bytes
 
@@ -28,7 +28,9 @@ class InitializeRepositoryAPI(API):
 
         return [
             {
-                "content": file_content_chunk,
+                "content": base64.b64encode(file_content_chunk).decode("utf-8"),
+                "type": "base64",
+                "size_bytes": len(file_content_chunk),
                 "chunk_index": i,
                 "num_total_chunks": len(file_content_chunks),
             }
@@ -54,17 +56,15 @@ class InitializeRepositoryAPI(API):
             )
 
             for file_content_chunk in file_content_chunks:
-                file_content_chunk_size_bytes = len(file_content_chunk["content"])
-
                 if (
-                    current_batch["size_bytes"] + file_content_chunk_size_bytes
+                    current_batch["size_bytes"] + file_content_chunk["size_bytes"]
                     > MAX_BATCH_SIZE_BYTES
                 ):
                     batches.append(current_batch)
                     current_batch = copy.deepcopy(empty_batch)
 
                 current_batch["files"][file_path] = file_content_chunk
-                current_batch["size_bytes"] += file_content_chunk_size_bytes
+                current_batch["size_bytes"] += file_content_chunk["size_bytes"]
 
         if current_batch != empty_batch:
             batches.append(current_batch)
@@ -88,7 +88,7 @@ class InitializeRepositoryAPI(API):
         response = requests.post(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
             cookies={"session_id": payload["session_id"]},
-            data={
+            json={
                 "files": payload["files"],
                 "batch_index": payload["batch_index"],
                 "num_total_batches": payload["num_total_batches"],

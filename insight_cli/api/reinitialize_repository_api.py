@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-import copy, requests
+import base64, copy, requests
 
 from .base.api import API
 from insight_cli import config
@@ -9,7 +9,7 @@ class ReinitializeRepositoryAPI(API):
     @staticmethod
     def _chunkify_file_content(
         file_content: bytes, chunk_size_bytes: int, first_chunk_size_bytes: int = 0
-    ) -> list[bytes]:
+    ) -> list[dict]:
         if first_chunk_size_bytes == 0:
             first_chunk_size_bytes = chunk_size_bytes
 
@@ -24,7 +24,9 @@ class ReinitializeRepositoryAPI(API):
 
         return [
             {
-                "content": file_content_chunk,
+                "content": base64.b64encode(file_content_chunk).decode("utf-8"),
+                "type": "base64",
+                "size_bytes": len(file_content_chunk),
                 "chunk_index": i,
                 "num_total_chunks": len(file_content_chunks),
             }
@@ -57,10 +59,8 @@ class ReinitializeRepositoryAPI(API):
                 )
 
                 for file_content_chunk in file_content_chunks:
-                    file_content_chunk_size_bytes = len(file_content_chunk["content"])
-
                     if (
-                        current_batch["size_bytes"] + file_content_chunk_size_bytes
+                        current_batch["size_bytes"] + file_content_chunk["size_bytes"]
                         > MAX_BATCH_SIZE_BYTES
                     ):
                         batches.append(current_batch)
@@ -68,7 +68,7 @@ class ReinitializeRepositoryAPI(API):
 
                     current_batch["files"][file_path] = file_content_chunk
                     current_batch["changes"][file_path] = change
-                    current_batch["size_bytes"] += file_content_chunk_size_bytes
+                    current_batch["size_bytes"] += file_content_chunk["size_bytes"]
 
         if current_batch != empty_batch:
             batches.append(current_batch)
@@ -91,7 +91,7 @@ class ReinitializeRepositoryAPI(API):
     ) -> None:
         response = requests.put(
             url=f"{config.INSIGHT_API_BASE_URL}/reinitialize_repository",
-            data={
+            json={
                 "repository_id": payload["repository_id"],
                 "files": payload["files"],
                 "changes": payload["changes"],
