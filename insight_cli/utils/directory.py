@@ -8,12 +8,23 @@ from .string_matcher import StringMatcher
 
 
 class Directory:
-    def __init__(self, path: Path, ignorable_regex_patterns: dict[str, set]):
+    def __init__(
+        self,
+        path: Path,
+        ignorable_regex_patterns: dict[str, set],
+        allowed_file_extensions: set[str],
+    ):
         self._path: Path = path
         self._ignorable_regex_patterns = ignorable_regex_patterns
+        self._allowed_file_extensions = allowed_file_extensions
         self._files: list[File] = self._get_files(self._path)
 
     def _entry_path_is_ignorable(self, entry_path: Path, pattern_scope: str) -> bool:
+        if pattern_scope == "file":
+            _, file_extension = os.path.splitext(entry_path)
+            if file_extension not in self._allowed_file_extensions:
+                return True
+            
         return StringMatcher.matches_any_regex_pattern(
             str(entry_path), self._ignorable_regex_patterns[pattern_scope]
         )

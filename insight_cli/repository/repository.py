@@ -19,6 +19,7 @@ class InvalidRepositoryError(Exception):
 
 class Repository:
     def __init__(self, path: Path):
+        self._allowed_file_extensions = {".py"}
         self._path = path
         self._manager = Manager(path)
         self._pattern_ignorer = PatternIgnorer(path)
@@ -42,7 +43,9 @@ class Repository:
 
     def initialize(self) -> None:
         repository_dir: Directory = Directory(
-            self._path, self._pattern_ignorer.regex_patterns
+            path=self._path,
+            ignorable_regex_patterns=self._pattern_ignorer.regex_patterns,
+            allowed_file_extensions=self._allowed_file_extensions,
         )
 
         response_data: dict[str, str] = InitializeRepositoryAPI.make_request(
@@ -57,7 +60,9 @@ class Repository:
         self._raise_for_invalid_repository()
 
         repository_dir: Directory = Directory(
-            self._path, self._pattern_ignorer.regex_patterns
+            path=self._path,
+            ignorable_regex_patterns=self._pattern_ignorer.regex_patterns,
+            allowed_file_extensions=self._allowed_file_extensions,
         )
 
         file_changes_detector = FileChangesDetector(

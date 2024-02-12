@@ -2,7 +2,7 @@
 
 ## Overview
 
-insight is a search engine that enables developers to search codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
+insight is a search engine that enables developers to search Python codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
 
 ## Installation
 
@@ -30,7 +30,7 @@ $ insight --initialize
 
 The following commands must be ran in a directory that has been initialized as an insight repository.
 
-To display the files and lines in an insight repository (excluding the files and directories specified in the .insightignore file) that satisfy a given natural language query, run the following command:
+To display the Python files (.py files) and lines in an insight repository (excluding the files and directories specified in the .insightignore file) that satisfy a given natural language query, run the following command:
 
 ```bash
 $ insight --query "<query>"
@@ -54,14 +54,14 @@ The .insightignore file contains regex patterns that specify directory and file 
 </ul>
 
 ```.insightignore
-# Ignore all directory and file paths ending in ".log"
-\.log$
+# Ignore all directory and file paths ending in "test.py"
+.*test\.py$
 
 # Ignore all directory and file paths starting with "test_"
 ^test_
 
-# Ignore all directory and file paths containing "#"
-\#
+# Ignore all directory and file paths that are exactly "#.py"
+\#\.py$
 
 ## _directory_
 # Patterns now only apply to directory paths
@@ -84,36 +84,37 @@ Install the insight-cli.
 $ pip install insight-cli
 ```
 
-Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/ChenGrant/fitcountr.
+Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/ChenGrant/instapix-word2vec.
 
 ```bash
-$ git clone https://github.com/ChenGrant/fitcountr
-$ cd fitcountr
+$ git https://github.com/ChenGrant/instapix-word2vec
+$ cd instapix-word2vec
 ```
 
 Initialize the current directory as an insight repository. This will create a .insight directory inside the current directory.
 
 ```bash
 $ insight --initialize
-Initialized insight repository in /path/to/current/directory/fitcountr
+Initialized insight repository in /path/to/current/directory/instapix-word2vec
 ```
 
-Create a .insightignore file in the current directory and specify that insight should ignore the .git directory.
+Create a .insightignore file in the current directory and specify that insight should ignore the proto directory.
 
 ```bash
-$ echo "^\.git$" > .insightignore
+$ echo "## _directory_ \n ^proto$" > .insightignore
 ```
 
-Search in the current insight repository (excluding the .git directory) for the "function that makes a connection to the mongodb database".
+Search in the current insight repository (excluding the proto directory) for the "function that loads the word2vec model".
 
 ```bash
-$ insight --query "function that makes a connection to the mongodb database"
+$ insight --query "function that loads the word2vec model"
 2 matches found in the following files:
-/server/src/config/database.js
-    Line 3 - 15: const connectToDatabase = async () => {...};
+/src/word2vec_service.py
+    Line 13 - 21: def load_model(): ... return model;
 
-/server/src/server.js
-    Line 25: await connectToDatabase(app);
+/src/word2vec_service.py
+    Line 26: self.model = load_model();
+
 ```
 
 ## Contributing
