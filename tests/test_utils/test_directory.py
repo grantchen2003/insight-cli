@@ -11,12 +11,12 @@ class TestDirectory(unittest.TestCase):
         self.temp_dir_path = Path(self.temp_dir.name)
 
         files = [
-            ("file1.txt", "content1"),
-            ("file2.txt", "content2"),
-            ("subdir/file3.txt", "content3"),
-            ("subdir/file4.txt", "content4"),
-            ("subdir/file5.txt", "content5"),
-            ("subdir1/file3.txt", "content6"),
+            ("file1.py", "content1"),
+            ("file2.py", "content2"),
+            ("subdir/file3.py", "content3"),
+            ("subdir/file4.py", "content4"),
+            ("subdir/file5.py", "content5"),
+            ("subdir1/file3.py", "content6"),
         ]
 
         for file_path, file_content in files:
@@ -30,26 +30,30 @@ class TestDirectory(unittest.TestCase):
     def test_files(self) -> None:
         self.assertEqual(
             Directory(
-                self.temp_dir_path, {"directory": {"subdir1"}, "file": {"file2"}}
+                self.temp_dir_path,
+                {"directory": {"subdir1"}, "file": {"file2"}},
+                {".py"},
             ).files,
             [
-                File(self.temp_dir_path / "file1.txt"),
-                File(self.temp_dir_path / "subdir/file3.txt"),
-                File(self.temp_dir_path / "subdir/file4.txt"),
-                File(self.temp_dir_path / "subdir/file5.txt"),
+                File(self.temp_dir_path / "file1.py"),
+                File(self.temp_dir_path / "subdir/file3.py"),
+                File(self.temp_dir_path / "subdir/file4.py"),
+                File(self.temp_dir_path / "subdir/file5.py"),
             ],
         )
 
     def test_file_paths(self) -> None:
         self.assertEqual(
             Directory(
-                self.temp_dir_path, {"directory": {"subdir1"}, "file": {"file2"}}
+                self.temp_dir_path,
+                {"directory": {"subdir1"}, "file": {"file2"}},
+                {".py"},
             ).file_paths,
             [
-                self.temp_dir_path / "file1.txt",
-                self.temp_dir_path / "subdir/file3.txt",
-                self.temp_dir_path / "subdir/file4.txt",
-                self.temp_dir_path / "subdir/file5.txt",
+                self.temp_dir_path / "file1.py",
+                self.temp_dir_path / "subdir/file3.py",
+                self.temp_dir_path / "subdir/file4.py",
+                self.temp_dir_path / "subdir/file5.py",
             ],
         )
 
@@ -57,16 +61,18 @@ class TestDirectory(unittest.TestCase):
         expected_file_modification_times = {
             file_path: datetime.fromtimestamp(os.path.getmtime(file_path))
             for file_path in [
-                self.temp_dir_path / "file1.txt",
-                self.temp_dir_path / "subdir/file3.txt",
-                self.temp_dir_path / "subdir/file4.txt",
-                self.temp_dir_path / "subdir/file5.txt",
+                self.temp_dir_path / "file1.py",
+                self.temp_dir_path / "subdir/file3.py",
+                self.temp_dir_path / "subdir/file4.py",
+                self.temp_dir_path / "subdir/file5.py",
             ]
         }
 
         self.assertEqual(
             Directory(
-                self.temp_dir_path, {"directory": {"subdir1"}, "file": {"file2"}}
+                self.temp_dir_path,
+                {"directory": {"subdir1"}, "file": {"file2.py"}},
+                {".py"},
             ).file_modified_times,
             expected_file_modification_times,
         )
@@ -74,12 +80,14 @@ class TestDirectory(unittest.TestCase):
     def test_file_paths_to_content(self) -> None:
         self.assertEqual(
             Directory(
-                self.temp_dir_path, {"directory": {"subdir1"}, "file": {"file2"}}
+                self.temp_dir_path,
+                {"directory": {"subdir1"}, "file": {"file2.py"}},
+                {".py"},
             ).file_paths_to_content,
             {
-                str(self.temp_dir_path / "file1.txt"): b"content1",
-                str(self.temp_dir_path / "subdir/file3.txt"): b"content3",
-                str(self.temp_dir_path / "subdir/file4.txt"): b"content4",
-                str(self.temp_dir_path / "subdir/file5.txt"): b"content5",
+                str(self.temp_dir_path / "file1.py"): b"content1",
+                str(self.temp_dir_path / "subdir/file3.py"): b"content3",
+                str(self.temp_dir_path / "subdir/file4.py"): b"content4",
+                str(self.temp_dir_path / "subdir/file5.py"): b"content5",
             },
         )
