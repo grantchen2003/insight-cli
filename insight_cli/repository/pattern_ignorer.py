@@ -32,18 +32,18 @@ class PatternIgnorer:
             if line == "":
                 continue
 
-            is_directory_scope_comment_line = line == "## _directory_"
-            if is_directory_scope_comment_line:
+            line_is_directory_scope_comment = line == "## _directory_"
+            if line_is_directory_scope_comment:
                 active_scopes = ["directory"]
                 continue
 
-            is_file_scope_comment_line = line == "## _file_"
-            if is_file_scope_comment_line:
+            line_is_file_scope_comment = line == "## _file_"
+            if line_is_file_scope_comment:
                 active_scopes = ["file"]
                 continue
 
-            is_comment_line = line.startswith("#")
-            if is_comment_line:
+            line_is_comment = line.startswith("#")
+            if line_is_comment:
                 continue
 
             if line.startswith(r"\#"):
