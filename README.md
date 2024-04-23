@@ -2,7 +2,7 @@
 
 ## Overview
 
-insight is a semantic search engine that enables developers to search Python codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
+insight is a search engine that enables developers to semantically search Python codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
 
 ## Installation
 
