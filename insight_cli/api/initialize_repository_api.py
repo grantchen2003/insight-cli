@@ -1,87 +1,62 @@
 from concurrent.futures import ThreadPoolExecutor
-import base64, copy, requests, secrets
+import copy, requests, secrets
 
+from insight_cli.utils import FileChunkifier, FileChucksEncoder
 from .base.api import API
 from insight_cli import config
 
 
 class InitializeRepositoryAPI(API):
     @staticmethod
-    def _generate_request_session_id() -> str:
-        return secrets.token_hex()
+    def _add_metadata_to_batches(batched_repository_files: list[dict]) -> list[dict]:
+        session_id = secrets.token_hex()
 
-    @staticmethod
-    def _chunkify_file_content(
-        file_content: bytes, chunk_size_bytes: int, first_chunk_size_bytes: int = 0
-    ) -> list[dict]:
-        if first_chunk_size_bytes == 0:
-            first_chunk_size_bytes = chunk_size_bytes
+        for i, batch in enumerate(batched_repository_files):
+            del batch["size_bytes"]
+            batch.update(
+                {
+                    "batch_index": i,
+                    "num_total_batches": len(batched_repository_files),
+                    "session_id": session_id,
+                }
+            )
 
-        file_size_bytes = len(file_content)
-
-        file_content_chunks = []
-        left, right = 0, first_chunk_size_bytes
-        while left < file_size_bytes:
-            right = min(right, file_size_bytes)
-            file_content_chunks.append(file_content[left:right])
-            left, right = right, right + chunk_size_bytes
-
-        return [
-            {
-                "content": base64.b64encode(file_content_chunk).decode("utf-8"),
-                "type": "base64",
-                "size_bytes": len(file_content_chunk),
-                "chunk_index": i,
-                "num_total_chunks": len(file_content_chunks),
-            }
-            for i, file_content_chunk in enumerate(file_content_chunks)
-        ]
+        return batched_repository_files
 
     @classmethod
-    def _get_batched_repository_files(
-        cls, repository_files: dict[str, bytes]
+    def _batch_repository_files(
+        cls, repository_files: dict[str, bytes], max_batch_size_bytes=10 * 1024**2
     ) -> list[dict]:
-        MAX_BATCH_SIZE_BYTES = 10 * 1024**2
-
-        batches = []
+        batched_repository_files = []
         empty_batch = {"files": {}, "size_bytes": 0}
-
         current_batch = copy.deepcopy(empty_batch)
 
         for file_path, file_content in repository_files.items():
-            file_content_chunks = cls._chunkify_file_content(
+            file_content_chunks = FileChunkifier.chunkify_file_content(
                 file_content,
-                MAX_BATCH_SIZE_BYTES,
-                MAX_BATCH_SIZE_BYTES - current_batch["size_bytes"],
+                max_batch_size_bytes,
+                max_batch_size_bytes - current_batch["size_bytes"],
             )
 
-            for file_content_chunk in file_content_chunks:
+            utf8_encoded_file_content_chunks = FileChucksEncoder.utf8_encode(
+                file_content_chunks
+            )
+
+            for file_content_chunk in utf8_encoded_file_content_chunks:
                 if (
                     current_batch["size_bytes"] + file_content_chunk["size_bytes"]
-                    > MAX_BATCH_SIZE_BYTES
+                    > max_batch_size_bytes
                 ):
-                    batches.append(current_batch)
+                    batched_repository_files.append(current_batch)
                     current_batch = copy.deepcopy(empty_batch)
 
                 current_batch["files"][file_path] = file_content_chunk
                 current_batch["size_bytes"] += file_content_chunk["size_bytes"]
 
         if current_batch != empty_batch:
-            batches.append(current_batch)
+            batched_repository_files.append(current_batch)
 
-        session_id = cls._generate_request_session_id()
-
-        for i, batch in enumerate(batches):
-            del batch["size_bytes"]
-            batch.update(
-                {
-                    "batch_index": i,
-                    "num_total_batches": len(batches),
-                    "session_id": session_id,
-                }
-            )
-
-        return batches
+        return batched_repository_files
 
     @staticmethod
     def _make_batch_request(payload: dict) -> dict[str, str]:
@@ -101,7 +76,8 @@ class InitializeRepositoryAPI(API):
 
     @classmethod
     def make_request(cls, repository_files: dict[str, bytes]) -> dict[str, str]:
-        request_batches = cls._get_batched_repository_files(repository_files)
+        repository_files_batches = cls._batch_repository_files(repository_files)
+        request_batches = cls._add_metadata_to_batches(repository_files_batches)
 
         with ThreadPoolExecutor(max_workers=len(request_batches)) as executor:
             results = executor.map(cls._make_batch_request, request_batches)
