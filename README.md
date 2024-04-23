@@ -2,7 +2,7 @@
 
 ## Overview
 
-insight is a search engine that enables developers to search Python codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
+insight is a semantic search engine that enables developers to search Python codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
 
 ## Installation
 
@@ -30,7 +30,7 @@ $ insight --initialize
 
 The following commands must be ran in a directory that has been initialized as an insight repository.
 
-To display the Python files (.py files) and lines in an insight repository (excluding the files and directories specified in the .insightignore file) that satisfy a given natural language query, run the following command:
+To display the Python files (.py files) and lines in an insight repository (excluding the files and directories specified in the .insightignore file) that semantically match a given natural language query, run the following command:
 
 ```bash
 $ insight --query "<query>"
@@ -46,11 +46,12 @@ $ insight --uninitialize
 
 The .insightignore file contains regex patterns that specify directory and file paths to ignore in an insight repository.
 
+
 <ul>
-    <li>Empty lines are not matchable, they serve as separators for readability.</li>
-    <li>Non-comment lines will be considered as a single regex pattern.</li>
-    <li>Lines starting with a hashtag '#' serve as comments. A single backslash '\' is placed in front of the first hashtag for patterns that begin with a hashtag.</li>
-    <li>Scope comments designate patterns to apply exclusively within a specified scope until encountering another scope comment. '## _directory_' and '## _file_' are scope comments which target patterns within directory and file path scopes respectively.</li>
+    <li>Each line will be considered as a single regex pattern.</li>
+    <li>Empty lines are not matchable, they serve only as separators for readability.</li>
+    <li>Lines starting with a hashtag '#' serve as comments. A single backslash '\' is placed in front of the first hashtag for patterns that begin with a literal hashtag.</li>
+    <li>Scope comments designate patterns to apply exclusively within a specified scope until encountering another scope comment. '## _directory_' and '## _file_' are scope comments which designate patterns to apply within directory and file path scopes respectively.</li>
 </ul>
 
 ```.insightignore
