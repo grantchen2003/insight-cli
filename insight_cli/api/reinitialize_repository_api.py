@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import copy, requests
 
-from insight_cli.utils import FileChunkifier, FileChucksEncoder
+from insight_cli.utils import FileChunkifier, ChunkedFileEncoder
 from .base.api import API
 from insight_cli import config
 
@@ -27,7 +27,7 @@ class ReinitializeRepositoryAPI(API):
     def _batch_repository_file_changes(
         cls,
         repository_file_changes: dict[str, list[tuple[str, bytes]]],
-        max_batch_size_bytes=10 * 1024**2,
+        max_batch_size_bytes: int = 10 * 1024**2,
     ) -> list[dict]:
         batched_repository_file_changes = []
         empty_batch = {"files": {}, "changes": {}, "size_bytes": 0}
@@ -45,11 +45,11 @@ class ReinitializeRepositoryAPI(API):
                     max_batch_size_bytes - current_batch["size_bytes"],
                 )
 
-                utf8_encoded_file_content_chunks = FileChucksEncoder.utf8_encode(
-                    file_content_chunks
+                encoded_file_content_chunks_with_metadata = (
+                    ChunkedFileEncoder.encode_with_metadata(file_content_chunks)
                 )
 
-                for file_content_chunk in utf8_encoded_file_content_chunks:
+                for file_content_chunk in encoded_file_content_chunks_with_metadata:
                     if (
                         current_batch["size_bytes"] + file_content_chunk["size_bytes"]
                         > max_batch_size_bytes
@@ -92,6 +92,7 @@ class ReinitializeRepositoryAPI(API):
         repository_file_changes_batches = cls._batch_repository_file_changes(
             repository_file_changes
         )
+
         request_batches = cls._add_metadata_to_batches(
             repository_file_changes_batches, repository_id
         )

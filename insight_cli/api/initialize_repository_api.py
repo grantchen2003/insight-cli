@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import copy, requests, secrets
 
-from insight_cli.utils import FileChunkifier, FileChucksEncoder
+from insight_cli.utils import FileChunkifier, ChunkedFileEncoder
 from .base.api import API
 from insight_cli import config
 
@@ -25,7 +25,9 @@ class InitializeRepositoryAPI(API):
 
     @classmethod
     def _batch_repository_files(
-        cls, repository_files: dict[str, bytes], max_batch_size_bytes=10 * 1024**2
+        cls,
+        repository_files: dict[str, bytes],
+        max_batch_size_bytes: int = 10 * 1024**2,
     ) -> list[dict]:
         batched_repository_files = []
         empty_batch = {"files": {}, "size_bytes": 0}
@@ -38,11 +40,11 @@ class InitializeRepositoryAPI(API):
                 max_batch_size_bytes - current_batch["size_bytes"],
             )
 
-            utf8_encoded_file_content_chunks = FileChucksEncoder.utf8_encode(
-                file_content_chunks
+            encoded_file_content_chunks_with_metadata = (
+                ChunkedFileEncoder.encode_with_metadata(file_content_chunks)
             )
 
-            for file_content_chunk in utf8_encoded_file_content_chunks:
+            for file_content_chunk in encoded_file_content_chunks_with_metadata:
                 if (
                     current_batch["size_bytes"] + file_content_chunk["size_bytes"]
                     > max_batch_size_bytes

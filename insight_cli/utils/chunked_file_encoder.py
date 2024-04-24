@@ -1,9 +1,9 @@
 import base64
 
 
-class FileChucksEncoder:
+class ChunkedFileEncoder:
     @staticmethod
-    def utf8_encode(file_content_chunks: list[bytes]) -> list[dict]:
+    def encode_with_metadata(file_content_chunks: list[bytes]) -> list[dict]:
         return [
             {
                 "content": base64.b64encode(file_content_chunk).decode("utf-8"),
