@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch
 import tempfile, unittest
 
 from insight_cli.repository import Repository, InvalidRepositoryError
@@ -95,8 +95,7 @@ class TestRepository(unittest.TestCase):
 
         self.assertTrue(repository.is_valid)
 
-        Path(self._temp_dir_path / "new_file").touch()
-
+        Path(repository._path / "new_file.py").touch()
         repository.reinitialize()
 
         self.assertTrue(repository.is_valid)

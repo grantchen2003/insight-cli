@@ -1,56 +1,12 @@
 from unittest.mock import patch, MagicMock
-import base64, unittest
+import unittest
 
 from insight_cli.api import InitializeRepositoryAPI
 from insight_cli.config import config
 
 
 class TestInitializeRepositoryAPI(unittest.TestCase):
-    def test_chunkify_file_content(self) -> None:
-        self.assertEqual(
-            InitializeRepositoryAPI._chunkify_file_content(bytes(), 0),
-            [],
-        )
-
-        size = 1200
-        file_content = bytes(range(256)) * (size // 256) + bytes(range(size % 256))
-        self.assertEqual(
-            InitializeRepositoryAPI._chunkify_file_content(file_content, 500, 100),
-            [
-                {
-                    "content": base64.b64encode(file_content[:100]).decode("utf-8"),
-                    "size_bytes": 100,
-                    "type": "base64",
-                    "chunk_index": 0,
-                    "num_total_chunks": 4,
-                },
-                {
-                    "content": base64.b64encode(file_content[100:600]).decode("utf-8"),
-                    "type": "base64",
-                    "chunk_index": 1,
-                    "size_bytes": 500,
-                    "num_total_chunks": 4,
-                },
-                {
-                    "content": base64.b64encode(file_content[600:1100]).decode("utf-8"),
-                    "chunk_index": 2,
-                    "type": "base64",
-                    "size_bytes": 500,
-                    "num_total_chunks": 4,
-                },
-                {
-                    "content": base64.b64encode(file_content[1100:1200]).decode(
-                        "utf-8"
-                    ),
-                    "size_bytes": 100,
-                    "type": "base64",
-                    "chunk_index": 3,
-                    "num_total_chunks": 4,
-                },
-            ],
-        )
-
-    def test_get_batched_repository_files(self) -> None:
+    def test_batch_repository_files(self) -> None:
         repository_files = {
             "file1": bytes(10 * 1024**2),
             "file2": bytes(5 * 1024**2),
@@ -61,10 +17,10 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
         }
 
         batched_repository_files = (
-            InitializeRepositoryAPI._get_batched_repository_files(repository_files)
+            InitializeRepositoryAPI._batch_repository_files(repository_files)
         )
 
-        # self.assertEqual(len(batched_repository_files), 4)
+        self.assertEqual(len(batched_repository_files), 4)
         self.assertEqual(
             [sorted(batch["files"].keys()) for batch in batched_repository_files],
             [["file1"], ["file2", "file3"], ["file4", "file5", "file6"], ["file6"]],

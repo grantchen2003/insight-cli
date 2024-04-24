@@ -6,7 +6,7 @@ from insight_cli.config import config
 
 
 class TestReinitializeRepositoryAPI(unittest.TestCase):
-    def test_get_batched_repository_file_changes(self) -> None:
+    def test_batch_repository_file_changes(self) -> None:
         repository_id = "123"
         repository_file_changes = {
             "add": [
@@ -24,18 +24,20 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
         }
 
         self.assertEqual(
-            ReinitializeRepositoryAPI._get_batched_repository_file_changes(
-                repository_id, repository_file_changes
+            ReinitializeRepositoryAPI._add_metadata_to_batches(
+                ReinitializeRepositoryAPI._batch_repository_file_changes(
+                    repository_file_changes
+                ),
+                repository_id,
             ),
             [
                 {
                     "files": {
                         "file1": {
-                            "content": base64.b64encode(repository_file_changes["add"][0][1][
-                                : 10 * 1024**2
-                            ]).decode("utf-8"),
+                            "content": base64.b64encode(
+                                repository_file_changes["add"][0][1][: 10 * 1024**2]
+                            ).decode("utf-8"),
                             "size_bytes": 10 * 1024**2,
-                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 2,
                         }
@@ -50,20 +52,18 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
                 {
                     "files": {
                         "file1": {
-                            "content": base64.b64encode(repository_file_changes["add"][0][1][
-                                10 * 1024**2 :
-                            ]).decode("utf-8"),
+                            "content": base64.b64encode(
+                                repository_file_changes["add"][0][1][10 * 1024**2 :]
+                            ).decode("utf-8"),
                             "size_bytes": 1 * 1024**2,
-                            "type": "base64",
                             "chunk_index": 1,
                             "num_total_chunks": 2,
                         },
                         "file2": {
-                            "content": base64.b64encode(repository_file_changes["add"][1][1][
-                                : 9 * 1024**2
-                            ]).decode("utf-8"),
+                            "content": base64.b64encode(
+                                repository_file_changes["add"][1][1][: 9 * 1024**2]
+                            ).decode("utf-8"),
                             "size_bytes": 9 * 1024**2,
-                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 2,
                         },
@@ -79,25 +79,26 @@ class TestReinitializeRepositoryAPI(unittest.TestCase):
                 {
                     "files": {
                         "file2": {
-                            "content": base64.b64encode(repository_file_changes["add"][1][1][
-                                9 * 1024**2 :
-                            ]).decode("utf-8"),
+                            "content": base64.b64encode(
+                                repository_file_changes["add"][1][1][9 * 1024**2 :]
+                            ).decode("utf-8"),
                             "size_bytes": 1 * 1024**2,
-                            "type": "base64",
                             "chunk_index": 1,
                             "num_total_chunks": 2,
                         },
                         "file3": {
-                            "content": base64.b64encode(repository_file_changes["update"][0][1]).decode("utf-8"),
+                            "content": base64.b64encode(
+                                repository_file_changes["update"][0][1]
+                            ).decode("utf-8"),
                             "size_bytes": 5 * 1024**2,
-                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 1,
                         },
                         "file4": {
-                            "content": base64.b64encode(repository_file_changes["update"][1][1]).decode("utf-8"),
+                            "content": base64.b64encode(
+                                repository_file_changes["update"][1][1]
+                            ).decode("utf-8"),
                             "size_bytes": 2 * 1024**2,
-                            "type": "base64",
                             "chunk_index": 0,
                             "num_total_chunks": 1,
                         },
