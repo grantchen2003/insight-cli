@@ -94,6 +94,7 @@ class TestQueryCommand(unittest.TestCase):
 
         query_command.execute(query_string)
 
+        mock_validate_repository_id_api_make_request.assert_called_once()
         mock_repository_query.assert_called_once_with(query_string)
         mock_print_matches.assert_called_once()
 
@@ -117,6 +118,7 @@ class TestQueryCommand(unittest.TestCase):
 
         query_command.execute(query_string)
 
+        mock_validate_repository_id_api_make_request.assert_called_once()
         mock_repository_query.assert_called_once_with(query_string)
         mock_print.assert_called_once_with(
             Color.red(f"{Path.cwd()} is not an insight repository")
@@ -139,6 +141,7 @@ class TestQueryCommand(unittest.TestCase):
         with self.assertRaises(ConnectionError):
             query_command.execute(query_string)
 
+        mock_validate_repository_id_api_make_request.assert_called_once()
         mock_repository_query.assert_called_once_with(query_string)
 
 
