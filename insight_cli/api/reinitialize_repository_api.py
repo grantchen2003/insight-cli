@@ -23,9 +23,8 @@ class ReinitializeRepositoryAPI(API):
 
         return batched_repository_file_changes
 
-    @classmethod
+    @staticmethod
     def _batch_repository_file_changes(
-        cls,
         repository_file_changes: dict[str, list[tuple[str, bytes]]],
         max_batch_size_bytes: int = 10 * 1024**2,
     ) -> list[dict]:

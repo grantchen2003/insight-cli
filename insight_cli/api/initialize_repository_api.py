@@ -23,11 +23,9 @@ class InitializeRepositoryAPI(API):
 
         return batched_repository_files
 
-    @classmethod
+    @staticmethod
     def _batch_repository_files(
-        cls,
-        repository_files: dict[str, bytes],
-        max_batch_size_bytes: int = 10 * 1024**2,
+        repository_files: dict[str, bytes], max_batch_size_bytes: int = 10 * 1024**2
     ) -> list[dict]:
         batched_repository_files = []
         empty_batch = {"files": {}, "size_bytes": 0}
