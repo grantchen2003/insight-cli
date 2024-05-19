@@ -22,19 +22,19 @@ class QueryCommand(Command):
         for i, match in enumerate(matches):
             is_first_match = i == 0
 
-            match_text = "" if is_first_match else "\n"
+            terminal_output = "" if is_first_match else "\n"
 
-            match_text += f"{match['path']}\n"
+            terminal_output += f"{match['path']}\n"
 
             if match["start_line"] == match["end_line"]:
-                match_text += (
+                terminal_output += (
                     f"\tLine {match['start_line']}: {Color.green(match['content'])}"
                 )
 
             else:
-                match_text += f"\tLine {match['start_line']} - {match['end_line']}: {Color.green(match['content'])}"
+                terminal_output += f"\tLine {match['start_line']} - {match['end_line']}: {Color.green(match['content'])}"
 
-            print(match_text)
+            print(terminal_output)
 
     def __init__(self):
         super().__init__(
