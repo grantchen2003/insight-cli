@@ -18,19 +18,13 @@ class InitializeCommand(Command):
 
             if repository.is_valid:
                 repository.reinitialize()
-                print(
-                    Color.green(
-                        f"Reinitialized existing insight repository in {repository.path.resolve()}"
-                    )
-                )
+                terminal_output = f"Reinitialized existing insight repository in {repository.path.resolve()}"
 
             else:
                 repository.initialize()
-                print(
-                    Color.green(
-                        f"Initialized insight repository in {repository.path.resolve()}"
-                    )
-                )
+                terminal_output = f"Initialized insight repository in {repository.path.resolve()}"
+                
+            print(Color.green(terminal_output))
 
         except InvalidRepositoryError as e:
             print(Color.red(e))
