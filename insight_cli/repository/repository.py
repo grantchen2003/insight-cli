@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from insight_cli.api import (
+    CreateRepositoryAPI,
     InitializeRepositoryAPI,
     QueryRepositoryAPI,
     ReinitializeRepositoryAPI,
@@ -48,8 +49,10 @@ class Repository:
             allowed_file_extensions=self._allowed_file_extensions,
         )
 
-        response_data: dict[str, str] = InitializeRepositoryAPI.make_request(
-            repository_dir.file_paths_to_content
+        response_data = CreateRepositoryAPI.make_request()
+
+        InitializeRepositoryAPI.make_request(
+            response_data["repository_id"], repository_dir.file_paths_to_content
         )
 
         self._manager.create(response_data["repository_id"], repository_dir.file_paths)

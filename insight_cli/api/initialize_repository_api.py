@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-import copy, requests, secrets
+import copy, requests
 
 from insight_cli.utils import FileChunkifier, ChunkedFileEncoder
 from .base.api import API
@@ -8,16 +8,16 @@ from insight_cli import config
 
 class InitializeRepositoryAPI(API):
     @staticmethod
-    def _add_metadata_to_batches(batched_repository_files: list[dict]) -> list[dict]:
-        session_id = secrets.token_hex()
-
+    def _add_metadata_to_batches(
+        repository_id: str, batched_repository_files: list[dict]
+    ) -> list[dict]:
         for i, batch in enumerate(batched_repository_files):
             del batch["size_bytes"]
             batch.update(
                 {
                     "batch_index": i,
                     "num_total_batches": len(batched_repository_files),
-                    "session_id": session_id,
+                    "repository_id": repository_id,
                 }
             )
 
@@ -59,10 +59,10 @@ class InitializeRepositoryAPI(API):
         return batched_repository_files
 
     @staticmethod
-    def _make_batch_request(payload: dict) -> dict[str, str]:
+    def _make_batch_request(payload: dict) -> None:
         response = requests.post(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            cookies={"session_id": payload["session_id"]},
+            cookies={"repository_id": payload["repository_id"]},
             json={
                 "files": payload["files"],
                 "batch_index": payload["batch_index"],
@@ -72,13 +72,14 @@ class InitializeRepositoryAPI(API):
 
         response.raise_for_status()
 
-        return response.json()
-
     @classmethod
-    def make_request(cls, repository_files: dict[str, bytes]) -> dict[str, str]:
+    def make_request(
+        cls, repository_id: str, repository_files: dict[str, bytes]
+    ) -> None:
         repository_files_batches = cls._batch_repository_files(repository_files)
-        request_batches = cls._add_metadata_to_batches(repository_files_batches)
+        request_batches = cls._add_metadata_to_batches(
+            repository_id, repository_files_batches
+        )
 
         with ThreadPoolExecutor(max_workers=len(request_batches)) as executor:
-            results = executor.map(cls._make_batch_request, request_batches)
-            return {"repository_id": result["repository_id"] for result in results}
+            executor.map(cls._make_batch_request, request_batches)

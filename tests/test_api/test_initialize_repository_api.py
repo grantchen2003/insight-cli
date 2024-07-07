@@ -16,8 +16,8 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
             "file6": bytes(4 * 1024**2),
         }
 
-        batched_repository_files = (
-            InitializeRepositoryAPI._batch_repository_files(repository_files)
+        batched_repository_files = InitializeRepositoryAPI._batch_repository_files(
+            repository_files
         )
 
         self.assertEqual(len(batched_repository_files), 4)
@@ -28,9 +28,8 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
 
     @patch("requests.post")
     def test_make_batch_request(self, mock_request_post) -> None:
-        expected_response = {"repository_id": "1234123"}
         mock_request_post.return_value = MagicMock(
-            json=lambda: expected_response,
+            json=lambda: None,
             raise_for_status=lambda: None,
         )
 
@@ -47,7 +46,7 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
                     "num_total_chunks": 1,
                 },
             },
-            "session_id": "1234asdfdasfas",
+            "repository_id": "1234asdfdasfas",
             "batch_index": "2",
             "num_total_batches": "4",
         }
@@ -56,7 +55,7 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
 
         mock_request_post.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/initialize_repository",
-            cookies={"session_id": payload["session_id"]},
+            cookies={"repository_id": payload["repository_id"]},
             json={
                 "files": payload["files"],
                 "batch_index": payload["batch_index"],
@@ -64,24 +63,26 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
             },
         )
 
-        self.assertEqual(result, expected_response)
+        self.assertIsNone(result)
 
     @patch("requests.post")
     def test_make_request(self, mock_post):
-        mock_response_data = {"repository_id": "mock_repository_id"}
         mock_post.return_value = MagicMock(
-            json=lambda: mock_response_data,
+            json=lambda: None,
             raise_for_status=lambda: None,
         )
+
+        repository_id = "mock_repository_id"
 
         repository_files = {
             "file1.txt": b"File content 1",
             "file2.txt": b"File content 2",
         }
 
-        self.assertEqual(
-            InitializeRepositoryAPI().make_request(repository_files), mock_response_data
+        self.assertIsNone(
+            InitializeRepositoryAPI().make_request(repository_id, repository_files)
         )
+        
         mock_post.assert_called_once()
 
 
