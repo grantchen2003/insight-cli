@@ -15,15 +15,18 @@ class TestRepository(unittest.TestCase):
 
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     @patch("insight_cli.api.InitializeRepositoryAPI.make_request")
+    @patch("insight_cli.api.CreateRepositoryAPI.make_request")
     def test_initialize_with_non_existing_repository(
         self,
+        mock_create_repository_request,
         mock_initialize_repository_request,
         mock_make_validate_repository_id_request,
     ) -> None:
         mock_make_validate_repository_id_request.return_value = {
             "repository_id_is_valid": True
         }
-        mock_initialize_repository_request.return_value = {"repository_id": "123"}
+        mock_create_repository_request.return_value = {"repository_id": "123"}
+        mock_initialize_repository_request.return_value = None
         repository = Repository(self._temp_dir_path)
 
         self.assertFalse(repository.is_valid)
@@ -35,15 +38,18 @@ class TestRepository(unittest.TestCase):
 
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     @patch("insight_cli.api.InitializeRepositoryAPI.make_request")
+    @patch("insight_cli.api.CreateRepositoryAPI.make_request")
     def test_initialize_with_existing_repository(
         self,
+        mock_create_repository_request,
         mock_initialize_repository_request,
         mock_make_validate_repository_id_request,
     ) -> None:
         mock_make_validate_repository_id_request.return_value = {
             "repository_id_is_valid": True
         }
-        mock_initialize_repository_request.return_value = {"repository_id": "123"}
+        mock_create_repository_request.return_value = {"repository_id": "123"}
+        mock_initialize_repository_request.return_value = None
         repository = Repository(self._temp_dir_path)
 
         self.assertFalse(repository.is_valid)
@@ -77,8 +83,10 @@ class TestRepository(unittest.TestCase):
     @patch("insight_cli.api.ReinitializeRepositoryAPI.make_request")
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     @patch("insight_cli.api.InitializeRepositoryAPI.make_request")
+    @patch("insight_cli.api.CreateRepositoryAPI.make_request")
     def test_reinitialize_with_existing_repository(
         self,
+        mock_create_repository_request,
         mock_initialize_repository_request,
         mock_make_validate_repository_id_request,
         mock_reinitialize_repository_request,
@@ -86,7 +94,8 @@ class TestRepository(unittest.TestCase):
         mock_make_validate_repository_id_request.return_value = {
             "repository_id_is_valid": True
         }
-        mock_initialize_repository_request.return_value = {"repository_id": "123"}
+        mock_create_repository_request.return_value = {"repository_id": "123"}
+        mock_initialize_repository_request.return_value = None
         repository = Repository(self._temp_dir_path)
 
         self.assertFalse(repository.is_valid)
@@ -110,8 +119,10 @@ class TestRepository(unittest.TestCase):
     @patch("insight_cli.api.UninitializeRepositoryAPI.make_request")
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     @patch("insight_cli.api.InitializeRepositoryAPI.make_request")
+    @patch("insight_cli.api.CreateRepositoryAPI.make_request")
     def test_uninitialize_with_existing_repository(
         self,
+        mock_create_repository_request,
         mock_initialize_repository_request,
         mock_make_validate_repository_id_request,
         mock_uninitialize_repository_request,
@@ -119,7 +130,8 @@ class TestRepository(unittest.TestCase):
         mock_make_validate_repository_id_request.return_value = {
             "repository_id_is_valid": True
         }
-        mock_initialize_repository_request.return_value = {"repository_id": "123"}
+        mock_create_repository_request.return_value = {"repository_id": "123abc"}
+        mock_initialize_repository_request.return_value = None
         repository = Repository(self._temp_dir_path)
 
         self.assertFalse(repository.is_valid)
@@ -144,8 +156,10 @@ class TestRepository(unittest.TestCase):
     @patch("insight_cli.api.QueryRepositoryAPI.make_request")
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     @patch("insight_cli.api.InitializeRepositoryAPI.make_request")
+    @patch("insight_cli.api.CreateRepositoryAPI.make_request")
     def test_query_with_existing_repository(
         self,
+        mock_create_repository_request,
         mock_initialize_repository_request,
         mock_make_validate_repository_id_request,
         mock_query_repository_request,
@@ -153,7 +167,8 @@ class TestRepository(unittest.TestCase):
         mock_make_validate_repository_id_request.return_value = {
             "repository_id_is_valid": True
         }
-        mock_initialize_repository_request.return_value = {"repository_id": "123"}
+        mock_create_repository_request.return_value = {"repository_id": "123"}
+        mock_initialize_repository_request.return_value = None
         mock_query_repository_request.return_value = []
         repository = Repository(self._temp_dir_path)
         query_string = "water"
