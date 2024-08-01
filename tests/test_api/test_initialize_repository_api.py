@@ -61,6 +61,7 @@ class TestInitializeRepositoryAPI(unittest.TestCase):
                 "batch_index": payload["batch_index"],
                 "num_total_batches": payload["num_total_batches"],
             },
+            timeout=None
         )
 
         self.assertIsNone(result)

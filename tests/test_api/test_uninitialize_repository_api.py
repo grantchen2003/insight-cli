@@ -15,6 +15,7 @@ class TestUninitializeRepositoryAPI(unittest.TestCase):
         mock_request_get.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/uninitialize_repository",
             json={"repository_id": repository_id},
+            timeout=None
         )
 
 
