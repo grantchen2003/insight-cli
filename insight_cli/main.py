@@ -2,6 +2,7 @@ from insight_cli.cli import CLI
 from insight_cli.commands import (
     InitializeCommand,
     QueryCommand,
+    StatusCommand,
     UninitializeCommand,
     VersionCommand,
 )
@@ -12,6 +13,7 @@ def main() -> None:
         commands=[
             InitializeCommand(),
             QueryCommand(),
+            StatusCommand(),
             UninitializeCommand(),
             VersionCommand(),
         ],
