@@ -78,6 +78,7 @@ class ReinitializeRepositoryAPI(API):
                 "batch_index": payload["batch_index"],
                 "num_total_batches": payload["num_total_batches"],
             },
+            timeout=None,
         )
 
         response.raise_for_status()

@@ -10,6 +10,7 @@ class UninitializeRepositoryAPI(API):
         response = requests.delete(
             url=f"{config.INSIGHT_API_BASE_URL}/uninitialize_repository",
             json={"repository_id": repository_id},
+            timeout=None,
         )
 
         response.raise_for_status()
