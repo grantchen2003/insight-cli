@@ -16,15 +16,20 @@ class TestQueryRepositoryAPI(unittest.TestCase):
 
         repository_id = "test_repo_id"
         query_string = "water"
+        limit = 1
 
         self.assertEqual(
-            QueryRepositoryAPI().make_request(repository_id, query_string),
+            QueryRepositoryAPI().make_request(repository_id, query_string, limit),
             expected_response,
         )
 
         mock_request_get.assert_called_once_with(
             url=f"{config.INSIGHT_API_BASE_URL}/query_repository",
-            json={"repository_id": repository_id, "query_string": query_string},
+            json={
+                "repository_id": repository_id,
+                "query_string": query_string,
+                "limit": limit,
+            },
         )
 
 

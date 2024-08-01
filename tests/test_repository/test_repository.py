@@ -149,9 +149,10 @@ class TestRepository(unittest.TestCase):
     def test_query_with_non_existing_repository(self) -> None:
         repository = Repository(self._temp_dir_path)
         query_string = "water"
+        limit = 1
 
         with self.assertRaises(InvalidRepositoryError):
-            repository.query(query_string)
+            repository.query(query_string, limit)
 
     @patch("insight_cli.api.QueryRepositoryAPI.make_request")
     @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
@@ -172,6 +173,7 @@ class TestRepository(unittest.TestCase):
         mock_query_repository_request.return_value = []
         repository = Repository(self._temp_dir_path)
         query_string = "water"
+        limit = 1
 
         self.assertFalse(repository.is_valid)
 
@@ -179,7 +181,7 @@ class TestRepository(unittest.TestCase):
 
         self.assertTrue(repository.is_valid)
 
-        self.assertEqual(repository.query(query_string), [])
+        self.assertEqual(repository.query(query_string, limit), [])
 
         self.assertTrue(repository.is_valid)
 

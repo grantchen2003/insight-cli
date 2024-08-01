@@ -211,8 +211,8 @@ class TestCLI(unittest.TestCase):
                     "flag_strings": ["-q", "--query"],
                     "options": {
                         "help": query_command.description,
-                        "metavar": ("<query_string>",),
-                        "nargs": 1,
+                        "metavar": ("<query_string>", "<limit>"),
+                        "nargs": 2,
                     },
                 },
             },
@@ -228,24 +228,24 @@ class TestCLI(unittest.TestCase):
             cli._arguments, argparse.Namespace(initialize=None, query=None)
         )
 
-    @patch("sys.argv", ["", "--query", "water"])
+    @patch("sys.argv", ["", "--query", "water", "1"])
     def test_parse_arguments_with_one_argument(self) -> None:
         cli = CLI(commands=[QueryCommand(), InitializeCommand()])
 
         cli.parse_arguments()
 
         self.assertEqual(
-            cli._arguments, argparse.Namespace(initialize=None, query=["water"])
+            cli._arguments, argparse.Namespace(initialize=None, query=["water", "1"])
         )
 
-    @patch("sys.argv", ["", "--query", "water", "-i"])
+    @patch("sys.argv", ["", "--query", "water", "1", "-i"])
     def test_parse_arguments_with_two_arguments(self) -> None:
         cli = CLI(commands=[QueryCommand(), InitializeCommand()])
 
         cli.parse_arguments()
 
         self.assertEqual(
-            cli._arguments, argparse.Namespace(initialize=[], query=["water"])
+            cli._arguments, argparse.Namespace(initialize=[], query=["water", "1"])
         )
 
     @patch("builtins.print")

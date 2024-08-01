@@ -42,10 +42,14 @@ class QueryCommand(Command):
             description="shows files in the current insight repository that satisfy the given natural language query",
         )
 
-    def execute(self, query_string: str) -> None:
+    def execute(self, query_string: str, limit: int) -> None:
+        if limit <= 0:
+            print(Color.red("Limit must be a positive integer"))
+            return
+            
         try:
             repository = Repository(Path(""))
-            matches = repository.query(query_string)
+            matches = repository.query(query_string, limit)
             self._print_matches(matches)
 
         except InvalidRepositoryError as e:

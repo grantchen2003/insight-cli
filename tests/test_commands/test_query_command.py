@@ -81,12 +81,13 @@ class TestQueryCommand(unittest.TestCase):
     ) -> None:
         query_command = QueryCommand()
         query_string = "sample_query_string"
+        limit = 1
 
         mock_repository_query.return_value = []
 
-        query_command.execute(query_string)
+        query_command.execute(query_string, limit)
 
-        mock_repository_query.assert_called_once_with(query_string)
+        mock_repository_query.assert_called_once_with(query_string, limit)
         mock_print_matches.assert_called_once()
 
     @patch("builtins.print")
@@ -97,12 +98,13 @@ class TestQueryCommand(unittest.TestCase):
         Color.init()
         query_command = QueryCommand()
         query_string = "sample_query_string"
+        limit = 1
 
         mock_repository_query.side_effect = InvalidRepositoryError(Path.cwd())
 
-        query_command.execute(query_string)
+        query_command.execute(query_string, limit)
 
-        mock_repository_query.assert_called_once_with(query_string)
+        mock_repository_query.assert_called_once_with(query_string, limit)
         mock_print.assert_called_once_with(
             Color.red(f"{Path.cwd()} is not an insight repository")
         )
@@ -112,13 +114,27 @@ class TestQueryCommand(unittest.TestCase):
         Color.init()
         query_command = QueryCommand()
         query_string = "sample_query_string"
+        limit = 1
 
         mock_repository_query.side_effect = ConnectionError("error message")
 
         with self.assertRaises(ConnectionError):
-            query_command.execute(query_string)
+            query_command.execute(query_string, limit)
 
-        mock_repository_query.assert_called_once_with(query_string)
+        mock_repository_query.assert_called_once_with(query_string, limit)
+
+    @patch("builtins.print")
+    def test_execute_with_invalid_limit(self, mock_print) -> None:
+        Color.init()
+        query_command = QueryCommand()
+        query_string = "sample_query_string"
+        limit = 0
+        
+        query_command.execute(query_string, limit)
+
+        mock_print.assert_called_once_with(
+            Color.red("Limit must be a positive integer")
+        )
 
 
 if __name__ == "__main__":

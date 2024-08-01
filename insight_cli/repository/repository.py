@@ -94,9 +94,9 @@ class Repository:
 
         self._is_valid = False
 
-    def query(self, query_string: str) -> list[dict]:
+    def query(self, query_string: str, limit: int) -> list[dict]:
         self._raise_for_invalid_repository()
 
         self.reinitialize()
 
-        return QueryRepositoryAPI.make_request(self._id, query_string)
+        return QueryRepositoryAPI.make_request(self._id, query_string, limit)
