@@ -46,7 +46,6 @@ $ insight --uninitialize
 
 The .insightignore file contains regex patterns that specify directory and file paths to ignore in an insight repository.
 
-
 <ul>
     <li>Each line will be considered as a single regex pattern.</li>
     <li>Empty lines are not matchable, they serve only as separators for readability.</li>
@@ -88,7 +87,7 @@ $ pip install insight-cli
 Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/ChenGrant/instapix-word2vec.
 
 ```bash
-$ git https://github.com/ChenGrant/instapix-word2vec
+$ git clone https://github.com/ChenGrant/instapix-word2vec
 $ cd instapix-word2vec
 ```
 
@@ -102,7 +101,7 @@ Initialized insight repository in /path/to/current/directory/instapix-word2vec
 Create a .insightignore file in the current directory and specify that insight should ignore the proto directory.
 
 ```bash
-$ echo "## _directory_ \n ^proto$" > .insightignore
+$ echo -e "## _directory_\n^proto$" > .insightignore
 ```
 
 Search in the current insight repository (excluding the proto directory) for the "function that loads the word2vec model".
