@@ -76,72 +76,48 @@ class TestQueryCommand(unittest.TestCase):
 
     @patch("insight_cli.commands.QueryCommand._print_matches")
     @patch("insight_cli.repository.Repository.query")
-    @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     def test_execute_with_valid_repository(
-        self,
-        mock_validate_repository_id_api_make_request,
-        mock_repository_query,
-        mock_print_matches,
+        self, mock_repository_query, mock_print_matches
     ) -> None:
         query_command = QueryCommand()
         query_string = "sample_query_string"
-
-        mock_validate_repository_id_api_make_request.return_value = {
-            "repository_id_is_valid": True
-        }
 
         mock_repository_query.return_value = []
 
         query_command.execute(query_string)
 
-        mock_validate_repository_id_api_make_request.assert_called_once()
         mock_repository_query.assert_called_once_with(query_string)
         mock_print_matches.assert_called_once()
 
     @patch("builtins.print")
     @patch("insight_cli.repository.Repository.query")
-    @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
     def test_execute_with_invalid_repository(
-        self,
-        mock_validate_repository_id_api_make_request,
-        mock_repository_query,
-        mock_print,
+        self, mock_repository_query, mock_print
     ) -> None:
         Color.init()
         query_command = QueryCommand()
         query_string = "sample_query_string"
 
-        mock_validate_repository_id_api_make_request.return_value = {
-            "repository_id_is_valid": True
-        }
         mock_repository_query.side_effect = InvalidRepositoryError(Path.cwd())
 
         query_command.execute(query_string)
 
-        mock_validate_repository_id_api_make_request.assert_called_once()
         mock_repository_query.assert_called_once_with(query_string)
         mock_print.assert_called_once_with(
             Color.red(f"{Path.cwd()} is not an insight repository")
         )
 
     @patch("insight_cli.repository.Repository.query")
-    @patch("insight_cli.api.ValidateRepositoryIdAPI.make_request")
-    def test_execute_with_connection_error(
-        self, mock_validate_repository_id_api_make_request, mock_repository_query
-    ) -> None:
+    def test_execute_with_connection_error(self, mock_repository_query) -> None:
         Color.init()
         query_command = QueryCommand()
         query_string = "sample_query_string"
 
-        mock_validate_repository_id_api_make_request.return_value = {
-            "repository_id_is_valid": True
-        }
         mock_repository_query.side_effect = ConnectionError("error message")
 
         with self.assertRaises(ConnectionError):
             query_command.execute(query_string)
 
-        mock_validate_repository_id_api_make_request.assert_called_once()
         mock_repository_query.assert_called_once_with(query_string)
 
 
