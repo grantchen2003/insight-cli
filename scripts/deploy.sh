@@ -27,3 +27,6 @@ if [ -n "$whl_file" ]; then
 else
     echo "No .whl file found in the dist directory."
 fi
+
+export $(grep -v '^#' .env | xargs)
+twine upload dist/* --username __token__ --password $PYPI_API_TOKEN --verbose
