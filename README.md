@@ -120,8 +120,8 @@ $ insight --query "function that loads the word2vec model"
 
 ## Contributing
 
-Interested in contributing? Please read the [Contribution Guidelines](./CONTRIBUTING.md) to get started.
+Interested in contributing? Please read the [Contribution Guidelines](https://github.com/grantchen2003/insight-cli/blob/main/CONTRIBUTING.md) to get started.
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE).
+This project is licensed under the [MIT License](https://github.com/grantchen2003/insight-cli/blob/main/LICENSE).
