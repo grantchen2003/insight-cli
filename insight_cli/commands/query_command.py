@@ -39,7 +39,7 @@ class QueryCommand(Command):
     def __init__(self):
         super().__init__(
             flags=["-q", "--query"],
-            description="shows files in the current insight repository that satisfy the given natural language query",
+            description="shows the top code snippets in the current insight repository that satisfy the given natural language query",
         )
 
     def execute(self, query_string: str, limit: int) -> None:

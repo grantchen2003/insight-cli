@@ -28,12 +28,18 @@ To initialize the current directory as an insight repository, run the following 
 $ insight --initialize
 ```
 
-The following commands must be ran in a directory that has been initialized as an insight repository.
-
-To display the Python files (.py files) and lines in an insight repository (excluding the files and directories specified in the .insightignore file) that semantically match a given natural language query, run the following command:
+To display the insight repository status of the current directory, run the following command:
 
 ```bash
-$ insight --query "<query>"
+$ insight --status
+```
+
+The following commands must be ran in a directory that has been initialized as an insight repository.
+
+To display the top code snippets in an insight repository (excluding the files and directories specified in the .insightignore file) that semantically match a given natural language query and limit the number of results, run the following command:
+
+```bash
+$ insight --query "<query>" <limit>
 ```
 
 To uninitialize an insight repository, run the following command:
@@ -116,24 +122,27 @@ Search in the current insight repository (excluding the proto directory) for the
 $ insight --query "function that loads the word2vec model" 3
 3 matches found in the following files:
 src\word2vec_service.py
-        Line 5: from sklearn.metrics.pairwise import cosine_similarity
+Line 5:
+from sklearn.metrics.pairwise import cosine_similarity
 
 src\word2vec_service.py
-        Line 13 - 21: def load_model():
+Line 13 - 21:
+def load_model():
     print("loading model")
     start_time = time.process_time()
     model = KeyedVectors.load_word2vec_format(
-        os.environ["MODEL_PATH"], binary=True, limit=None      
+        os.environ["MODEL_PATH"], binary=True, limit=None
     )
     end_time = time.process_time()
     print(f"loaded model in {round(end_time - start_time, 1)} seconds")
     return model
 
 src\word2vec_service.py
-        Line 24 - 49: class Word2Vec(word2vec_pb2_grpc.Word2VecServiceServicer):
+Line 24 - 49:
+class Word2Vec(word2vec_pb2_grpc.Word2VecServiceServicer):
     def __init__(self):
         self.model = load_model()
-        self.vocabulary = set(self.model.key_to_index.keys())  
+        self.vocabulary = set(self.model.key_to_index.keys())
 
     def EmbedWords(self, request, context):
         print("EmbedWords request received")
@@ -143,14 +152,14 @@ src\word2vec_service.py
             for word in words
             if word in self.vocabulary
         ]
-        return word2vec_pb2.EmbedWordsResponse(embeddings=embeddings)
+        return word2vec_pb2.EmbedWordsResponse(embeddings=embeddings)  
 
     def Similarity(self, request, context):
         print("Similarity request received")
         embeddings1 = np.array([element.embedding for element in request.embeddings1])
         embeddings2 = np.array([element.embedding for element in request.embeddings2])
-        if len(embeddings1) == 0 or len(embeddings2) == 0:     
-            return word2vec_pb2.SimilarityResponse(similarity=0)
+        if len(embeddings1) == 0 or len(embeddings2) == 0:
+            return word2vec_pb2.SimilarityResponse(similarity=0)       
         avg_embedding1 = np.mean(embeddings1, axis=0)
         avg_embedding2 = np.mean(embeddings2, axis=0)
         return word2vec_pb2.SimilarityResponse(
