@@ -84,18 +84,17 @@ Install the insight-cli.
 $ pip install insight-cli
 ```
 
-Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/ChenGrant/instapix-word2vec.
+Verify the installation was successful by checking the version.
 
 ```bash
-$ git clone https://github.com/ChenGrant/instapix-word2vec
-$ cd instapix-word2vec
+$ insight --version
 ```
 
-Initialize the current directory as an insight repository. This will create a .insight directory inside the current directory.
+Change the current working directory to the desired codebase. This example will use the following GitHub repository: https://github.com/grantchen2003/instapix-word2vec.
 
 ```bash
-$ insight --initialize
-Initialized insight repository in /path/to/current/directory/instapix-word2vec
+$ git clone https://github.com/grantchen2003/instapix-word2vec
+$ cd instapix-word2vec
 ```
 
 Create a .insightignore file in the current directory and specify that insight should ignore the proto directory.
@@ -104,17 +103,59 @@ Create a .insightignore file in the current directory and specify that insight s
 $ echo -e "## _directory_\n^proto$" > .insightignore
 ```
 
-Search in the current insight repository (excluding the proto directory) for the "function that loads the word2vec model".
+Initialize the current directory as an insight repository. This will create a .insight directory inside the current directory.
 
 ```bash
-$ insight --query "function that loads the word2vec model"
-2 matches found in the following files:
-/src/word2vec_service.py
-    Line 13 - 21: def load_model(): ... return model;
+$ insight --initialize
+Initialized insight repository in \path\to\current\directory\instapix-word2vec
+```
 
-/src/word2vec_service.py
-    Line 26: self.model = load_model();
+Search in the current insight repository (excluding the proto directory) for the top 3 code snippets that match the query of "function that loads the word2vec model".
 
+```bash
+$ insight --query "function that loads the word2vec model" 3
+3 matches found in the following files:
+src\word2vec_service.py
+        Line 5: from sklearn.metrics.pairwise import cosine_similarity
+
+src\word2vec_service.py
+        Line 13 - 21: def load_model():
+    print("loading model")
+    start_time = time.process_time()
+    model = KeyedVectors.load_word2vec_format(
+        os.environ["MODEL_PATH"], binary=True, limit=None      
+    )
+    end_time = time.process_time()
+    print(f"loaded model in {round(end_time - start_time, 1)} seconds")
+    return model
+
+src\word2vec_service.py
+        Line 24 - 49: class Word2Vec(word2vec_pb2_grpc.Word2VecServiceServicer):
+    def __init__(self):
+        self.model = load_model()
+        self.vocabulary = set(self.model.key_to_index.keys())  
+
+    def EmbedWords(self, request, context):
+        print("EmbedWords request received")
+        words = request.words
+        embeddings = [
+            word2vec_pb2.Embedding(embedding=self.model.get_vector(word).tolist())
+            for word in words
+            if word in self.vocabulary
+        ]
+        return word2vec_pb2.EmbedWordsResponse(embeddings=embeddings)
+
+    def Similarity(self, request, context):
+        print("Similarity request received")
+        embeddings1 = np.array([element.embedding for element in request.embeddings1])
+        embeddings2 = np.array([element.embedding for element in request.embeddings2])
+        if len(embeddings1) == 0 or len(embeddings2) == 0:     
+            return word2vec_pb2.SimilarityResponse(similarity=0)
+        avg_embedding1 = np.mean(embeddings1, axis=0)
+        avg_embedding2 = np.mean(embeddings2, axis=0)
+        return word2vec_pb2.SimilarityResponse(
+            similarity=cosine_similarity([avg_embedding1], [avg_embedding2])[0][0]
+        )
 ```
 
 ## Contributing

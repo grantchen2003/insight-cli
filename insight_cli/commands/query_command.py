@@ -28,11 +28,11 @@ class QueryCommand(Command):
 
             if match["start_line"] == match["end_line"]:
                 terminal_output += (
-                    f"\tLine {match['start_line']}: {Color.green(match['content'])}"
+                    f"Line {match['start_line']}:\n{Color.green(match['content'])}"
                 )
 
             else:
-                terminal_output += f"\tLine {match['start_line']} - {match['end_line']}: {Color.green(match['content'])}"
+                terminal_output += f"Line {match['start_line']} - {match['end_line']}:\n{Color.green(match['content'])}"
 
             print(terminal_output)
 

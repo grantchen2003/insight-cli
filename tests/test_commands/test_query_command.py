@@ -38,7 +38,8 @@ class TestQueryCommand(unittest.TestCase):
             [
                 Color.yellow("1 match found in the following file:"),
                 "/example_path",
-                f"\tLine 3 - 4: {Color.green('const x = () => {...};')}",
+                "Line 3 - 4:",
+                Color.green('const x = () => {...};'),
             ],
         )
 
@@ -67,10 +68,12 @@ class TestQueryCommand(unittest.TestCase):
             [
                 Color.yellow("2 matches found in the following files:"),
                 "/server/insight_cli/config/database.js",
-                f"\tLine 3 - 15: {Color.green('const connectToDatabase = async () => {...};')}",
+                "Line 3 - 15:",
+                Color.green('const connectToDatabase = async () => {...};'),
                 "",
                 "/server/insight_cli/server.js",
-                f"\tLine 25: {Color.green('await connectToDatabase(app);')}",
+                "Line 25:",
+                Color.green('await connectToDatabase(app);'),
             ],
         )
 
