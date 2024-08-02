@@ -119,11 +119,7 @@ Initialized insight repository in \path\to\current\directory\instapix-word2vec
 Search in the current insight repository (excluding the proto directory) for the top 3 code snippets that match the query of "function that loads the word2vec model".
 
 ```bash
-$ insight --query "function that loads the word2vec model" 3
-src\word2vec_service.py
-Line 5:
-from sklearn.metrics.pairwise import cosine_similarity
-
+$ insight --query "function that loads the word2vec model" 2
 src\word2vec_service.py
 Line 13 - 21:
 def load_model():
