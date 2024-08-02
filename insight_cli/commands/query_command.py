@@ -8,17 +8,6 @@ from insight_cli.utils import Color
 class QueryCommand(Command):
     @staticmethod
     def _print_matches(matches) -> None:
-        num_matches = len(matches)
-
-        if num_matches == 0:
-            print(Color.yellow(f"{num_matches} matches found"))
-
-        elif num_matches == 1:
-            print(Color.yellow(f"{num_matches} match found in the following file:"))
-
-        else:
-            print(Color.yellow(f"{num_matches} matches found in the following files:"))
-
         for i, match in enumerate(matches):
             is_first_match = i == 0
 

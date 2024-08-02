@@ -8,16 +8,6 @@ from insight_cli.utils import Color
 
 
 class TestQueryCommand(unittest.TestCase):
-    def test_print_matches_with_no_matches(self) -> None:
-        Color.init()
-        matches = []
-
-        with io.StringIO() as buffer, contextlib.redirect_stdout(buffer):
-            QueryCommand._print_matches(matches)
-            output = buffer.getvalue().strip().split("\n")
-
-        self.assertEqual(output, [Color.yellow("0 matches found")])
-
     def test_print_matches_with_one_match(self) -> None:
         Color.init()
         matches = [
@@ -36,7 +26,6 @@ class TestQueryCommand(unittest.TestCase):
         self.assertEqual(
             output,
             [
-                Color.yellow("1 match found in the following file:"),
                 "/example_path",
                 "Line 3 - 4:",
                 Color.green('const x = () => {...};'),
@@ -66,7 +55,6 @@ class TestQueryCommand(unittest.TestCase):
         self.assertEqual(
             output,
             [
-                Color.yellow("2 matches found in the following files:"),
                 "/server/insight_cli/config/database.js",
                 "Line 3 - 15:",
                 Color.green('const connectToDatabase = async () => {...};'),
