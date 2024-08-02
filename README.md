@@ -120,7 +120,6 @@ Search in the current insight repository (excluding the proto directory) for the
 
 ```bash
 $ insight --query "function that loads the word2vec model" 3
-3 matches found in the following files:
 src\word2vec_service.py
 Line 5:
 from sklearn.metrics.pairwise import cosine_similarity
