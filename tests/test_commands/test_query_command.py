@@ -26,7 +26,7 @@ class TestQueryCommand(unittest.TestCase):
         self.assertEqual(
             output,
             [
-                "/example_path",
+                str(Path("").resolve() / "/example_path"),
                 "Line 3 - 4:",
                 Color.green('const x = () => {...};'),
             ],
@@ -55,11 +55,11 @@ class TestQueryCommand(unittest.TestCase):
         self.assertEqual(
             output,
             [
-                "/server/insight_cli/config/database.js",
+                str(Path("").resolve() / "/server/insight_cli/config/database.js"),
                 "Line 3 - 15:",
                 Color.green('const connectToDatabase = async () => {...};'),
                 "",
-                "/server/insight_cli/server.js",
+                str(Path("").resolve() / "/server/insight_cli/server.js"),
                 "Line 25:",
                 Color.green('await connectToDatabase(app);'),
             ],

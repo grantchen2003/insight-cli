@@ -13,7 +13,7 @@ class QueryCommand(Command):
 
             terminal_output = "" if is_first_match else "\n"
 
-            terminal_output += f"{match['path']}\n"
+            terminal_output += f"{Path("").resolve() / match['path']}\n"
 
             if match["start_line"] == match["end_line"]:
                 terminal_output += (
