@@ -77,6 +77,9 @@ class InitializeRepositoryAPI(API):
     def make_request(
         cls, repository_id: str, repository_files: dict[str, bytes]
     ) -> None:
+        if not repository_files:
+            return
+        
         repository_files_batches = cls._batch_repository_files(repository_files)
         request_batches = cls._add_metadata_to_batches(
             repository_id, repository_files_batches
