@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import copy, requests
 
 from insight_cli.utils import FileChunkifier, ChunkedFileEncoder
@@ -26,7 +26,7 @@ class ReinitializeRepositoryAPI(API):
     @staticmethod
     def _batch_repository_file_changes(
         repository_file_changes: dict[str, list[tuple[str, bytes]]],
-        max_batch_size_bytes: int = 10 * 1024**2,
+        max_batch_size_bytes: int = 3 * 1024**2,
     ) -> list[dict]:
         batched_repository_file_changes = []
         empty_batch = {"files": {}, "changes": {}, "size_bytes": 0}
@@ -98,4 +98,9 @@ class ReinitializeRepositoryAPI(API):
         )
 
         with ThreadPoolExecutor(max_workers=len(request_batches)) as executor:
-            executor.map(cls._make_batch_request, request_batches)
+            futures = {
+                executor.submit(cls._make_batch_request, batch): batch
+                for batch in request_batches
+            }
+            for future in as_completed(futures):
+                future.result()
