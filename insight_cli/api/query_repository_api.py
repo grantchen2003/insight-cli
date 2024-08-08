@@ -6,7 +6,7 @@ from insight_cli import config
 
 class QueryRepositoryAPI(API):
     @staticmethod
-    def make_request(repository_id: str, query_string: str, limit: int) -> list[dict]:
+    def make_request(repository_id: str, query_string: str, limit: int) -> list[dict] | None:
         response = requests.get(
             url=f"{config.INSIGHT_API_BASE_URL}/query_repository",
             json={

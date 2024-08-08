@@ -8,6 +8,11 @@ from insight_cli.utils import Color
 class QueryCommand(Command):
     @staticmethod
     def _print_matches(matches) -> None:
+        if matches is None:
+            print(Color.red("No matches found"))
+            
+            return
+            
         for i, match in enumerate(matches):
             is_first_match = i == 0
 
