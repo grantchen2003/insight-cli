@@ -22,6 +22,7 @@ class Manager:
     def create(
         self, repository_id: str, nested_repository_file_paths: list[Path]
     ) -> None:
+        self.delete()
         os.makedirs(self._path, exist_ok=True)
         self._authenticator.create({"repository_id": repository_id})
         self._file_tracker.create(nested_repository_file_paths)
@@ -36,7 +37,8 @@ class Manager:
         )
 
     def delete(self) -> None:
-        shutil.rmtree(self._path)
+        if os.path.exists(self._path):
+            shutil.rmtree(self._path)
 
     @property
     def is_valid(self) -> bool:
