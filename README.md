@@ -1,5 +1,8 @@
 ## insight-cli
 
+[![Stable Version](https://img.shields.io/pypi/v/insight-cli?color=blue)](https://pypi.org/project/insight-cli/)
+[![Downloads](https://img.shields.io/pypi/dm/insight-cli)](https://pypistats.org/packages/insight-cli)
+
 ## Overview
 
 insight is a search engine that enables developers to semantically search Python codebases using natural language queries. The insight-cli provides a CLI for developers to use insight.
