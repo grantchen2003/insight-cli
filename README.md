@@ -1,7 +1,7 @@
 ## insight-cli
 
 [![Stable Version](https://img.shields.io/pypi/v/insight-cli?color=blue)](https://pypi.org/project/insight-cli/)
-[![Downloads](https://img.shields.io/pypi/dm/insight-cli)](https://pypistats.org/packages/insight-cli)
+[![Downloads](https://static.pepy.tech/badge/insight-cli)](https://pepy.tech/project/insight-cli)
 
 ## Overview
 
