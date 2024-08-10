@@ -10,8 +10,7 @@ class Manager:
     _DIR_NAME = ".insight"
 
     @classmethod
-    @property
-    def name(cls) -> str:
+    def get_dir_name(cls) -> str:
         return cls._DIR_NAME
 
     def __init__(self, parent_dir_path: Path):
@@ -23,9 +22,9 @@ class Manager:
         self, repository_id: str, nested_repository_file_paths: list[Path]
     ) -> None:
         self.delete()
-        os.makedirs(self._path, exist_ok=True)
-        self._authenticator.create({"repository_id": repository_id})
-        self._file_tracker.create(nested_repository_file_paths)
+        os.makedirs(self._path)
+        self._authenticator.create_file({"repository_id": repository_id})
+        self._file_tracker.create_file(nested_repository_file_paths)
 
     def update(
         self, repository_file_changes: dict[str, list[tuple[str, bytes]]]
@@ -37,8 +36,12 @@ class Manager:
         )
 
     def delete(self) -> None:
-        if os.path.exists(self._path):
-            shutil.rmtree(self._path)
+        if not os.path.isdir(self._path):
+            return
+        
+        shutil.rmtree(self._path)
+        self._authenticator = Authenticator(self._path)
+        self._file_tracker = FileTracker(self._path)
 
     @property
     def is_valid(self) -> bool:

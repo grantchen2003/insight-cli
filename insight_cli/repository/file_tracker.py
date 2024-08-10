@@ -9,8 +9,16 @@ class FileTracker:
     def __init__(self, parent_dir_file_path: Path):
         self._file_path: Path = parent_dir_file_path / FileTracker._FILE_NAME
         self._data: dict[str, float] = self._read_from_file()
+        
+    def _raise_if_file_exists(self) -> None:
+        if self._file_path.is_file():
+            raise FileExistsError(f"file at {self._file_path} already exists")
+        
+    def _raise_if_file_missing(self) -> None:
+        if not self._file_path.is_file():
+            raise FileExistsError(f"file at {self._file_path} does not exist")
 
-    def _write_to_file(self) -> None:
+    def _write_data_to_file(self) -> None:
         with open(self._file_path, "w") as file:
             file.write(json.dumps(self._data, indent=4))
 
@@ -21,7 +29,7 @@ class FileTracker:
         with open(self._file_path, "r") as file:
             return json.load(file)
 
-    def _add(self, file_paths: list[Path]) -> None:
+    def _add_file_paths_to_data(self, file_paths: list[Path]) -> None:
         for file_path in file_paths:
             if not file_path.is_file():
                 raise FileNotFoundError(f"cannot find file at {file_path}")
@@ -33,7 +41,7 @@ class FileTracker:
 
             self._data[str(file_path)] = os.path.getmtime(file_path)
 
-    def _update(self, file_paths: list[Path]) -> None:
+    def _update_file_paths_in_data(self, file_paths: list[Path]) -> None:
         for file_path in file_paths:
             if not file_path.is_file():
                 raise FileNotFoundError(f"cannot find file at {file_path}")
@@ -45,7 +53,7 @@ class FileTracker:
 
             self._data[str(file_path)] = os.path.getmtime(file_path)
 
-    def _delete(self, file_paths: list[Path]) -> None:
+    def _delete_file_paths_from_data(self, file_paths: list[Path]) -> None:
         for file_path in file_paths:
             if str(file_path) not in self._data:
                 raise ValueError(
@@ -54,9 +62,10 @@ class FileTracker:
 
             del self._data[str(file_path)]
 
-    def create(self, file_paths: list[Path]) -> None:
-        self._add(file_paths)
-        self._write_to_file()
+    def create_file(self, file_paths: list[Path]) -> None:
+        self._raise_if_file_exists()
+        self._add_file_paths_to_data(file_paths)
+        self._write_data_to_file()
 
     def change_file_paths(
         self,
@@ -64,10 +73,11 @@ class FileTracker:
         paths_to_update: list[Path],
         paths_to_delete: list[Path],
     ) -> None:
-        self._add(paths_to_add)
-        self._update(paths_to_update)
-        self._delete(paths_to_delete)
-        self._write_to_file()
+        self._raise_if_file_missing()
+        self._add_file_paths_to_data(paths_to_add)
+        self._update_file_paths_in_data(paths_to_update)
+        self._delete_file_paths_from_data(paths_to_delete)
+        self._write_data_to_file()
 
     @property
     def tracked_file_modified_times(self) -> dict[Path, datetime]:

@@ -17,7 +17,7 @@ class PatternIgnorer:
     @property
     def regex_patterns(self) -> dict[str, set]:
         scope_to_regex_patterns = {
-            "directory": {re.compile(re.escape(Manager.name)).pattern},
+            "directory": {re.compile(re.escape(Manager.get_dir_name())).pattern},
             "file": {re.compile(re.escape(PatternIgnorer._FILE_NAME)).pattern},
         }
 

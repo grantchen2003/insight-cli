@@ -26,7 +26,7 @@ class Authenticator:
     def __init__(self, parent_dir_path: Path):
         self._path = parent_dir_path / Authenticator._FILE_NAME
 
-    def create(self, data: AuthenticatorData) -> None:
+    def create_file(self, data: AuthenticatorData) -> None:
         if not Authenticator._is_authenticator_data_instance(data):
             raise ValueError(f"{data} is not valid authenticator data.")
 
