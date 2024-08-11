@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .base.command import Command
-from insight_cli.repository import Repository, InvalidRepositoryError
+from insight_cli.repository import Repository, FileSizeExceededError, InvalidRepositoryError
 from insight_cli.utils import Color
 
 
@@ -45,6 +45,9 @@ class QueryCommand(Command):
             repository = Repository(Path(""))
             matches = repository.query(query_string, limit)
             self._print_matches(matches)
+            
+        except FileSizeExceededError as e:
+            print(Color.red(e))
 
         except InvalidRepositoryError as e:
             print(Color.red(e))

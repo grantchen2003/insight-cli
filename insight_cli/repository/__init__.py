@@ -1,1 +1,1 @@
-from .repository import Repository, InvalidRepositoryError
+from .repository import Repository, FileSizeExceededError, InvalidRepositoryError

@@ -24,7 +24,7 @@ class Directory:
             _, file_extension = os.path.splitext(entry_path)
             if file_extension not in self._allowed_file_extensions:
                 return True
-            
+
         return StringMatcher.matches_any_regex_pattern(
             str(entry_path), self._ignorable_regex_patterns[pattern_scope]
         )
@@ -70,3 +70,7 @@ class Directory:
                 lambda file: (file.path, file.content), self._files
             )
             return {str(path): content for path, content in path_content_pairs}
+
+    @property
+    def largest_file_by_size(self) -> File:
+        return max(self._files, key=lambda file: os.path.getsize(file.path))

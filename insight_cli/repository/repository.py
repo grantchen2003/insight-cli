@@ -7,7 +7,7 @@ from insight_cli.api import (
     ReinitializeRepositoryAPI,
     UninitializeRepositoryAPI,
 )
-from insight_cli.utils import Directory, FileChangesDetector
+from insight_cli.utils import Directory, File, FileChangesDetector
 from .manager import Manager
 from .pattern_ignorer import PatternIgnorer
 
@@ -18,9 +18,19 @@ class InvalidRepositoryError(Exception):
         super().__init__(self.message)
 
 
+class FileSizeExceededError(Exception):
+    def __init__(self, file: File, max_allowed_file_size_bytes: int):
+        def bytes_to_mb(size_bytes):
+            return size_bytes / (1024 * 1024)
+
+        self.message = f"{file.path} has a size of {bytes_to_mb(file.size_bytes):.2f}MB which exceeds the max allowed file size of {bytes_to_mb(max_allowed_file_size_bytes):.2f}MB"
+        super().__init__(self.message)
+
+
 class Repository:
     def __init__(self, path: Path):
-        self._allowed_file_extensions = {".py"}
+        self._ALLOWED_FILE_EXTENSIONS = {".py"}
+        self._MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 10MB
         self._path = path
         self._manager = Manager(path)
         self._pattern_ignorer = PatternIgnorer(path)
@@ -42,12 +52,18 @@ class Repository:
         if not self.is_valid:
             raise InvalidRepositoryError(self._path)
 
+    def _raise_for_file_size_exceeded(self, file: File) -> None:
+        if file.size_bytes > self._MAX_FILE_SIZE_BYTES:
+            raise FileSizeExceededError(file, self._MAX_FILE_SIZE_BYTES)
+
     def initialize(self) -> None:
         repository_dir: Directory = Directory(
             path=self._path,
             ignorable_regex_patterns=self._pattern_ignorer.regex_patterns,
-            allowed_file_extensions=self._allowed_file_extensions,
+            allowed_file_extensions=self._ALLOWED_FILE_EXTENSIONS,
         )
+        
+        self._raise_for_file_size_exceeded(repository_dir.largest_file_by_size)
 
         response_data = CreateRepositoryAPI.make_request()
 
@@ -65,8 +81,10 @@ class Repository:
         repository_dir: Directory = Directory(
             path=self._path,
             ignorable_regex_patterns=self._pattern_ignorer.regex_patterns,
-            allowed_file_extensions=self._allowed_file_extensions,
+            allowed_file_extensions=self._ALLOWED_FILE_EXTENSIONS,
         )
+        
+        self._raise_for_file_size_exceeded(repository_dir.largest_file_by_size)
 
         file_changes_detector = FileChangesDetector(
             previous_file_modified_times=self._manager.tracked_file_modified_times,

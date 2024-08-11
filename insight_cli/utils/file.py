@@ -1,5 +1,5 @@
 from pathlib import Path
-import functools
+import functools, os
 
 
 class File:
@@ -22,6 +22,10 @@ class File:
     @property
     def path(self) -> Path:
         return self._path
+
+    @property
+    def size_bytes(self) -> int:
+        return os.path.getsize(self._path)
 
     @property
     @functools.lru_cache(maxsize=None)
