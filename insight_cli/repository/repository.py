@@ -52,8 +52,8 @@ class Repository:
         if not self.is_valid:
             raise InvalidRepositoryError(self._path)
 
-    def _raise_for_file_size_exceeded(self, file: File) -> None:
-        if file.size_bytes > self._MAX_FILE_SIZE_BYTES:
+    def _raise_for_file_size_exceeded(self, file: File | None) -> None:
+        if file is not None and file.size_bytes > self._MAX_FILE_SIZE_BYTES:
             raise FileSizeExceededError(file, self._MAX_FILE_SIZE_BYTES)
 
     def initialize(self) -> None:
@@ -62,7 +62,7 @@ class Repository:
             ignorable_regex_patterns=self._pattern_ignorer.regex_patterns,
             allowed_file_extensions=self._ALLOWED_FILE_EXTENSIONS,
         )
-        
+
         self._raise_for_file_size_exceeded(repository_dir.largest_file_by_size)
 
         response_data = CreateRepositoryAPI.make_request()
@@ -83,7 +83,7 @@ class Repository:
             ignorable_regex_patterns=self._pattern_ignorer.regex_patterns,
             allowed_file_extensions=self._ALLOWED_FILE_EXTENSIONS,
         )
-        
+
         self._raise_for_file_size_exceeded(repository_dir.largest_file_by_size)
 
         file_changes_detector = FileChangesDetector(

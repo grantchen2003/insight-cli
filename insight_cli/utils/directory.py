@@ -72,5 +72,12 @@ class Directory:
             return {str(path): content for path, content in path_content_pairs}
 
     @property
-    def largest_file_by_size(self) -> File:
+    def is_empty(self) -> bool:
+        return len(self._files) == 0
+    
+    @property
+    def largest_file_by_size(self) -> File | None:
+        if self.is_empty:
+            return None
+        
         return max(self._files, key=lambda file: os.path.getsize(file.path))
