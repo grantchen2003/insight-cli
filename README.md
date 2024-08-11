@@ -123,7 +123,7 @@ Search in the current insight repository (excluding the proto directory) for the
 
 ```bash
 $ insight --query "function that loads the word2vec model" 2
-src\word2vec_service.py
+\path\to\current\directory\instapix-word2vec\src\word2vec_service.py
 Line 13 - 21:
 def load_model():
     print("loading model")
@@ -135,7 +135,7 @@ def load_model():
     print(f"loaded model in {round(end_time - start_time, 1)} seconds")
     return model
 
-src\word2vec_service.py
+\path\to\current\directory\instapix-word2vec\src\word2vec_service.py
 Line 24 - 49:
 class Word2Vec(word2vec_pb2_grpc.Word2VecServiceServicer):
     def __init__(self):
