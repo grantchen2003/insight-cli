@@ -1,4 +1,5 @@
 from pathlib import Path
+import requests
 
 from .base.command import Command
 from insight_cli.repository import (
@@ -37,3 +38,9 @@ class InitializeCommand(Command):
 
         except InvalidRepositoryError as e:
             print(Color.red(e))
+
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 500:
+                print(Color.red("Internal server error. Try again later."))
+            else:
+                raise

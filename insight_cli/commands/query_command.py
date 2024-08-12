@@ -1,4 +1,5 @@
 from pathlib import Path
+import requests
 
 from .base.command import Command
 from insight_cli.repository import Repository, FileSizeExceededError, InvalidRepositoryError
@@ -51,3 +52,9 @@ class QueryCommand(Command):
 
         except InvalidRepositoryError as e:
             print(Color.red(e))
+        
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 500:
+                print(Color.red("Internal server error. Try again later or try uninitializing then initializing the current directory as an insight repository."))
+            else:
+                raise
