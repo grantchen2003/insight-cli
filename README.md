@@ -119,7 +119,7 @@ $ insight --initialize
 Initialized insight repository in \path\to\current\directory\instapix-word2vec
 ```
 
-Search in the current insight repository (excluding the proto directory) for the top 3 code snippets that match the query of "function that loads the word2vec model".
+Search in the current insight repository (excluding the proto directory) for the top 2 code snippets that match the query of "function that loads the word2vec model".
 
 ```bash
 $ insight --query "function that loads the word2vec model" 2
